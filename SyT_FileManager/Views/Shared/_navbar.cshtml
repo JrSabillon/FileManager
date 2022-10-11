@@ -1,5 +1,8 @@
 ﻿@model List<SyT_FileManager.Models.PrivilegioModel>
 @using SyT_FileManager.AppCode;
+@{ 
+    string[] dropdownDividers = new string [] { "MODIII_ARMC", "MODIII_ENVARCINA", "MODIII_RCBD", "MODIV_ARMC", "MODIV_TRIT", "MODIV_RCBD" };
+}
 
 <div class="navbar navbar-expand-lg navbar-dark bg-enterprise shadow-sm">
     @Html.ActionLink("Inicio", "Index", "Home", null, new { @class = "navbar-brand" })
@@ -8,7 +11,7 @@
     </button>
     <div class="collapse navbar-collapse" id="navbar-menu">
         <ul class="navbar-nav mr-auto">
-            @foreach (var item in Model.Where(x => x.PrivNivelOrden.Equals("0")))
+            @foreach (var item in Model.Where(x => x.PrivNivelOrden.Equals("0")).OrderBy(x => x.PrivPosicion))
             {
                 var childs = Model.Where(x => x.PrivId.StartsWith(item.PrivId + "_") && !x.PrivId.Equals(item.PrivId) && x.PrivNivelOrden.Equals("1"))
                     .OrderBy(x => x.PrivPosicion).ToList();
@@ -23,6 +26,10 @@
                             @foreach (var child in childs)
                             {
                                 @Html.ActionLink(child.PrivNombre, HttpUtility.UrlDecode(child.PrivAction), child.PrivController, null, new { @class = "dropdown-item" })
+                                if (dropdownDividers.Any(x => x.Equals(child.PrivId)))
+                                {
+                                    <div class="dropdown-divider"></div>
+                                }
                             }
                         </div>
                     </li>

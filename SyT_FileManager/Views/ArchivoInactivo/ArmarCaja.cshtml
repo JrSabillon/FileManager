@@ -1,0 +1,159 @@
+﻿@model SyT_FileManager.Models.DocumentoModel
+@{
+    ViewBag.Title = "Armar Cajas";
+}
+
+<h2><i class="fa fa-dropbox"></i> Armar Cajas</h2>
+<hr />
+
+<form onsubmit="addDocument(event); return false;" method="post" id="form-document">
+    @Html.Hidden("DocID")
+    <div class="row">
+        <div class="col-12 col-lg-4">
+            <div class="form-group">
+                @Html.Label("Almacen de archivos activos")
+                @Html.DropDownList("AlmacenID", null, new { @class = "form-control col-12", required = "required", id = "select-almacen", onchange = "$('#AlmacenID').val($(this).val())" })
+            </div>
+        </div>
+        <div class="col-12 col-sm-6 col-lg-4">
+            <div class="form-group">
+                @Html.Label("Agencia")
+                @Html.DropDownList("Agencias", null, new { @class = "form-control col-12", onchange = "GetZonaIDByAgenciaID();", Name = "DocAgenciaID" })
+            </div>
+        </div>
+        <div class="col-12 col-sm-6 col-lg-4">
+            <div class="form-group">
+                @Html.Label("Zona de agencia")
+                @Html.Hidden("ZonaID", null, new { Name = "DocZonaID" })
+                @Html.DropDownListFor(model => model.DocZonaID, new SelectList(Model.Zonas, "RecursoItemID", "RecursoItemNombre", ViewBag.ZonaID), new { @class = "form-control col-12", disabled = "disabled" })
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12 col-sm-6 col-lg-4">
+            <div class="form-group">
+                @Html.LabelFor(model => model.DocBancoID) *
+                @Html.DropDownListFor(model => model.DocBancoID, new SelectList(Model.Bancos, "BancoID", "BancoNombre"), "Seleccione una opción", new { @class = "form-control col-12", required = "required" })
+            </div>
+        </div>
+        <div class="col-12 col-sm-6 col-lg-4">
+            <div class="form-group">
+                @Html.LabelFor(model => model.DocCCCCID) *
+                <select name="DocCCCCID" id="DocCCCCID" class="form-control col-12" required>
+                    <option value="">Seleccione una opción</option>
+                    @foreach (var item in Model.CentrosDeCosto)
+                    {
+                        if (item.EstOrgaIDPadre == null)
+                        {
+                            <option disabled>@item.EstOrgaNombre</option>
+                        }
+                        else
+                        {
+                            <option value="@item.EstOrgaID">&nbsp;&nbsp; @item.EstOrgaNombre</option>
+                        }
+                    }
+                </select>
+            </div>
+        </div>
+        <div class="col-12 col-sm-6 col-lg-4">
+            <div class="form-group">
+                @Html.LabelFor(model => model.DocTipo) *
+                @Html.DropDownListFor(model => model.DocTipo, new SelectList(Model.TiposDocumentos, "TipoDocID", "TipoDocNombre"), "Seleccione una opción", new { @class = "form-control col-12", required = "required" })
+            </div>
+        </div>
+        <div class="col-12 col-sm-6 col-lg-4">
+            <div class="form-group">
+                @Html.LabelFor(model => model.DocFechaInfo)
+                @Html.TextBoxFor(model => model.DocFechaInfo, new { @class = "form-control col-12", type = "date", required = "required" })
+            </div>
+        </div>
+        <div class="col-12 col-sm-6 col-lg-4">
+            <div class="form-group">
+                @Html.LabelFor(model => model.DocDescripcion)
+                @Html.TextAreaFor(model => model.DocDescripcion, new { @class = "form-control col-12", rows = "3" })
+            </div>
+        </div>
+        <div class="col-12 col-sm-6 col-lg-4 align-self-center">
+            <div class="form-check">
+                @Html.CheckBoxFor(model => model.DocPaquete, new { @class = "form-check-input" })
+                @Html.LabelFor(model => model.DocPaquete, new { @class = "form-check-label" })
+            </div>
+        </div>
+        <div class="col-12 align-self-end">
+            <button class="btn btn-success mb-3"><i class="fa fa-plus"></i> Agregar</button>
+        </div>
+    </div>
+</form>
+
+<br />
+<h3><i class="fa fa-dropbox"></i> Documentos anexados</h3>
+<hr />
+
+@using (Html.BeginForm("Enviar", "ArchivoInactivo", FormMethod.Post))
+{
+    @Html.DropDownList("AlmacenID", null, new { @class = "form-control col-12 d-none", required = "required" })
+    <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
+        <table class="table table-striped">
+            <thead style="position: sticky; top: 0;">
+                <tr>
+                    <th>Documento</th>
+                    <th>Descripción</th>
+                    <th>Fecha de registro</th>
+                    <th>Banco</th>
+                    <th>Centro de costo</th>
+                    <th>Agencia</th>
+                    <th>Zona</th>
+                    <th>Es paquete</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody id="table-document-body">
+            </tbody>
+        </table>
+    </div>
+    <br />
+    <button class="btn btn-success" disabled id="btn-send-box"><i class="fa fa-truck"></i> Enviar caja</button>
+}
+
+<script type="text/javascript">
+    var currentIndex = 0;
+
+    $(function () {
+        GetZonaIDByAgenciaID();
+    });
+
+    function addDocument(event) {
+        $('#DocID').val(currentIndex);
+        const data = new FormData(event.target);
+        var payload = Object.fromEntries(data.entries());
+        payload.DocPaquete = $('#DocPaquete').is(':checked');
+
+        $.post('@Url.Action("_DocumentGrid", "ArchivoInactivo")', payload, function (row) {
+            $('#table-document-body').append(row);
+            //$('#form-document').trigger('reset');
+            currentIndex++;
+
+            if ($('#table-document-body tr').not('.d-none').length > 0) {
+                $('#btn-send-box').removeAttr("disabled");
+            }
+
+            resetForm();
+        }).fail(handleAjaxAuth);
+    }
+
+    function GetZonaIDByAgenciaID() {
+        $.get('@Url.Action("GetZonaIDByAgenciaID", "ArchivoInactivo")', { AgenciaID: $('#Agencias').val() }, function (ZonaID) {
+            console.log(ZonaID);
+            $('#ZonaID').val(ZonaID);
+            $('#DocZonaID').val(ZonaID);
+        }).fail(handleAjaxAuth);
+    }
+
+    function resetForm() {
+        $('#DocBancoID').val('');
+        $('#DocCCCCID').val('');
+        $('#DocTipo').val('');
+        $('#DocDescripcion').val('');
+        $('#DocPaquete').prop('checked', false);
+    }
+</script>

@@ -368,5 +368,62 @@ namespace SyT_FileManager.Controllers
 
             return View(model.Where(x => AlmacenesID.Any(id => x.AlmacenID.Equals(id))).ToPagedList(pageNumber, pageSize));
         }
+
+        public ActionResult ArmarCaja()
+        {
+            var model = new DocumentoModel()
+            {
+                Bancos = BancoAccess.GetBancos(),
+                Zonas = RecursoAccess.GetRecursoItems("ZONA"),
+                CentrosDeCosto = OrganizacionAccess.GetCCDropdown(),
+                TiposDocumentos = TipoDocumentoAccess.GetTipoDocumentos().Where(x => x.TipoDocStatus.Equals("AC")).ToList()
+            };
+            var userAgency = Constants.GetUserData().AgenciaID;
+            List<AlmacenModel> almacenes = new List<AlmacenModel>();
+
+            almacenes = AlmacenAccess.GetAlmacenesActivos();
+
+            ViewBag.AlmacenID = new SelectList(almacenes, "AlmacenID", "AlmacenLabel");
+            ViewBag.Agencias = new SelectList(AgenciaAccess.GetAgencias(), "AgenciaID", "AgenciaNombre", userAgency);
+            ViewBag.ZonaID = userAgency.HasValue ? AgenciaAccess.GetAgencia(userAgency).ZonaID : almacenes.First().ZonaId;
+            ViewBag.AgenciaID = userAgency;
+
+            return View(model);
+        }
+
+        public JsonResult GetZonaIDByAgenciaID(int AgenciaID)
+        {
+            string ZonaID = AgenciaAccess.GetZonaIDByAgenciaID(AgenciaID);
+
+            return Json(ZonaID, JsonRequestBehavior.AllowGet);
+        }
+
+        public ActionResult _DocumentGrid(DocumentoModel documento)
+        {
+            documento.Bancos = BancoAccess.GetBancos();
+            documento.Agencias = AgenciaAccess.GetAgencias();
+            documento.Zonas = RecursoAccess.GetRecursoItems("ZONA");
+            documento.CentrosDeCosto = OrganizacionAccess.GetCCDropdown();
+            documento.TiposDocumentos = TipoDocumentoAccess.GetTipoDocumentos().Where(x => x.TipoDocStatus.Equals("AC")).ToList();
+            //documento.DocFechaInfo = documento.DocFechaInfo;
+            //documento.DocFechaVencimiento = documento.DocFechaInfo.Value.AddYears(0);
+
+            return PartialView("./Partials/_DocumentGrid", documento);
+        }
+
+        [HttpPost]
+        public ActionResult Enviar(List<DocumentoModel> documentos, int AlmacenID)
+        {
+            //Obtener solo los documentos que se ingresaran al final.
+            var documents = documentos.Where(x => x.Create).ToList();
+
+            //Ingresar registro de la caja
+            var CajaID = CajaBusiness.Create(AlmacenID, Constants.GetUserData().UserId);
+
+            //Ingresar documentos
+            DocumentoBusiness.CreateDocuments(documents, Convert.ToInt32(CajaID));
+
+            return RedirectToAction("CajaEnviada", new { CajaID });
+        }
     }
 }

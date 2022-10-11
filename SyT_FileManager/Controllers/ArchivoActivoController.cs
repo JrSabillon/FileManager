@@ -475,7 +475,7 @@ namespace SyT_FileManager.Controllers
             var cajaStatus = RecursoAccess.GetRecursoItems("CAJASTTS");
             var AlmacenesID = AlmacenAccess.GetAlmacenIDByUserID(Constants.GetUserData().UserId);
 
-            var model = CajaAccess.GetCajasByAlmacenID_Filtered(busqueda.FechaInicio, busqueda.FechaFin, busqueda.Agencia, string.Join(",", AlmacenesID), "ACT", busqueda.Caja);
+            var model = CajaAccess.GetCajasByAlmacenID_Filtered(busqueda.FechaInicio, busqueda.FechaFin, busqueda.Agencia, string.Join(",", AlmacenesID), "ACT", busqueda.searchBox ? busqueda.Caja : 0);
 
             model.ForEach((CajaModel caja) =>
             {
