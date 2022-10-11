@@ -17,6 +17,7 @@
 mono_crash.*
 
 # Build results
+SyT_FileManager/obj/Debug/SyT_FileManager.pdb
 [Dd]ebug/
 [Dd]ebugPublic/
 [Rr]elease/

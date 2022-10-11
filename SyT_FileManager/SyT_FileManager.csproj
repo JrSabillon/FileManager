@@ -411,6 +411,7 @@
     <Content Include="Views\Shared\NotFound.cshtml" />
     <Content Include="Views\ArchivoInactivo\Triturar.cshtml" />
     <Content Include="Views\Shared\SessionExpired.cshtml" />
+    <Content Include="Views\ArchivoInactivo\ArmarCaja.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
