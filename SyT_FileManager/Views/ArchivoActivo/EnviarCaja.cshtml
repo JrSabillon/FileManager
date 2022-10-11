@@ -1,0 +1,142 @@
+﻿@model PagedList.IPagedList<SyT_FileManager.Models.CajaModel>
+@using PagedList.Mvc;
+@{
+    ViewBag.Title = "Transferir Cajas";
+    bool searchDate = ViewBag.searchDate, searchAgency = ViewBag.searchAgency;
+}
+
+<h2><i class="fa fa-truck"></i> Enviar caja</h2>
+<hr />
+@using (Html.BeginForm("EnviarCaja", "ArchivoActivo", FormMethod.Post))
+{
+    <div class="row">
+        <label class="col-12 col-md">Filtros: </label>
+        <div class="col-12 col-md custom-control custom-switch">
+            @Html.CheckBox("searchDate", searchDate, new { @class = "custom-control-input", id = "chk-searchDate", onchange = "handleCheckbox(this);" })
+            <label class="custom-control-label" for="chk-searchDate">Filtrar por fecha</label>
+        </div>
+        <div class="col-12 col-md custom-control custom-switch">
+            @Html.CheckBox("searchAgency", searchAgency, new { @class = "custom-control-input", id = "chk-searchAgency", onchange = "handleCheckbox(this);" })
+            <label class="custom-control-label" for="chk-searchAgency">Filtrar por agencia</label>
+        </div>
+    </div>
+    <hr />
+    <div class="row">
+        <div class="col-12 col-md-6 col-xl-4 @(searchDate ? "" : "d-none")" id="col-searchDate">
+            <div class="row">
+                <div class="form-group col">
+                    <label>Fecha inicio</label>
+                    @Html.TextBox("FechaInicio", null, "{0:yyyy-MM-dd}", new { type = "date", @class = "form-control col-12" })
+                </div>
+                <div class="form-group col">
+                    <label>Fecha fin</label>
+                    @Html.TextBox("FechaFin", null, new { type = "date", @class = "form-control col-12" })
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-md-6 col-xl-4 @(searchAgency ? "" : "d-none")" id="col-searchAgency">
+            <div class="form-group">
+                <label>Agencia</label>
+                @Html.DropDownList("Agencia", null, "Seleccionar una agencia", new { @class = "form-control col-12" })
+            </div>
+        </div>
+    </div>
+
+    <button class="btn btn-success"><i class="fa fa-search"></i> Buscar</button>
+}
+<div class="table-responsive pt-3">
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th>#Caja</th>
+                <th>Fecha de recepción</th>
+                <th>Usuario envío</th>
+                <th>Almacen</th>
+                <th>Estante</th>
+                <th>Sección</th>
+                <th>Nivel</th>
+                <th>Fila</th>
+                <th>Ubicación</th>
+                <th>Fecha ubicado</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.CajaActivaID</td>
+                    <td>@item.CajaFechaRecepcion</td>
+                    <td>@item.CajaPersonaEntrega</td>
+                    <td>@item.SelectedAlmacen.AlmacenNombre</td>
+                    <td>@item.SelectedEstante.RecursoItemNombre</td>
+                    <td>@item.SelectedSeccion.RecursoItemNombre</td>
+                    <td>@item.SelectedNivel.RecursoItemNombre</td>
+                    <td>@item.SelectedFila.RecursoItemNombre</td>
+                    <td>@item.SelectedUbicacion.RecursoItemNombre</td>
+                    <td>@item.CajaFechaRegistro</td>
+                    <td>
+                        <button type="button" class="btn btn-sm btn-enterprise" title="Enviar caja a otro almacen" onclick="seeBox(@item.CajaID, @item.AlmacenID);">
+                            <i class="fa fa-truck"></i>
+                        </button>
+                    </td>
+                </tr>
+            }
+            @if (Model.Count == 0)
+            {
+                <tr>
+                    <td colspan="11">
+                        <h5 class="text-muted text-center">No hay datos que mostrar.</h5>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<label>Página @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) de @Model.PageCount</label>
+<br />
+@Html.PagedListPager(Model, page => Url.Action("EnviarCaja", new { page }), PagedListRenderOptions.OnlyShowFivePagesAtATime)
+
+<hr />
+<div id="div-box-info" class="d-none">
+    @using (Html.BeginForm("TransferBox", "ArchivoActivo", FormMethod.Post))
+    {
+        @Html.Hidden("CajaID")
+        <div class="row">
+            <div class="col-10">
+                <div class="form-group">
+                    @Html.Label("Almacen a transferir caja")
+                    @Html.DropDownList("AlmacenID", null, "Seleccionar un almacen", new { @class = "form-control col-12", required = "required" })
+                </div>
+            </div>
+            <div class="col-2 align-self-end text-right">
+                <button class="btn btn-success mb-3" title="Enviar caja"><i class="fa fa-truck"></i> <span class="d-none d-lg-inline">Enviar</span></button>
+            </div>
+        </div>
+        <div id="div-partial" class="pt-3 pb-3">
+
+        </div>
+    }
+</div>
+
+<script type="text/javascript">
+    
+
+    function seeBox(CajaID, AlmacenID) {
+        $.get('@Url.Action("_CajaDocumentos", "ArchivoActivo")', { CajaID: CajaID, ActionType: 'SendToInactive' }, function (content) {
+            $('#div-box-info').removeClass('d-none');
+            $('#CajaID').val(CajaID);
+            $('#AlmacenID option').removeAttr('disabled');
+            $(`#AlmacenID option[value=${AlmacenID}]`).prop('disabled', 'disabled');
+            $('#div-box-info').removeClass('d-none');
+            $('#div-partial').fadeOut(200, function () {
+                $(this).html(content).fadeIn(600);
+            });
+        }).fail(handleAjaxAuth);
+    }
+
+    function handleCheckbox(element) {
+        $(`#col-${$(element).attr('name')}`).toggleClass('d-none');
+    }
+</script>

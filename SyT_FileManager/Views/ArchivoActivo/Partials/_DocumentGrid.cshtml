@@ -1,0 +1,56 @@
+﻿@model SyT_FileManager.Models.DocumentoModel
+
+<tr>
+    <td>
+        @Html.Hidden($"[{Model.DocID}].Create", Model.Create)
+        @Html.Hidden($"[{Model.DocID}].DocTipo", Model.DocTipo)
+        @Model.SelectedDocumento.TipoDocNombre
+    </td>
+    <td>
+        @Html.Hidden($"[{Model.DocID}].DocDescripcion", Model.DocDescripcion)
+        @Model.DocDescripcion
+    </td>
+    @if(!string.IsNullOrEmpty(Model.DocStatus)) 
+    {
+        <td>@Model.SelectedEstado.RecursoItemNombre</td>
+    }
+    <td>
+        @Html.Hidden($"[{Model.DocID}].DocFechaInfo", Model.DocFechaInfo)
+        @Model.DocFechaInfo.Value.ToString("yyyy-MM-dd")
+    </td>
+    @if (Model.DocFechaVencimiento.HasValue)
+    {
+        <td>
+            @Model.DocFechaVencimiento.Value.ToString("yyyy-MM-dd")
+        </td>
+    }
+    <td>
+        @Html.Hidden($"[{Model.DocID}].DocBancoID", Model.DocBancoID)
+        @Model.SelectedBanco.BancoNombre
+    </td>
+    <td>
+        @Html.Hidden($"[{Model.DocID}].DocCCCCID", Model.DocCCCCID)
+        @Model.SelectedCentroDeCosto.EstOrgaNombre
+    </td>
+    <td>
+        @Html.Hidden($"[{Model.DocID}].DocAgenciaID", Model.DocAgenciaID)
+        @Model.SelectedAgencia.AgenciaNombre
+    </td>
+    <td>
+        @Html.Hidden($"[{Model.DocID}].DocZonaID", Model.DocZonaID)
+        @Model.SelectedZona.RecursoItemNombre
+    </td>
+    <td>
+        @Html.Hidden($"[{Model.DocID}].DocPaquete", Model.DocPaquete)
+        @(Model.DocPaquete ? "Si" : "No")
+    </td>
+    @if (Model.CajaID == 0)
+    {
+        <td>
+            <button type="button" class="btn btn-danger btn-sm shadow"
+                    onclick="$(this).closest('tr').find('td input').first().val('False'); $(this).closest('tr').addClass('d-none'); if($('#table-document-body tr').not('.d-none').length == 0) $('#btn-send-box').attr('disabled', 'disabled');">
+                <i class="fa fa-trash-o"></i>
+            </button>
+        </td>
+    }
+</tr>

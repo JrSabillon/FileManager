@@ -1,0 +1,90 @@
+﻿@model SyT_FileManager.Models.DocPrestamo
+@{ 
+    //Variable para identificar en el formulario si se esta entregando o recibiendo devuelta
+    bool isLendingDocument = Model.PrestamoID == 0;
+}
+
+<hgroup>
+    <h4>Caja #@ViewBag.CajaActivaID</h4>
+    <h5>Documento: @ViewBag.NombreDocumento</h5>
+</hgroup>
+
+<br />
+
+@using (Html.BeginForm("_PrestarDocumento", "ArchivoActivo", FormMethod.Post)) 
+{
+    @Html.HiddenFor(model => model.CajaID)
+    @Html.HiddenFor(model => model.DocID)
+
+    <div class="row">
+        <div class="col-12 col-md-6 col-lg-4">
+            <div class="form-group">
+                @Html.LabelFor(model => model.PrestDepartamentoSolicitanteID)
+                @Html.DropDownListFor(model => model.PrestDepartamentoSolicitanteID, new SelectList(Model.Departamentos, "EstOrgaID", "EstOrgaNombre"), "Seleccionar un departamento", new { @class = "form-control col-12", required = "required" })
+            </div>
+        </div>
+        <div class="col-12 col-md-6 col-lg-4">
+            <div class="form-group">
+                @Html.LabelFor(model => model.PrestNombreSolicitante)
+                @Html.TextBoxFor(model => model.PrestNombreSolicitante, new { @class = "form-control col-12", required = "required", maxlength = "200" })
+            </div>
+        </div>
+        <div class="col-12 col-md-6 col-lg-4">
+            <div class="form-group">
+                @Html.LabelFor(model => model.PrestEmailSolicitante)
+                @Html.TextBoxFor(model => model.PrestEmailSolicitante, new { @class = "form-control col-12", required = "required", maxlength = "50", type = "email" })
+            </div>
+        </div>
+        <div class="col-12 col-md-6 col-lg-4">
+            <div class="form-group">
+                @Html.LabelFor(model => model.PrestFechaSolicitud)
+                @Html.TextBoxFor(model => model.PrestFechaSolicitud, "{0:yyyy-MM-dd}", new { @class = "form-control col-12", required = "required", type = "date" })
+            </div>
+        </div>
+        <div class="col-12 col-md-6 col-lg-4">
+            <div class="form-group">
+                @Html.LabelFor(model => model.PrestFechaRetira)
+                @Html.TextBoxFor(model => model.PrestFechaRetira, new { @class = "form-control col-12", type = "date", required = "required" })
+            </div>
+        </div>
+        <div class="col-12 col-md-6 col-lg-4">
+            <div class="form-group">
+                @Html.LabelFor(model => model.PrestPlazoMaximoDevolucion)
+                <div class="input-group">
+                    @Html.TextBoxFor(model => model.PrestPlazoMaximoDevolucion, new { @class = "form-control col-12", type = "number", required = "required" })
+                    <div class="input-group-append">
+                        <div class="input-group-text">Dias</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-md-6 col-lg-4 align-self-center">
+            <div class="custom-control custom-switch form-group">
+                @Html.CheckBoxFor(model => model.OtraPersonaRetira, new { @class = "custom-control-input", id = "chk-personaRetira", onchange = "enablePersonaRetira(this);" })
+                @Html.LabelFor(model => model.OtraPersonaRetira, new { @class = "custom-control-label", @for = "chk-personaRetira" })
+            </div>
+        </div>
+        <div class="col-12 col-md-6 col-lg-4">
+            <div class="form-group d-none" id="div-personaRetira">
+                @Html.LabelFor(model => model.PrestPersonaRetira)
+                @Html.TextBoxFor(model => model.PrestPersonaRetira, new { @class = "form-control col-12", id = "input-personaRetira" })
+            </div>
+        </div>
+    </div>
+
+    <button class="btn btn-success"><i class="fa fa-save"></i> Guardar</button>
+}
+
+<script type="text/javascript">
+    function enablePersonaRetira(element) {
+        var flag = $(element).is(':checked');
+
+        if (flag) {
+            $('#div-personaRetira').removeClass('d-none');
+            $('#input-personaRetira').prop('required', 'required');
+        } else {
+            $('#div-personaRetira').addClass('d-none');
+            $('#input-personaRetira').removeAttr('required');
+        }
+    }
+</script>

@@ -1,0 +1,45 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title - Administración de archivos</title>
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/modernizr")
+    @Scripts.Render("~/bundles/jquery")
+    <style>
+        body {
+            background-color: #FFFFFF;
+        }
+
+        .tr-selected {
+            background-color: rgba(0, 0, 0, 0.075);
+        }
+
+        .footer-bottom {
+            position: sticky;
+            bottom: 0;
+        }
+    </style>
+    <script src="~/Scripts/barcode.js"></script>
+</head>
+<body>
+    @Html.Action("NavBar", "Nav")
+    <div class="body-content" style="padding-bottom: 85px;">
+        @RenderBody()
+    </div>
+    <footer class="container-fluid text-center bg-white fixed-bottom">
+        <hr />
+        <h6>Powered by <a href="http://www.sytcorp.com/c" target="_blank"><img src="@Url.Content("~/Content/imgs/SyTCorp_Logo.jfif")" width="80" /></a> &copy; @DateTime.Now.Year</h6>
+    </footer>
+
+    <script type="text/javascript">
+        function handleAjaxAuth(responseStatus) {
+            if (responseStatus.status === 401)
+                window.location = '@Url.Action("SessionExpired", "Home")';
+        }
+    </script>
+    @Scripts.Render("~/bundles/bootstrap")
+    @RenderSection("scripts", required: false)
+</body>
+</html>

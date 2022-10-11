@@ -1,0 +1,66 @@
+﻿@model SyT_FileManager.Models.CajaModel
+
+@*<h6>Caja #@ViewBag.CajaID</h6>
+<hr />*@
+@using (Html.BeginForm("_UbicacionCaja", "ArchivoInactivo", FormMethod.Post, new { id = "form-position-box" }))
+{
+    @Html.HiddenFor(model => model.CajaID)
+    @Html.HiddenFor(model => model.AlmacenID)
+
+    <div class="row">
+        <div class="col-6">
+            <div class="form-group">
+                @Html.LabelFor(model => model.CajaEstante)
+                @Html.DropDownListFor(model => model.CajaEstante, new SelectList(Model.Estantes, "RecursoItemID", "RecursoItemNombre"), "Seleccionar un estante", new { @class = "form-control col-12", required = "required" })
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="form-group">
+                @Html.LabelFor(model => model.CajaSeccion)
+                @Html.DropDownListFor(model => model.CajaSeccion, new SelectList(Model.Secciones, "RecursoItemID", "RecursoItemNombre"), "Seleccionar una sección", new { @class = "form-control col-12", required = "required" })
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="form-group">
+                @Html.LabelFor(model => model.CajaNivel)
+                @Html.DropDownListFor(model => model.CajaNivel, new SelectList(Model.Niveles, "RecursoItemID", "RecursoItemNombre"), "Seleccionar un nivel", new { @class = "form-control col-12", required = "required" })
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="form-group">
+                @Html.LabelFor(model => model.CajaFila)
+                @Html.DropDownListFor(model => model.CajaFila, new SelectList(Model.Filas, "RecursoItemID", "RecursoItemNombre"), "Seleccionar una fila", new { @class = "form-control col-12", required = "required" })
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="form-group">
+                @Html.LabelFor(model => model.CajaUbicacion)
+                @Html.DropDownListFor(model => model.CajaUbicacion, new SelectList(Model.Ubicaciones, "RecursoItemID", "RecursoItemNombre"), "Seleccionar una ubicación", new { @class = "form-control col-12", required = "required" })
+            </div>
+        </div>
+    </div>
+    <br />
+    <div class="row">
+        <div class="col-12">
+            <button type="button" onclick="ValidateBoxPosition(event);" class="btn btn-success"><i class="fa fa-save"></i> Guardar</button>
+            <button type="button" class="btn btn-danger" data-dismiss="modal"><i class="fa fa-times"></i> Cancelar</button>
+        </div>
+    </div>
+}
+
+<script type="text/javascript">
+    function ValidateBoxPosition(event) {
+        const data = new FormData(document.getElementById('form-position-box'));
+        var payload = Object.fromEntries(data.entries());
+        console.log(payload);
+
+        $.get('@Url.Action("ValidateBoxPosition", "ArchivoInactivo")', payload, function (isAvailable) {
+            if (isAvailable) {
+                $('#form-position-box').submit();
+                return;
+            }
+
+            alert('El espacio seleccionado ya esta siendo utilizado por otra caja');
+        });
+    }
+</script>

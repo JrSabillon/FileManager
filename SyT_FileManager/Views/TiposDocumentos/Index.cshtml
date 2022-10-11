@@ -1,0 +1,105 @@
+﻿@model PagedList.IPagedList<SyT_FileManager.Models.TipoDocumentoModel>
+@using PagedList.Mvc;
+@using SyT_FileManager.AppCode;
+@using SyT_FileManager.Models;
+@{
+    ViewBag.Title = "Tipos Doc.";
+    var Labels = new TipoDocumentoModel();
+}
+
+
+
+<div class="row">
+    <div class="col-12 col-lg-6">
+        <h2><i class="fa fa-book"></i> Tipos de documentos</h2>
+        @if (Constants.Privilegios.Where(x => x.PrivId.Equals("MODII_TPD_ADD")).Count() > 0)
+        {
+            <button class="btn btn-success rounded-circle position-absolute shadow" onclick="documentAction(0, null);"
+                    style="right: 18px; bottom: -18px; z-index: 9;" title="Agregar documento">
+                <i class="fa fa-plus"></i>
+            </button>
+        }
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12 col-lg-6 border">
+        @using (Html.BeginForm("Index", "TiposDocumentos", FormMethod.Get))
+        {
+            <div class="input-group mt-5">
+                @Html.TextBox("searchString", null, new { @class = "form-control col-12 col-lg-6", placeholder = "Buscar tipo de documento..." })
+                <div class="input-group-append">
+                    <button class="btn btn-info" title="Buscar usuario">
+                        <i class="fa fa-search"></i>
+                    </button>
+                </div>
+            </div>
+        }
+        <br />
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th><label>#</label></th>
+                        <th>@Html.LabelFor(model => Labels.TipoDocNombre)</th>
+                        <th>@Html.LabelFor(model => Labels.TipoDocPlazo)</th>
+                        <th>@Html.LabelFor(model => Labels.TipoDocStatus)</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@item.TipoDocID</td>
+                            <td>@item.TipoDocNombre</td>
+                            <td>@item.TipoDocPlazo</td>
+                            <td>@(item.TipoDocStatus.Equals("AC") ? "Activo" : "Inactivo")</td>
+                            <td>
+                                @if (Constants.Privilegios.Where(x => x.PrivId.Equals("MODII_TPD_EDT")).Count() > 0)
+                                {
+                                    <button class="btn btn-sm btn-warning shadow float-right" title="Editar documento" onclick="documentAction(@item.TipoDocID, this)">
+                                        <i class="fa fa-pencil"></i>
+                                    </button>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <label>Página @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) de @Model.PageCount</label>
+        <br />
+        @Html.PagedListPager(Model, page => Url.Action("Index", new { page }), PagedListRenderOptions.OnlyShowFivePagesAtATime)
+    </div>
+    <div class="col-12 col-lg-6 border p-1">
+        <div class="container">
+            <h4 class="text-center">Documento</h4>
+            <hr />            
+            <div id="div-docType">
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    $(function () {
+
+    });
+
+    function documentAction(id, element) {
+        $('tbody tr').removeClass('tr-selected');
+        $(element).closest('tr').addClass('tr-selected');
+        $.get('@Url.Action("_TipoDocumento", "TiposDocumentos")', { TipoDocID: id }, function (page) {
+            $('#div-docType').fadeOut(100, function () {
+                $(this).html(page).fadeIn(800);
+            });
+        }).fail(handleAjaxAuth);
+    }
+
+    function cancel() {
+        $('#div-docType').fadeOut(250);
+    }
+</script>

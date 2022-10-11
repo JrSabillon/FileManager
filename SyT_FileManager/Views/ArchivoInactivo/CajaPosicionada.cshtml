@@ -1,0 +1,23 @@
+﻿
+@{
+    ViewBag.Title = "Caja Posicionada";
+}
+
+<div class="row">
+    <div class="col-6">
+        <h2 class="text-success"><i class="fa fa-check"></i> Caja Posicionada</h2>
+    </div>
+    <div class="col-6 text-right">
+        <a href="@Url.Action("Index", "Home")" class="btn btn-primary" title="Ir a inicio">
+            <i class="fa fa-chevron-left"></i> <span class="d-none d-md-inline">Ir a inicio</span>
+        </a>
+        <a href="@Url.Action("Posicionar", "ArchivoInactivo")" class="btn btn-enterprise" title="Enviar otra caja">
+                <i class="fa fa-send-o"></i> <span class="d-none d-md-inline">Posicionar otra caja</span>
+        </a>
+    </div>
+</div>
+<hr />
+
+@{
+    Html.RenderAction("_CajaDocumentos", "ArchivoInactivo", new { CajaID = ViewBag.CajaID, ActionType = ViewBag.ActionType });
+} 

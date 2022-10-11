@@ -1,0 +1,179 @@
+﻿@model PagedList.IPagedList<SyT_FileManager.Models.UsuarioModel>
+@using PagedList.Mvc;
+@using SyT_FileManager.AppCode;
+@{
+    ViewBag.Title = "Usuarios";
+}
+
+<div class="row">
+    <div class="col-12 col-lg-6">
+        <h2><i class="fa fa-users"></i> Usuarios</h2>
+        @if (Constants.Privilegios.Where(x => x.PrivId.Equals("MODI_USR_ADD")).Count() > 0)
+        { 
+            <button class="btn btn-success rounded-circle position-absolute shadow" style="right: 18px; bottom: -18px; z-index: 9;" title="Agregar usuario"
+                    onclick="loadUserModal('')">
+                <i class="fa fa-plus"></i>
+            </button>
+        }
+    </div>
+</div>
+
+@using (Html.BeginForm("Index", "Usuarios", FormMethod.Get, new { id = "form-user" }))
+{
+    <div class="row">
+        <div class="col-12 col-lg-6 border pt-3">
+            <div class="row mt-3">
+                <div class="col-12 col-lg-6">
+                    <div class="input-group form-group">
+                        @Html.TextBox("searchString", null, new { @class = "form-control col-12", placeholder = "Buscar usuario..." })
+                        <div class="input-group-append">
+                            <button class="btn btn-info" title="Buscar usuario">
+                                <i class="fa fa-search"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-lg-6">
+                    <div class="input-group form-group">
+                        @Html.DropDownList("usuarioStatus", null, "Todos", new { @class = "form-control col-12", onchange = "$('#form-user').submit();" })
+                    </div>
+                </div>
+            </div>
+            <br />
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Usuario</th>
+                            <th>Nombre</th>
+                            <th>Correo</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            @*if (Constants.Privilegios.Where(x => x.PrivId.Equals("MODI_USR_EDTROL")).Count() > 0)
+                            {
+                                <tr class="clickable" data-user="@item.UserId">
+                                    <td>@item.UserId</td>
+                                    <td>@item.UserNombre</td>
+                                    <td>@item.UserEmail</td>
+                                    <td>@(item.UserStatus.Equals("ACT") ? "Activo" : "Inactivo")</td>
+                                    <td>
+                                        @if (Constants.Privilegios.Where(x => x.PrivId.Equals("MODI_USR_EDT")).Count() > 0)
+                                        {
+                                            <button class="btn btn-warning btn-sm shadow" type="button" title="Editar usuario" onclick="loadUserModal('@item.UserId')">
+                                                <i class="fa fa-pencil"></i>
+                                            </button>
+                                        }
+
+
+                                    </td>
+                                </tr>
+                            }
+                            else
+                            {*@
+                                <tr>
+                                    <td>@item.UserId</td>
+                                    <td>@item.UserNombre</td>
+                                    <td>@item.UserEmail</td>
+                                    <td class="text-nowrap">
+                                        @if (Constants.Privilegios.Where(x => x.PrivId.Equals("MODI_USR_EDT")).Count() > 0)
+                                        {
+                                            <button type="button" class="btn btn-warning btn-sm shadow" title="Editar usuario" onclick="loadUserModal('@item.UserId')">
+                                                <i class="fa fa-pencil"></i>
+                                            </button>
+                                        }
+                                        @if (Constants.Privilegios.Where(x => x.PrivId.Equals("MODI_USR_EDTROL")).Count() > 0)
+                                        {
+                                            <button type="button" class="btn btn-enterprise btn-sm shadow" title="Editar roles" onclick="loadUserRoles('@item.UserId')">
+                                                <i class="fa fa-cogs"></i>
+                                            </button>
+                                        }
+                                        @if (Constants.Privilegios.Where(x => x.PrivId.Equals("MODI_USR_ASGA")).Count() > 0)
+                                        {
+                                            <button type="button" class="btn btn-enterprise btn-sm shadow" title="Asignar almacenes" onclick="loadUserAlmacen('@item.UserId')">
+                                                <i class="fa fa-building-o"></i>
+                                            </button>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        @*}*@
+                    </tbody>
+                </table>
+            </div>
+
+            <label>Página @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) de @Model.PageCount</label>
+            <br />
+            @Html.PagedListPager(Model, page => Url.Action("Index", new { page }), PagedListRenderOptions.OnlyShowFivePagesAtATime)
+        </div>
+        <div class="col-12 col-lg-6 border p-1">
+            <h4 class="text-center">Roles</h4>
+            <hr />
+            @if (Constants.Privilegios.Where(x => x.PrivId.Equals("MODI_USR_EDTROL")).Count() > 0)
+            {
+                <p class="lead text-center">Seleccionar un usuario para visualizar sus roles</p>
+            }
+            else
+            {
+                <div class="alert alert-danger ml-5 mr-5">
+                    <h4 class="alert-heading">Asignacion de roles</h4>
+                    <label>No tiene los permisos necesarios para asignar roles al usuario.</label>
+                    <hr />
+                    <label>Solicitar accesos al administrador de permisos.</label>
+                </div>
+            }
+            <div id="div-partial" style="max-height: 500px; overflow-y: auto; overflow-x: hidden;"></div>
+        </div>
+    </div>
+}
+
+<div id="div-modal-user">
+    @Html.Action("_User", "Usuarios")
+</div>
+
+<script type="text/javascript">
+    $(function () {
+        $('tbody tr').on('click', function () {
+            $('tbody tr').removeClass('tr-selected');
+            $(this).addClass('tr-selected');
+        });
+    });
+
+    function loadUserModal(UserId) {
+        $.get('@Url.Action("_User", "Usuarios")', { UserId: UserId }, function (content) {
+            $('#div-modal-user').html(content);
+            $('#modal-user').modal();
+        }).fail(handleAjaxAuth);
+    }
+
+    function loadUserRoles(UserId) {
+        $.get('@Url.Action("_UserRole", "Usuarios")', { UserId: UserId }, function (content) {
+            $('#div-partial').fadeOut(100, function () {
+                $(this).html(content).fadeIn(800);
+            })
+        }).fail(handleAjaxAuth);
+    }
+
+    function loadUserAlmacen(UserId) {
+        $.get('@Url.Action("_UsuarioAlmacen", "Usuarios")', { UserId: UserId }, function (content) {
+            $('#div-partial').fadeOut(100, function () {
+                $(this).html(content).fadeIn(800);
+            })
+        }).fail(handleAjaxAuth);
+    }
+
+    function validateUserId(userIdControl) {
+        $.get('@Url.Action("ValidateUserId", "Usuarios")', { UserId: $(userIdControl).val() }, function (isAvailable) {
+            if (isAvailable === "True") {
+                $('#label-user-validation').addClass("d-none");
+                $('#btn-save-user').removeAttr("disabled");
+            } else {
+                $('#label-user-validation').removeClass("d-none");
+                $('#label-user-validation').text("ID de usuario no disponible");
+            }
+        }).fail(handleAjaxAuth);
+    }
+</script>

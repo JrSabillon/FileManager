@@ -1,0 +1,71 @@
+﻿@model SyT_FileManager.Models.UsuarioModel
+
+@using (Html.BeginForm("_User", "Usuarios", FormMethod.Post))
+{
+    <div class="modal fade" id="modal-user" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modal-user-title">Usuario</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="form-group">
+                                @Html.LabelFor(x => x.UserId)
+                                @if(!string.IsNullOrEmpty(Model.UserId))
+                                {
+                                    @Html.TextBoxFor(x => x.UserId, new { @class = "form-control col-12", maxlength = "20", placeholder = "Id de usuario", @readonly = "readonly" })
+                                }
+                                else
+                                {
+                                    @Html.TextBoxFor(x => x.UserId, new { @class = "form-control col-12", maxlength = "20", placeholder = "Id de usuario", required = "required", onchange = "validateUserId(this);" })
+                                    <label class="d-none text-danger" id="label-user-validation"></label>
+                                }
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group">
+                                @Html.LabelFor(x => x.UserNombre)
+                                @Html.TextBoxFor(x => x.UserNombre, new { @class = "form-control col-12", maxlength = "50", placeholder = "Nombre completo", required = "required" })
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group">
+                                @Html.LabelFor(x => x.UserEmail)
+                                @Html.TextBoxFor(x => x.UserEmail, new { @class = "form-control col-12", maxlength = "50", placeholder = "correo@dominio.com", required = "required" })
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group">
+                                @Html.LabelFor(x => x.UserStatus)
+                                @Html.DropDownListFor(x => x.UserStatus, (IEnumerable<SelectListItem>)ViewBag.EstatusUsuario, new { @class = "form-control col-12" })
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="form-group">
+                                @Html.LabelFor(x => x.AgenciaID)
+                                @Html.DropDownListFor(x => x.AgenciaID, new SelectList(Model.Agencias, "AgenciaID", "AgenciaNombre"), "Seleccione una agencia", new { @class = "form-control col-12" })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    @if (!string.IsNullOrEmpty(Model.UserId))
+                    {
+                        <button type="submit" class="btn btn-success">Guardar</button>
+                    }
+                    else
+                    {
+                        <button type="submit" class="btn btn-success" disabled="disabled" id="btn-save-user">Guardar</button>
+                    }
+
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}

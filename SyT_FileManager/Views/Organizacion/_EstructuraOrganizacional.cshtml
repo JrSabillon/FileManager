@@ -1,0 +1,37 @@
+﻿@model SyT_FileManager.Models.EstructuraOrganizacionalModel
+
+<h5>@ViewBag.ActionType</h5>
+<br />
+@using (Html.BeginForm("_EstructuraOrganizacional", "Organizacion", FormMethod.Post))
+{
+    @Html.HiddenFor(model => model.EstOrgaID)
+    @Html.HiddenFor(model => model.EstOrgaIDPadre)
+    @Html.Hidden("ActionType")
+    <div class="row">
+        <div class="col-12 col-lg-6">
+            <div class="form-group">
+                @Html.LabelFor(model => model.EstOrgaNombre)
+                @Html.TextBoxFor(model => model.EstOrgaNombre, new { @class = "form-control col-12", maxlength = "200", required = "required" })
+            </div>
+        </div>
+        <div class="col-12 col-lg-6">
+            <div class="form-group">
+                @Html.LabelFor(model => model.EstOrgaAbreviatura)
+                @Html.TextBoxFor(model => model.EstOrgaAbreviatura, new { @class = "form-control col-12", maxlength = "50" })
+            </div>
+        </div>
+        <div class="col-12 col-lg-6">
+            <div class="form-group">
+                @Html.LabelFor(model => model.EstOrgaStatus)
+                @Html.DropDownList("EstOrgaStatus", null, new { @class = "form-control col-12" })
+            </div>
+        </div>
+    </div>
+    <br />
+    <button class="btn btn-success">
+        <i class="fa fa-save"></i> Guardar
+    </button>
+    <button class="btn btn-danger" type="button" onclick="cancel();">
+        <i class="fa fa-times"></i> Cancelar
+    </button>
+}

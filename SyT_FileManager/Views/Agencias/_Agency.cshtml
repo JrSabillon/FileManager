@@ -1,0 +1,38 @@
+﻿@model SyT_FileManager.Models.AgenciaModel
+
+@using (Html.BeginForm("_Agency", "Agencias", FormMethod.Post))
+{
+    <h5>@ViewBag.ActionType</h5>
+    @Html.Hidden("ActionType")
+    @Html.HiddenFor(x => x.AgenciaID)
+    <br />
+    <div class="row">
+        <div class="col-12 col-lg-6">
+            <div class="form-group">
+                @Html.LabelFor(x => x.AgenciaCodigo)
+                @Html.TextBoxFor(x => x.AgenciaCodigo, new { @class = "form-control col-12", maxlength = "20" })
+            </div>
+        </div>
+        <div class="col-12 col-lg-6">
+            <div class="form-group">
+                @Html.LabelFor(x => x.AgenciaNombre)
+                @Html.TextBoxFor(x => x.AgenciaNombre, new { @class = "form-control col-12", maxlength = "200", required = "required" })
+            </div>
+        </div>
+        <div class="col-12 col-lg-6">
+            <div class="form-group">
+                @Html.LabelFor(x => x.ZonaID)
+                @Html.DropDownList("ZonaID", null, new { @class = "form-control col-12" })
+            </div>
+        </div>
+        <div class="col-12 col-lg-6">
+            <div class="form-group">
+                @Html.LabelFor(x => x.AgenciaStatus)
+                @Html.DropDownList("AgenciaStatus", null, new { @class = "form-control col-12" })
+            </div>
+        </div>
+    </div>
+
+    <button class="btn btn-success mt-3 mb-2"><i class="fa fa-save"></i> Guardar</button>
+    <button class="btn btn-danger mt-3 mb-2" type="button" onclick="cancel();"><i class="fa fa-times"></i> Cancelar</button>
+}

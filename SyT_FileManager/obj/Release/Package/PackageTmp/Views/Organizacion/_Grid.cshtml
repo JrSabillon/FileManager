@@ -1,0 +1,115 @@
+﻿@model SyT_FileManager.Models.EstructuraOrganizacionalModel
+@using SyT_FileManager.AppCode;
+
+<style>
+    button i.active {
+        transform: rotate(-180deg);
+        transition: all 0.5s;
+    }
+
+    button i.inactive {
+        transform: rotate(0deg);
+        transition: all 0.5s;
+    }
+</style>
+
+@helper GetSubMenus(List<SyT_FileManager.Models.EstructuraOrganizacionalModel> data)
+{
+    foreach (var item in data)
+    {
+        var subItems = item.Estructuras;
+
+        <li class="list-group-item" style="padding: 0;">
+            <table class="table table-hover table-sm">
+                <!--<thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Nombre</th>
+                        <th>Abreviatura</th>
+                        <th>Estado</th>
+                        <th></th>
+                    </tr>
+                </thead>-->
+                <tbody>
+                    <tr>
+                        <td width="10%">@(item.EstOrgaIDPadre).@(item.EstOrgaID)</td>
+                        <td width="40%">@item.EstOrgaNombre</td>
+                        <td width="20%">@item.EstOrgaAbreviatura</td>
+                        <td width="15%">@(item.EstOrgaStatus.Equals("AC") ? "Activo" : "Inactivo")</td>
+                        <td width="15%" class="text-right text-nowrap">
+                            @if (Constants.Privilegios.Where(x => x.PrivId.Equals("MODII_DPT_ADD")).Count() > 0)
+                            {
+                                <button class="btn btn-sm btn-success shadow" type="button" onclick="organizationAction(0, @item.EstOrgaID)"><i class="fa fa-plus"></i></button>
+                            }
+                            @if (Constants.Privilegios.Where(x => x.PrivId.Equals("MODII_DPT_EDT")).Count() > 0)
+                            {
+                                <button class="btn btn-sm btn-warning shadow" type="button" onclick="organizationAction(@item.EstOrgaID, @item.EstOrgaIDPadre)"><i class="fa fa-pencil"></i></button>
+                            }
+                            @if (item.Estructuras.Count > 0)
+                            {
+                                <button class="btn btn-sm btn-enterprise shadow" data-toggle="collapse" data-target="#item_@item.EstOrgaID" onclick="$(this).find('i').toggleClass('active').toggleClass('inactive')">
+                                    <i class="fa fa-chevron-down inactive"></i>
+                                </button>
+                            }
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            @if (item.Estructuras.Count > 0)
+            {
+                <div class="collapse pl-3" id="item_@item.EstOrgaID">
+                    <ul class="list-group-flush mt-2" style="padding: 0;">
+                        @GetSubMenus(item.Estructuras)
+                    </ul>
+                </div>
+            }
+        </li>
+    }
+}
+
+<div class="table-responsive">
+    <table class="table table-hover table-sm">
+        <thead>
+            <tr>
+                <th width="10%">#</th>
+                <th width="40%">Nombre</th>
+                <th width="20%">Abreviatura</th>
+                <th width="15%">Estado</th>
+                <th width="15%"></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>@Model.EstOrgaID</td>
+                <td>@Model.EstOrgaNombre</td>
+                <td>@Model.EstOrgaAbreviatura</td>
+                <td>@(Model.EstOrgaStatus.Equals("AC") ? "Activo" : "Inactivo")</td>
+                <td class="text-right text-nowrap">
+                    @if (Constants.Privilegios.Where(x => x.PrivId.Equals("MODII_DPT_ADD")).Count() > 0)
+                    {
+                        <button class="btn btn-sm btn-success shadow" type="button" onclick="organizationAction(0, @Model.EstOrgaID)"><i class="fa fa-plus"></i></button>
+                    }
+                    @if (Constants.Privilegios.Where(x => x.PrivId.Equals("MODII_DPT_EDT")).Count() > 0)
+                    {
+                        <button class="btn btn-sm btn-warning shadow" type="button" onclick="organizationAction(@Model.EstOrgaID, @Model.EstOrgaIDPadre)"><i class="fa fa-pencil"></i></button>
+                    }
+                    @if (Model.Estructuras.Count > 0)
+                    {
+                        <button class="btn btn-sm btn-enterprise shadow" data-toggle="collapse" data-target="#item_@Model.EstOrgaID" onclick="$(this).find('i').toggleClass('active').toggleClass('inactive')">
+                            <i class="fa fa-chevron-down inactive"></i>
+                        </button>
+                    }
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    @if(Model.Estructuras.Count() > 0)
+    {
+        <div id="item_@Model.EstOrgaID" class="collapse pl-3">
+            <ul class="list-group-flush mt-2" style="padding: 0;">
+                @GetSubMenus(Model.Estructuras)
+            </ul>
+        </div>
+    }
+</div>
+

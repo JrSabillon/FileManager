@@ -1,0 +1,65 @@
+﻿@model List<SyT_FileManager.Models.RoleModel>
+@{ 
+    int position = 0;
+}
+
+<h5 class="text-center">Usuario: @ViewBag.UserId</h5>
+<hr />
+
+@using (Html.BeginForm("UserRole", "Usuarios", FormMethod.Post))
+{
+    @Html.Hidden("UserId")
+    <div class="row">
+        <div class="col-12">
+            <ul class="list-group">
+                @foreach (var item in Model)
+                {
+                    @Html.Hidden($"[{position}].RolId", item.RolId, new { })
+                    <li class="list-group-item">
+                        <div class="row">
+                            <div class="col-10">
+                                @Html.CheckBox(item.RolId, item.Selected, new { Name = $"[{position}].selected" })
+                                <label for="@item.RolId">
+                                    @item.RolNombre
+                                </label>
+                            </div>
+                            <div class="col-2">
+                                <button type="button" class="btn btn-enterprise btn-sm float-right shadow"
+                                        data-target="#collapse-@item.RolId" data-toggle="collapse" onclick="loadPrivileges('@item.RolId');">
+                                    <i class="fa fa-arrow-circle-down"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="collapse" id="collapse-@item.RolId">
+                            <div class="container mt-2">
+                                <h6>@item.RolDescripcion</h6>
+                                <hr />
+                                <ul id="list-privilegios-@item.RolId" style="max-height: 200px; overflow-y: auto;">
+                                </ul>
+                            </div>
+                        </div>
+                    </li>
+
+                    position++;
+                }
+            </ul>
+        </div>
+    </div>
+    <br />
+    <div class="row">
+        <div class="col-12 text-center">
+            <button class="btn btn-success mb-2 shadow"><i class="fa fa-save"></i> Guardar</button>
+        </div>
+    </div>
+}
+
+<script type="text/javascript">
+    function loadPrivileges(rolId) {
+        $.get('@Url.Action("GetPrivilegiosByRol", "Roles")', { RolId: rolId }, function (data) {
+            $(`#list-privilegios-${rolId}`).html('');
+            $(data).each(function (index, element) {
+                $(`#list-privilegios-${rolId}`).append(`<li>${element.PrivNombre} - ${element.PrivDescripcion == null ? "<b>Sin descripción</b>" : element.PrivDescripcion}</li>`)
+            });
+        });
+    }
+</script>

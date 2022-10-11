@@ -1,0 +1,45 @@
+﻿@model List<SyT_FileManager.Models.PrivilegioModel>
+@using SyT_FileManager.AppCode;
+
+<div class="navbar navbar-expand-lg navbar-dark bg-enterprise shadow-sm">
+    @Html.ActionLink("Inicio", "Index", "Home", null, new { @class = "navbar-brand" })
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-menu" aria-controls="navbar-menu" aria-expanded="false" aria-label="Desplegar menú">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbar-menu">
+        <ul class="navbar-nav mr-auto">
+            @foreach (var item in Model.Where(x => x.PrivNivelOrden.Equals("0")))
+            {
+                var childs = Model.Where(x => x.PrivId.StartsWith(item.PrivId + "_") && !x.PrivId.Equals(item.PrivId) && x.PrivNivelOrden.Equals("1"))
+                    .OrderBy(x => x.PrivPosicion).ToList();
+
+                if (childs.Count > 0)
+                {
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="submenu_@item.PrivId" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            @item.PrivNombre
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="submenu_@item.PrivId">
+                            @foreach (var child in childs)
+                            {
+                                @Html.ActionLink(child.PrivNombre, HttpUtility.UrlDecode(child.PrivAction), child.PrivController, null, new { @class = "dropdown-item" })
+                            }
+                        </div>
+                    </li>
+                }
+                else
+                {
+                    <li class="nav-item">
+                        @Html.ActionLink(item.PrivNombre, "Index", "Home", new { @class = "nav-link" })
+                    </li>
+                }
+            }
+        </ul>
+        <div class="navbar-nav">
+            <a class="nav-item nav-link" href="@Url.Action("Logout", "Nav")" id="navbarDropdown">
+                [@Constants.GetUserData().UserId] Salir
+                <i class="fa fa-sign-out"></i>
+            </a>
+        </div>
+    </div>
+</div>

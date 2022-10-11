@@ -1,0 +1,104 @@
+﻿@model List<SyT_FileManager.Models.DocumentoModel>
+
+<div>
+    @if(ViewBag.ActionType == "BoxPositioned")
+    {
+        <h5 class="text-center">Caja #@ViewBag.CajaInactivaID</h5>
+        <hr />
+    }
+    @if (ViewBag.ActionType == "PositionBox")
+    {
+        <div class="alert alert-info">
+            <label>Favor revisar el contenido de la caja antes de asignarla a un estante.</label>
+        </div>
+    }
+    <div class="table-responsive">
+        <table class="table table-hover table-bordered">
+            <tr>
+                <td>
+                    Usuario envío: @ViewBag.UsuarioEntrego
+                </td>
+                <td>
+                    Agencia envío: @ViewBag.AgenciaEnvia
+                </td>
+            </tr>
+        </table>
+    </div>
+    <br />
+
+    <div class="table-responsive">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>Documento</th>
+                    <th>Descripción</th>
+                    <th>Estado</th>
+                    <th>Fecha de registro</th>
+                    <th>Fecha de vencimiento</th>
+                    <th>Banco</th>
+                    <th>Centro de costo</th>
+                    <th>Agencia</th>
+                    <th>Zona</th>
+                    <th>Es paquete</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    Html.RenderPartial("Partials/_DocumentGrid", item);
+                }
+            </tbody>
+        </table>
+    </div>
+
+    @if (ViewBag.ActionType == "PositionBox")
+    {
+        <div class="row mt-3">
+            <div class="col-12">
+                <button type="button" class="btn btn-success mb-3" onclick="placeBox(@ViewBag.CajaID, @ViewBag.AlmacenID)"><i class="fa fa-map-marker"></i> Posicionar caja</button>
+            </div>
+        </div>
+    }
+
+    @if(ViewBag.ActionType == "BoxPositioned")
+    {
+        <hr />
+        <div class="row">
+            <div class="col align-self-center">
+                <h5>Codigo de barra</h5>
+            </div>
+            <div class="col text-right">
+                <button class="btn btn-enterprise">
+                    <i class="fa fa-print"></i> <span class="d-none d-md-inline" onclick="printQRCode();">Imprimir</span>
+                </button>
+            </div>
+        </div>
+        <hr />
+        <div id="div-barCode" class="text-center">
+            <svg id="barCode"></svg>
+            <br />
+            <label>Fecha inicio: @Model.Min(x => x.DocFechaInfo).Value.ToString("dd/MM/yyyy") - Fecha Fin: @Model.Max(x => x.DocFechaInfo).Value.ToString("dd/MM/yyyy")</label>
+        </div>
+    }
+</div>
+
+<script type="text/javascript">
+    $(function () {
+        JsBarcode("#barCode", `${@ViewBag.CajaInactivaID}, ${'@ViewBag.AlmacenNombre'}`, {
+            width: 1,
+            height: 40,
+            fontSize: 12
+        });
+    });
+
+    function printQRCode() {
+        var divContents = document.getElementById("div-barCode").innerHTML;
+        var a = window.open('', '', 'height=500, width=500');
+        a.document.write('<html>');
+        a.document.write('<body>');
+        a.document.write(divContents);
+        a.document.write('</body></html>');
+        a.document.close();
+        a.print();
+    }
+</script>

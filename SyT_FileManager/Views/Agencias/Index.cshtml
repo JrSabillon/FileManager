@@ -1,0 +1,114 @@
+﻿@model PagedList.IPagedList<SyT_FileManager.Models.AgenciaModel>
+@using PagedList.Mvc;
+@using SyT_FileManager.AppCode;
+@{
+    ViewBag.Title = "Agencias";
+}
+
+<div class="row">
+    <div class="col-12 col-lg-6">
+        <h2><i class="fa fa-building"></i> Agencias</h2>
+        @if (Constants.Privilegios.Where(x => x.PrivId.Equals("MODII_AGN_ADD")).Count() > 0)
+        {
+            <button class="btn btn-success rounded-circle position-absolute shadow" style="right: 18px; bottom: -18px; z-index: 9;"
+                    title="Agregar agencia" onclick="agencyAction(0, null);">
+                <i class="fa fa-plus"></i>
+            </button>
+        }
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12 col-lg-6 border pt-3">
+        @using (Html.BeginForm("Index", "Agencias", FormMethod.Get, new { @class = "w-100" }))
+        {
+            <div class="input-group mt-3">
+                @Html.TextBox("searchString", null, new { @class = "form-control col-12 col-lg-6", placeholder = "Buscar agencia..." })
+                <div class="input-group-append">
+                    <button class="btn btn-info" title="Buscar agencia">
+                        <i class="fa fa-search"></i>
+                    </button>
+                </div>
+            </div>
+        }
+        <br />
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Código</th>
+                        <th>Nombre</th>
+                        <th>Zona</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@item.AgenciaID</td>
+                            <td>@item.AgenciaCodigo</td>
+                            <td>@item.AgenciaNombre</td>
+                            <td>@item.RecursoItemNombre</td>
+                            <td>
+                                @if (Constants.Privilegios.Where(x => x.PrivId.Equals("MODII_AGN_EDT")).Count() > 0)
+                                {
+                                    <button class="btn btn-warning btn-sm shadow" type="button" title="Editar agencia" onclick="agencyAction(@item.AgenciaID, this)">
+                                        <i class="fa fa-pencil"></i>
+                                    </button>
+                                }
+
+                                @if(Constants.Privilegios.Where(x => x.PrivId.Equals("MODII_AGN_ASGN")).Count() > 0)
+                                {
+                                    <button class="btn btn-enterprise btn-sm shadow" type="button" title="Asignar almacenes" onclick="asignarAlmacen(@item.AgenciaID, this)">
+                                        <i class="fa fa-building-o"></i>
+                                    </button>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <label>Página @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) de @Model.PageCount</label>
+        <br />
+        @Html.PagedListPager(Model, page => Url.Action("Index", new { page }), PagedListRenderOptions.OnlyShowFivePagesAtATime)
+    </div>
+    <div class="col-12 col-lg-6 border p-1">
+        <h4 class="text-center">Agencias</h4>
+        <hr />
+        <div id="div-partial" class="container">
+
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    function agencyAction(id, element) {
+        $('tbody tr').removeClass('tr-selected');
+        $(element).closest('tr').addClass('tr-selected');
+
+        $.get('@Url.Action("_Agency", "Agencias")', { id: id }, function (page) {
+            $('#div-partial').fadeOut(100, function () {
+                $(this).html(page).fadeIn(800);
+            });
+        });
+    }
+
+    function cancel() {
+        $('#div-partial').fadeOut(250);
+    }
+
+    function asignarAlmacen(id, element) {
+        $('tbody tr').removeClass('tr-selected');
+        $(element).closest('tr').addClass('tr-selected');
+
+        $.get('@Url.Action("_AlmacenAgencia", "Agencias")', { AgenciaID: id }, function (page) {
+            $('#div-partial').fadeOut(100, function () {
+                $(this).html(page).fadeIn(800);
+            });
+        });
+    }
+</script>

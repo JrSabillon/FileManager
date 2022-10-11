@@ -1,0 +1,88 @@
+﻿@model List<SyT_FileManager.Models.RecursoItem>
+@using SyT_FileManager.AppCode;
+
+@{ 
+    var Labels = new SyT_FileManager.Models.RecursoItem();
+}
+
+<div class="row">
+    <div class="col-12">
+        @Html.TextBox("text-filter", null, new { @class = "form-control col-12", placeholder = "Buscar recurso...", onkeyup = "filterTable();" })
+        <br />
+        <div class="table-responsive" style="max-height: 500px; overflow-y: auto;">
+            <table class="table table-hover" id="table-resource">
+                <thead style="position: sticky; top: 0;" class="bg-white">
+                    <tr>
+                        <th>@Html.LabelFor(model => Labels.RecursoItemNombre)</th>
+                        <th>@Html.LabelFor(model => Labels.RecursoItemStatus)</th>
+                        <th>
+                            @if (Constants.Privilegios.Where(x => x.PrivId.Equals("MODII_CAT_ADDREC")).Count() > 0)
+                            {
+                                <button class="btn btn-success btn-sm float-right shadow" title="Agregar recurso" onclick="resourceAction('@ViewBag.RecursoID', '')">
+                                    <i class="fa fa-plus"></i>
+                                </button>
+                            }
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if(Model.Count == 0)
+                    {
+                        <tr>
+                            <td colspan="3">
+                                <h5>No hay datos por mostrar</h5>
+                            </td>
+                        </tr>
+                    }
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@item.RecursoItemNombre</td>
+                            <td>@(item.RecursoItemStatus.Equals("AC") ? "Activo" : "Inactivo")</td>
+                            <td>
+                                @if (Constants.Privilegios.Where(x => x.PrivId.Equals("MODII_CAT_EDTREC")).Count() > 0)
+                                {
+                                    <button class="btn btn-warning btn-sm shadow float-right" type="button" title="editar"
+                                            onclick="resourceAction('@item.RecursoID', '@item.RecursoItemID')">
+                                        <i class="fa fa-pencil"></i>
+                                    </button>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div id="div-modal-resource">
+</div>
+
+<script type="text/javascript">
+    function resourceAction(RecursoID, RecursoItemID) {
+        $.get('@Url.Action("_Recurso", "Catalogos")', { RecursoID: RecursoID, RecursoItemID: RecursoItemID }, function (page) {
+            $('#div-modal-resource').html(page);
+            $('#modal-recurso').modal();
+        });
+    }
+
+    function filterTable() {
+        var input, filter, table, tr, td, i, txtValue;
+        input = document.getElementById("text-filter");
+        filter = input.value.toUpperCase();
+        table = document.getElementById("table-resource");
+        tr = table.getElementsByTagName("tr");
+        for (i = 0; i < tr.length; i++) {
+            td = tr[i].getElementsByTagName("td")[0];
+            if (td) {
+                txtValue = td.textContent || td.innerText;
+                if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                    tr[i].style.display = "";
+                } else {
+                    tr[i].style.display = "none";
+                }
+            }
+        }
+    }
+</script>
