@@ -1,0 +1,97 @@
+﻿@model List<SyT_FileManager.Models.DocumentoModel>
+
+@{ 
+    var documentosActivos = Model.Where(x => x.DocStatus.Equals("ACT")).Count();
+}
+
+@if (Model.Count > 0)
+{
+    using (Html.BeginForm("_SelectDocuments", "ArchivoInactivo", FormMethod.Post))
+    {
+        @Html.Hidden("CajaInactivaID")
+        @Html.Hidden("CajaID")
+        @Html.Hidden("AlmacenIDOrigen")
+        @Html.Hidden("lote")
+        <div class="form-group">
+            <hr />
+            <h5>Caja #@ViewBag.CajaInactivaID</h5>
+            <div class="custom-control custom-switch">
+                @Html.CheckBox("sendAll", new { @class = "custom-control-input", id = "chk-sendbox", onchange = "handleCheckbox(this);" })
+                <label class="custom-control-label" for="chk-sendbox">Triturar todos los documentos</label>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th>Documento</th>
+                        <th>Descripción</th>
+                        <th>Estado</th>
+                        <th>Fecha de registro</th>
+                        <th>Fecha de vencimiento</th>
+                        <th>Banco</th>
+                        <th>Centro de costo</th>
+                        <th>Zona</th>
+                        <th>Es paquete</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (int i = 0; i < Model.Count; i++)
+                    {
+                        <tr>
+                            <td>
+                                @Html.HiddenFor(model => Model[i].CajaID)
+                                @Html.HiddenFor(model => Model[i].DocID)
+                                @Html.HiddenFor(model => Model[i].DocAgenciaID)
+                                @Html.HiddenFor(model => Model[i].DocStatus)
+                                @if (Model[i].DocStatus.Equals("ACT"))
+                                {
+                                    @Html.CheckBoxFor(model => Model[i].Create)
+                                }
+                                else
+                                {
+                                    <input type="checkbox" onclick="alert('No puede enviar documentos que no esten en la caja'); return false;" />
+                                }
+                            </td>
+                            <td>@Model[i].SelectedDocumento.TipoDocNombre</td>
+                            <td>@Model[i].DocDescripcion</td>
+                            <td>@Model[i].SelectedEstado.RecursoItemNombre</td>
+                            <td>@Model[i].DocFechaInfo.Value.ToString("yyyy-MM-dd")</td>
+                            <td>@Model[i].DocFechaVencimiento.Value.ToString("yyyy-MM-dd")</td>
+                            <td>@Model[i].SelectedBanco.BancoNombre</td>
+                            <td>@Model[i].SelectedCentroDeCosto.EstOrgaNombre</td>
+                            <td>@Model[i].SelectedZona.RecursoItemNombre</td>
+                            <td>@(Model[i].DocPaquete ? "Si" : "No")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <br />
+
+        if(documentosActivos > 0)
+        {
+            <button class="btn btn-danger">
+                <i class="fa fa-trash-o"></i> Triturar documentos
+            </button>
+        }
+    }
+}
+else
+{
+    <h4 class="text-muted text-center">No hay documentos disponibles</h4>
+}
+
+<script type="text/javascript">
+    function handleCheckbox(element) {
+        var isChecked = $('#chk-sendbox').is(':checked');
+
+        if (isChecked) {
+            $('tbody tr td input[type=checkbox]').addClass('d-none');
+        } else {
+            $('tbody tr td input[type=checkbox]').removeClass('d-none');
+        }
+    }
+</script>

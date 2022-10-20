@@ -231,5 +231,58 @@ namespace SyT_FileManager.DataAccess
                 return data;
             }
         }
+
+        public int GetNextTrituraID()
+        {
+            using (IDbConnection context = new SqlConnection(Constants.ConnectionString))
+            {
+                string query = "SELECT ISNULL(MAX(TrituraID), 0) + 1 FROM DocTritura";
+                var data = context.QuerySingle<int>(query);
+
+                return data;
+            }
+        }
+
+        public long TriturarDocumentos(List<DocTrituraModel> docTrituras)
+        {
+            long affectedRows = 0L;
+
+            using (IDbConnection context = new SqlConnection(Constants.ConnectionString))
+            {
+                string query = "INSERT INTO [dbo].[DocTritura] ([TrituraID], [DocID], [CajaID], [AlmacenID], [TrituraNombreTestigo], [TrituraFecha], [TrituraUsuario]) " +
+                    "VALUES (@TrituraID, @DocID, @CajaID, 0, '', @TrituraFecha, @TrituraUsuario)";
+
+                docTrituras.ForEach((DocTrituraModel docTritura) =>
+                {
+                    var values = new { docTritura.TrituraID, docTritura.DocID, docTritura.CajaID, docTritura.TrituraFecha, docTritura.TrituraUsuario };
+
+                    affectedRows += context.Execute(query, values);
+                });
+
+                return affectedRows;
+            }
+        }
+
+        internal List<DocTrituraModel> GetDocTrituraByTrituraID(int? lote)
+        {
+            using (IDbConnection context = new SqlConnection(Constants.ConnectionString))
+            {
+                string query = "SELECT * FROM DocTritura WHERE TrituraID = @TrituraID";
+                var data = context.Query<DocTrituraModel>(query, new { TrituraID = lote }).ToList();
+
+                return data;
+            }
+        }
+
+        internal bool UpdateDocTrituraSetTrituraNombreTestigo(string TrituraNombreTestigo, int lote)
+        {
+            using (IDbConnection context = new SqlConnection(Constants.ConnectionString))
+            {
+                string query = "UPDATE DocTritura SET TrituraNombreTestigo = @TrituraNombreTestigo WHERE TrituraID = @lote";
+                var data = context.Execute(query, new { TrituraNombreTestigo, lote });
+
+                return data > 0;
+            }
+        }
     }
 }

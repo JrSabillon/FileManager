@@ -73,7 +73,7 @@ namespace SyT_FileManager.Controllers
         }
 
         [HttpPost]
-        public ActionResult Enviar(List<DocumentoModel> documentos, int AlmacenID)
+        public ActionResult Enviar(List<DocumentoModel> documentos, int AlmacenID, string Source)
         {
             //Obtener solo los documentos que se ingresaran al final.
             var documents = documentos.Where(x => x.Create).ToList();
@@ -84,7 +84,7 @@ namespace SyT_FileManager.Controllers
             //Ingresar documentos
             DocumentoBusiness.CreateDocuments(documents, Convert.ToInt32(CajaID));
             
-            return RedirectToAction("CajaEnviada", new { CajaID });
+            return RedirectToAction(Source ?? "CajaEnviada", new { CajaID });
         }
 
         public ActionResult _DocumentGrid(DocumentoModel documento)
@@ -245,10 +245,10 @@ namespace SyT_FileManager.Controllers
 
             var almacenes = AlmacenAccess.GetAlmacenes();
 
-            ViewBag.CajaID = caja.CajaActivaID;
-            var cajasInactivas = CajaAccess.GetCajasByStatusAndAlmacenTipo("ACT", "INA");
+            ViewBag.CajaID = CajaID;
+            //var cajasInactivas = CajaAccess.GetCajasByStatusAndAlmacenTipo("ACT", "INA");
 
-            ViewBag.CajaInactivaID = cajasInactivas;
+            //ViewBag.CajaInactivaID = cajasInactivas;
             ViewBag.CajaActivaID = caja.CajaActivaID;
             ViewBag.AlmacenIDOrigen = CajaAccess.GetCaja(CajaID).AlmacenID;
             //Obtener almacenes de tipo almacen inactivo
@@ -266,7 +266,6 @@ namespace SyT_FileManager.Controllers
         /// <param name="CajaID">ID de la caja actual</param>
         /// <returns></returns>
         [HttpPost]
-        [AllowAnonymous]
         public ActionResult _SelectDocuments(List<DocumentoModel> Documentos, int AlmacenID, bool SendAll, int CajaID)
         {
             //Si envia todos los documentos entonces la caja actual pasa al almacen inactivo
@@ -502,7 +501,7 @@ namespace SyT_FileManager.Controllers
             return View(model.Where(x => AlmacenesID.Any(id => x.AlmacenID.Equals(id))).ToPagedList(pageNumber, pageSize));
         }
 
-        public ActionResult ArmarCaja()
+        public ActionResult ArmarCaja(int? CajaID)
         {
             var model = new DocumentoModel()
             {
@@ -512,18 +511,18 @@ namespace SyT_FileManager.Controllers
                 TiposDocumentos = TipoDocumentoAccess.GetTipoDocumentos().Where(x => x.TipoDocStatus.Equals("AC")).ToList()
             };
 
-            var userAgency = Constants.GetUserData().AgenciaID;
+            var user = Constants.GetUserData();
             List<AlmacenModel> almacenes = new List<AlmacenModel>();
+            var almacenesUsuario = AlmacenAccess.GetAlmacenIDByUserID(user.UserId);
 
-            //if (userAgency.HasValue)
-            //    almacenes = AlmacenAccess.GetAlmacenesActivosByAgenciaID(userAgency).Where(x => x.AlmacenStatus.Equals("AC")).ToList();
-            //else
-                almacenes = AlmacenAccess.GetAlmacenesActivos();
+            almacenes = AlmacenAccess.GetAlmacenesActivos().Where(x => almacenesUsuario.Any(y => x.AlmacenID.Equals(y))).ToList();
 
             ViewBag.AlmacenID = new SelectList(almacenes, "AlmacenID", "AlmacenLabel");
-            ViewBag.Agencias = new SelectList(AgenciaAccess.GetAgencias(), "AgenciaID", "AgenciaNombre", userAgency);
-            ViewBag.ZonaID = userAgency.HasValue ? AgenciaAccess.GetAgencia(userAgency).ZonaID : almacenes.First().ZonaId;
-            ViewBag.AgenciaID = userAgency;
+            ViewBag.Agencias = new SelectList(AgenciaAccess.GetAgencias(), "AgenciaID", "AgenciaNombre", user.AgenciaID);
+            ViewBag.ZonaID = user.AgenciaID.HasValue ? AgenciaAccess.GetAgencia(user.AgenciaID).ZonaID : almacenes.First().ZonaId;
+            ViewBag.AgenciaID = user.AgenciaID;
+            ViewBag.CajaID = CajaID ?? 0;
+            ViewBag.AlmacenGuardado = CajaID.HasValue ? CajaAccess.GetCaja(CajaID.Value).AlmacenID : 0;
 
             return View(model);
         }

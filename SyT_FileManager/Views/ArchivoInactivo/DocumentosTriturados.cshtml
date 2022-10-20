@@ -1,0 +1,135 @@
+﻿@model List<SyT_FileManager.Models.DocTrituraModel>
+@{
+    ViewBag.Title = "DocumentosTriturados";
+    var user = SyT_FileManager.AppCode.Constants.GetUserData();
+    var fechaTrituracion = Model.Select(x => x.TrituraFecha).First().ToString("yyyy-MM-dd");
+}
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="~/Scripts/dist/jspdf-autotable.js"></script>
+
+<h2>Documentos triturados</h2>
+<hr />
+
+@if (ViewBag.Message != null)
+{
+    <div class="alert alert-warning mb-3">
+        <label>@ViewBag.Message</label>
+    </div>
+    <a href="@Url.Action("Triturar", "ArchivoInactivo")" class="btn btn-primary">Ir a trituración de Docs.</a>
+
+
+    <br />
+}
+else
+{
+    <button type="button" class="btn btn-success" data-target="#modal-triturar" data-toggle="modal"><i class="fa fa-print"></i> Imprimir reporte</button>
+    <a class="btn btn-primary" href="@Url.Action("Triturar", "ArchivoInactivo", new { lote = ViewBag.lote })"><i class="fa fa-trash-o"></i> Seguir triturando</a>
+    <div class="table-responsive mt-3" id="div-docs">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Documento</th>
+                    <th>Descripción</th>
+                    <th>Fecha trituración</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.Count > 0)
+                {
+                    foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@item.TrituraID</td>
+                            <td>@item.Documento.SelectedDocumento.TipoDocNombre</td>
+                            <td>@item.Documento.DocDescripcion</td>
+                            <td>@item.Documento.DocFechaTrituracion.Value.ToString("yyyy-MM-dd")</td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+
+    using(Html.BeginForm("ConsolidarTrituracion", "ArchivoInactivo", FormMethod.Post, new { id = "form-triturar" }))
+    {
+        @Html.Hidden("lote")
+        <div class="modal fade" tabindex="-1" role="dialog" id="modal-triturar">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Imprimir reporte de trituración</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label>Nombre del testigo</label>
+                            @Html.TextBox("TrituraNombreTestigo", null, new { @class = "form-control col-12" })
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" id="btn-print" onclick="print();"><i class="fa fa-save"></i> Imprimir</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+    <script type="text/javascript">
+        $(function () {
+            $('#btn-print').attr('disabled', 'disabled');
+
+            $('#TrituraNombreTestigo').on('keyup', function () {
+                let nombre = $(this).val();
+
+                if (nombre != '') {
+                    $('#btn-print').removeAttr('disabled');
+                } else {
+                    $('#btn-print').attr('disabled', 'disabled');
+                }
+            });
+        });
+
+        function print() {
+            //TODO: Generar reporte de trituracion.
+            var doc = new jsPDF();
+
+            margins = {
+                top: 45,
+                bottom: 60,
+                left: 10,
+                width: 522
+            };
+
+            specialElementHandlers = {
+                // element with id of "bypass" - jQuery style selector
+                '#bypassme': function (element, renderer) {
+                    // true = "handled elsewhere, bypass text extraction"
+                    return true
+                }
+            };
+
+            doc.text('Acta de trituración', 80, 10);
+            doc.line(10, 12, 200, 11);
+            doc.setFontSize(10);
+            doc.text(`Nombre del testigo: ${$('#TrituraNombreTestigo').val()}`, 10, 20);
+            doc.text(`Persona que tritura: ${'@user.UserNombre'}`, 10, 25);
+            doc.text(`Fecha de trituración: ${'@fechaTrituracion'}`, 10, 30);
+            doc.setFontSize(15);
+            doc.text('Documentos triturados', 10, 45);
+            doc.line(10, 47, 200, 47);
+            doc.setFontSize(10);
+            doc.fromHTML(
+                $('#div-docs')[0], margins.left, margins.top, { 'width': margins.width, 'elementHandlers': specialElementHandlers },
+                function (dispose) { doc.save('Trituracion.pdf'); }, margins
+            );
+            autoTable(doc, { html: '#div-docs' });
+
+            //Agregar nombre del testigo al lote de trituracion.
+            $('#form-triturar').submit();
+        }
+    </script>
+}

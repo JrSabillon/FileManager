@@ -179,6 +179,7 @@
     <Compile Include="Models\CajaModel.cs" />
     <Compile Include="Models\DocCajaHistoricaModel.cs" />
     <Compile Include="Models\DocPrestamo.cs" />
+    <Compile Include="Models\DocTrituraModel.cs" />
     <Compile Include="Models\DocumentoModel.cs" />
     <Compile Include="Models\EstructuraOrganizacionalModel.cs" />
     <Compile Include="Models\POCO\EnviarCajaBusqueda.cs" />
@@ -219,6 +220,8 @@
     <Content Include="Scripts\bootstrap.bundle.min.js" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
+    <Content Include="Scripts\dist\jspdf-autotable.js" />
+    <None Include="Scripts\dist\jspdf.umd.min.js.map" />
     <Content Include="Scripts\dist\qrcode.js" />
     <Content Include="Scripts\dist\qrcode.min.js" />
     <Content Include="Scripts\esm\popper-utils.js" />
@@ -412,6 +415,8 @@
     <Content Include="Views\ArchivoInactivo\Triturar.cshtml" />
     <Content Include="Views\Shared\SessionExpired.cshtml" />
     <Content Include="Views\ArchivoInactivo\ArmarCaja.cshtml" />
+    <Content Include="Views\ArchivoInactivo\_SelectDocuments.cshtml" />
+    <Content Include="Views\ArchivoInactivo\DocumentosTriturados.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

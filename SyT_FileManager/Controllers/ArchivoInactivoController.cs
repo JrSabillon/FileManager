@@ -340,7 +340,7 @@ namespace SyT_FileManager.Controllers
             return View(model.Where(x => AlmacenesID.Any(id => x.AlmacenID.Equals(id))).ToPagedList(pageNumber, pageSize));
         }
 
-        public ActionResult Triturar(int? page, bool searchOutdated = true)
+        public ActionResult Triturar(int? page, int? lote, bool searchOutdated = true)
         {
             var model = searchOutdated ? CajaAccess.GetCajasOutdated("INA") : CajaAccess.GetCajasByStatusAndAlmacenTipo("ACT", "INA");
             var almacenes = AlmacenAccess.GetAlmacenes();
@@ -362,6 +362,7 @@ namespace SyT_FileManager.Controllers
             });
 
             ViewBag.searchOutdated = searchOutdated;
+            ViewBag.lote = lote;
 
             int pageSize = Constants.PaginationSize;
             int pageNumber = (page ?? 1);
@@ -369,7 +370,71 @@ namespace SyT_FileManager.Controllers
             return View(model.Where(x => AlmacenesID.Any(id => x.AlmacenID.Equals(id))).ToPagedList(pageNumber, pageSize));
         }
 
-        public ActionResult ArmarCaja()
+        public ActionResult _SelectDocuments(int CajaID, int lote)
+        {
+            var caja = CajaAccess.GetCaja(CajaID);
+            var documentos = DocumentoAccess.GetDocumentosByCajaID(CajaID).ToList();
+            var Bancos = BancoAccess.GetBancos();
+            var Zonas = RecursoAccess.GetRecursoItems("ZONA");
+            var CentrosDeCosto = OrganizacionAccess.GetCCDropdown();
+            var TiposDocumentos = TipoDocumentoAccess.GetTipoDocumentos().Where(x => x.TipoDocStatus.Equals("AC")).ToList();
+            var EstadosDocumentos = RecursoAccess.GetRecursoItems("DOCSTTS");
+
+            documentos.ForEach((DocumentoModel documento) => {
+                documento.Bancos = Bancos;
+                documento.Zonas = Zonas;
+                documento.CentrosDeCosto = CentrosDeCosto;
+                documento.TiposDocumentos = TiposDocumentos;
+                documento.Create = documento.DocFechaVencimiento <= DateTime.Now;
+                documento.Estados = EstadosDocumentos;
+            });
+
+            var almacenes = AlmacenAccess.GetAlmacenes();
+
+            ViewBag.CajaID = caja.CajaID;
+            ViewBag.CajaInactivaID = caja.CajaInactivaID;
+            ViewBag.lote = lote;
+            
+            return PartialView("_SelectDocuments", documentos);
+        }
+
+        /// <summary>
+        /// Enviar documentos a almacen inactivo
+        /// </summary>
+        /// <param name="Documentos">Listado de documentos de la caja, solo los seleccionados con el atributo create seran enviados a menos que el usuario seleccionara enviarlos todos.</param>
+        /// <param name="SendAll">Parametro que indica si enviara todos los documentos o no.</param>
+        /// <param name="lote">ID de lote, si viene en 0 se crea un nuevo lote si no se anexan al lote enviado.</param>
+        /// <returns></returns>
+        [HttpPost]
+        public ActionResult _SelectDocuments(List<DocumentoModel> Documentos, bool SendAll, int lote)
+        {
+            lote = DocumentoBusiness.TriturarDocumentos(Documentos, SendAll, lote);
+
+            return RedirectToAction("DocumentosTriturados", new { lote });
+        }
+
+        public ActionResult DocumentosTriturados(int? lote)
+        {
+            if (!lote.HasValue)
+            {
+                ViewBag.Message = "No se selecciono un No. de lote";
+                return View();
+            }
+            
+            var model = DocumentoAccess.GetDocTrituraByTrituraID(lote);
+            ViewBag.Message = model.Count == 0 ? $"No hay documentos en este lote No. de lote [{lote}]" : null;
+            ViewBag.lote = lote;
+
+            model.ForEach((DocTrituraModel docTritura) =>
+            {
+                docTritura.Documento = DocumentoAccess.GetDocumento(docTritura.DocID);
+                docTritura.Documento.TiposDocumentos = TipoDocumentoAccess.GetTipoDocumentos();
+            });
+
+            return View(model);
+        }
+
+        public ActionResult ArmarCaja(int? CajaID)
         {
             var model = new DocumentoModel()
             {
@@ -378,15 +443,18 @@ namespace SyT_FileManager.Controllers
                 CentrosDeCosto = OrganizacionAccess.GetCCDropdown(),
                 TiposDocumentos = TipoDocumentoAccess.GetTipoDocumentos().Where(x => x.TipoDocStatus.Equals("AC")).ToList()
             };
-            var userAgency = Constants.GetUserData().AgenciaID;
+            var user = Constants.GetUserData();
             List<AlmacenModel> almacenes = new List<AlmacenModel>();
+            var almacenesUsuario = AlmacenAccess.GetAlmacenIDByUserID(user.UserId);
 
-            almacenes = AlmacenAccess.GetAlmacenesActivos();
+            almacenes = AlmacenAccess.GetAlmacenesActivos().Where(x => almacenesUsuario.Any(y => x.AlmacenID.Equals(y))).ToList();
 
             ViewBag.AlmacenID = new SelectList(almacenes, "AlmacenID", "AlmacenLabel");
-            ViewBag.Agencias = new SelectList(AgenciaAccess.GetAgencias(), "AgenciaID", "AgenciaNombre", userAgency);
-            ViewBag.ZonaID = userAgency.HasValue ? AgenciaAccess.GetAgencia(userAgency).ZonaID : almacenes.First().ZonaId;
-            ViewBag.AgenciaID = userAgency;
+            ViewBag.Agencias = new SelectList(AgenciaAccess.GetAgencias(), "AgenciaID", "AgenciaNombre", user.AgenciaID);
+            ViewBag.ZonaID = user.AgenciaID.HasValue ? AgenciaAccess.GetAgencia(user.AgenciaID).ZonaID : almacenes.First().ZonaId;
+            ViewBag.AgenciaID = user.AgenciaID;
+            ViewBag.CajaID = CajaID ?? 0;
+            ViewBag.AlmacenGuardado = CajaID.HasValue ? CajaAccess.GetCaja(CajaID.Value).AlmacenID : 0;
 
             return View(model);
         }
@@ -412,7 +480,7 @@ namespace SyT_FileManager.Controllers
         }
 
         [HttpPost]
-        public ActionResult Enviar(List<DocumentoModel> documentos, int AlmacenID)
+        public ActionResult Enviar(List<DocumentoModel> documentos, int AlmacenID, string Source)
         {
             //Obtener solo los documentos que se ingresaran al final.
             var documents = documentos.Where(x => x.Create).ToList();
@@ -423,7 +491,14 @@ namespace SyT_FileManager.Controllers
             //Ingresar documentos
             DocumentoBusiness.CreateDocuments(documents, Convert.ToInt32(CajaID));
 
-            return RedirectToAction("CajaEnviada", new { CajaID });
+            return RedirectToAction(Source ?? "CajaEnviada", new { CajaID });
+        }
+
+        public ActionResult ConsolidarTrituracion(string TrituraNombreTestigo, int lote)
+        {
+            bool updated = DocumentoAccess.UpdateDocTrituraSetTrituraNombreTestigo(TrituraNombreTestigo, lote);
+
+            return RedirectToAction("DocumentosTriturados", new { lote });
         }
     }
 }

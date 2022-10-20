@@ -10,6 +10,7 @@
 
 @using (Html.BeginForm("Triturar", "ArchivoInactivo", FormMethod.Post))
 {
+    @Html.Hidden("lote")
     <div class="col-12 col-md custom-control custom-switch form-group">
         @Html.CheckBox("searchOutdated", searchOutdated, new { @class = "custom-control-input", id = "chk-searchOutdated" })
         <label class="custom-control-label" for="chk-searchOutdated">Mostrar solo cajas con documentos vencidos</label>
@@ -17,10 +18,9 @@
     <button class="btn btn-success"><i class="fa fa-search"></i> Buscar</button>
 }
 <br />
-<label class="text-muted">Seleccionar los documentos que desea triturar</label>
-<div class="table-responsive">
+<div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
     <table class="table table-hover">
-        <thead>
+        <thead style="position: sticky; top: 0;" class="bg-white">
             <tr>
                 <th>#Caja</th>
                 <th>Fecha recepción</th>
@@ -37,7 +37,7 @@
             @foreach (var item in Model)
             {
                 <tr>
-                    <td>@item.CajaActivaID</td>
+                    <td>@item.CajaInactivaID</td>
                     <td>@item.CajaFechaRecepcion</td>
                     <td>@item.SelectedAlmacen.AlmacenLabel</td>
                     <td>@item.SelectedEstante.RecursoItemNombre</td>
@@ -46,7 +46,7 @@
                     <td>@item.SelectedFila.RecursoItemNombre</td>
                     <td>@item.SelectedUbicacion.RecursoItemNombre</td>
                     <td>
-                        <a href="#div-partial" class="btn btn-enterprise btn-sm" onclick="seeDocuments(@item.CajaID);"><i class="fa fa-book"></i></a>
+                        <a href="#div-partial" class="btn btn-enterprise btn-sm" onclick="seeDocuments(@item.CajaID, @(ViewBag.lote != null ? ViewBag.lote : 0));"><i class="fa fa-book"></i></a>
                     </td>
                 </tr>
             }
@@ -61,3 +61,17 @@
         </tbody>
     </table>
 </div>
+
+<div id="div-partial">
+
+</div>
+
+<script type="text/javascript">
+    function seeDocuments(CajaID, lote) {
+        $.get('@Url.Action("_SelectDocuments", "ArchivoInactivo")', { CajaID: CajaID, lote: lote }, function (content, status) {
+            $('#div-partial').fadeOut(200, function () {
+                $(this).html(content).fadeIn(600);
+            });
+        }).fail(handleAjaxAuth);
+    }
+</script>

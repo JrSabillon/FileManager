@@ -155,5 +155,47 @@ namespace SyT_FileManager.Business
 
             return DocumentoAccess.Update(documento);
         }
+
+        /// <summary>
+        /// Enviar documentos a trituracion por lotes.
+        /// </summary>
+        /// <param name="documentos">Documentos de la caja que pueden ser triturados</param>
+        /// <param name="sendAll">Variable que indica si todos los documentos de la caja seran triturados(true para enviarlos todos)</param>
+        /// <returns>ID del lote de trituracion para los documentos seleccionados.</returns>
+        public int TriturarDocumentos(List<DocumentoModel> documentos, bool sendAll, int lote)
+        {
+            //Enviar los documentos a triturar por lotes, conseguir numero de lote.
+            int TrituraID = lote != 0 ? lote : DocumentoAccess.GetNextTrituraID();
+            //Inicializar lote que se triturara.
+            List<DocTrituraModel> docTrituras = new List<DocTrituraModel>();
+            DocTrituraModel docTritura = null;
+            var today = DateTime.Now;
+
+            documentos.ForEach((DocumentoModel documento) =>
+            {
+                //Si tritura todos los documentos y el documento se encuentra disponible para triturar entonces setear la bandera a true.
+                documento.Create = sendAll ? sendAll : documento.Create && documento.DocStatus.Equals("ACT");
+
+                if (documento.Create)
+                {
+                    docTritura = new DocTrituraModel
+                    {
+                        TrituraID = TrituraID,
+                        DocID = documento.DocID,
+                        CajaID = documento.CajaID,
+                        TrituraFecha = today,
+                        TrituraUsuario = Constants.GetUserData().UserId
+                    };
+
+                    //Agregar documento al lote de trituracion.
+                    docTrituras.Add(docTritura);
+                }
+            });
+
+            //Enviar a trituracion por lotes.
+            DocumentoAccess.TriturarDocumentos(docTrituras);
+
+            return TrituraID;
+        }
     }
 }
