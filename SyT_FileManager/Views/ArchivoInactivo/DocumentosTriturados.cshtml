@@ -37,10 +37,12 @@ else
         <table class="table table-hover">
             <thead>
                 <tr>
-                    <th>#</th>
                     <th>Documento</th>
                     <th>Descripción</th>
+                    <th>Banco</th>
+                    <th>Agencia</th>
                     <th>Fecha trituración</th>
+                    <th>Fecha vencimiento</th>
                 </tr>
             </thead>
             <tbody>
@@ -49,10 +51,12 @@ else
                     foreach (var item in Model)
                     {
                         <tr>
-                            <td>@item.TrituraID</td>
                             <td>@item.Documento.SelectedDocumento.TipoDocNombre</td>
                             <td>@item.Documento.DocDescripcion</td>
+                            <td>@item.Documento.SelectedBanco.BancoNombre</td>
+                            <td>@item.Documento.SelectedAgencia.AgenciaNombre</td>
                             <td>@item.Documento.DocFechaTrituracion.Value.ToString("yyyy-MM-dd")</td>
+                            <td>@item.Documento.DocFechaVencimiento.Value.ToString("yyyy-MM-dd")</td>
                         </tr>
                     }
                 }

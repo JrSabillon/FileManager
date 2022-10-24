@@ -426,12 +426,16 @@ namespace SyT_FileManager.Controllers
             }
             
             var model = DocumentoAccess.GetDocTrituraByTrituraID(lote);
+            var agencias = AgenciaAccess.GetAgencias();
+            var bancos = BancoAccess.GetBancos();
             ViewBag.Message = model.Count == 0 ? $"No hay documentos en este lote No. de lote [{lote}]" : null;
             ViewBag.lote = lote;
 
             model.ForEach((DocTrituraModel docTritura) =>
             {
                 docTritura.Documento = DocumentoAccess.GetDocumento(docTritura.DocID);
+                docTritura.Documento.Agencias = agencias;
+                docTritura.Documento.Bancos = bancos;
                 docTritura.Documento.TiposDocumentos = TipoDocumentoAccess.GetTipoDocumentos();
             });
 
