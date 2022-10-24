@@ -519,7 +519,7 @@ namespace SyT_FileManager.Controllers
             Document doc = new Document(PageSize.A4);
             doc.SetMargins(25f, 25f, 10f, 10f);
 
-            PdfPTable tableLayout = new PdfPTable(5);
+            PdfPTable tableLayout = new PdfPTable(6);
             PdfWriter.GetInstance(doc, workStream).CloseStream = false;
             doc.Open();
 
@@ -556,14 +556,14 @@ namespace SyT_FileManager.Controllers
             signaturesLayout.WidthPercentage = 100;
             signaturesLayout.HeaderRows = 0;
 
-            signaturesLayout.AddCell(new PdfPCell(new Phrase("__________________________________ \nFirma del testigo", new Font(Font.FontFamily.HELVETICA, 10f)))
+            signaturesLayout.AddCell(new PdfPCell(new Phrase("__________________________________ \n\nFirma del testigo", new Font(Font.FontFamily.HELVETICA, 10f)))
             {
                 HorizontalAlignment = Element.ALIGN_CENTER,
                 BackgroundColor = new BaseColor(255, 255, 255),
                 Border = Rectangle.NO_BORDER
             });
 
-            signaturesLayout.AddCell(new PdfPCell(new Phrase("__________________________________ \nFirma del encargado de trituración", new Font(Font.FontFamily.HELVETICA, 10f)))
+            signaturesLayout.AddCell(new PdfPCell(new Phrase("__________________________________ \n\nFirma del encargado de trituración", new Font(Font.FontFamily.HELVETICA, 10f)))
             {
                 HorizontalAlignment = Element.ALIGN_CENTER,
                 BackgroundColor = new BaseColor(255, 255, 255),
@@ -575,24 +575,25 @@ namespace SyT_FileManager.Controllers
 
         private PdfPTable AddTableContent(List<DocTrituraModel> pdfData, PdfPTable tableLayout)
         {
-            float[] headers = { 25, 40, 30, 20, 30 };
+            float[] headers = { 15, 15, 20, 20, 15, 15 };
             tableLayout.SetWidths(headers);
             tableLayout.WidthPercentage = 100;
             tableLayout.HeaderRows = 1;
 
             tableLayout.AddCell(new PdfPCell(new Phrase("Documentos triturados"))
             {
-                Colspan = 5,
+                Colspan = 6,
                 Border = 0,
                 PaddingBottom = 5,
                 HorizontalAlignment = Element.ALIGN_LEFT
             });
 
-            AddCellToHeader(tableLayout, columnName: "Documento");
+            AddCellToHeader(tableLayout, columnName: "Doc.");
             AddCellToHeader(tableLayout, columnName: "Descripcion");
             AddCellToHeader(tableLayout, columnName: "Banco");
             AddCellToHeader(tableLayout, columnName: "Agencia");
-            AddCellToHeader(tableLayout, columnName: "Fecha trituración");
+            AddCellToHeader(tableLayout, columnName: "Trituración");
+            AddCellToHeader(tableLayout, columnName: "Vencimiento");
 
             var bancos = BancoAccess.GetBancos();
             var documentos = TipoDocumentoAccess.GetTipoDocumentos();
@@ -607,6 +608,7 @@ namespace SyT_FileManager.Controllers
                 AddCellToBody(tableLayout, value: bancos.Find(x => x.BancoID.Equals(documentoTriturado.DocBancoID)).BancoNombre); //Tipo de banco.
                 AddCellToBody(tableLayout, value: agencias.Find(x => x.AgenciaID.Equals(documentoTriturado.DocAgenciaID)).AgenciaNombre); //Agencia de origen del documento.
                 AddCellToBody(tableLayout, value: documentoTriturado.DocFechaTrituracion.Value.ToString("yyyy-MM-dd"));
+                AddCellToBody(tableLayout, value: documentoTriturado.DocFechaVencimiento.Value.ToString("yyyy-MM-dd"));
             }
 
             return tableLayout;
