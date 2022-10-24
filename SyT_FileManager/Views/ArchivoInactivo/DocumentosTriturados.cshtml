@@ -2,11 +2,19 @@
 @{
     ViewBag.Title = "DocumentosTriturados";
     var user = SyT_FileManager.AppCode.Constants.GetUserData();
-    var fechaTrituracion = Model.Select(x => x.TrituraFecha).First().ToString("yyyy-MM-dd");
+    var fechaTrituracion = Model != null ? Model.Select(x => x.TrituraFecha).First().ToString("yyyy-MM-dd") : "";
 }
 
+@*<script src="~/Scripts/dist/jspdf.js"></script>*@
+
+@*<script src="~/Scripts/dist/jspdf-autotable.js"></script>*@
+<script src="~/Scripts/dist/html2canvas.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="~/Scripts/dist/jspdf-autotable.js"></script>
+<script src="https://unpkg.com/jspdf-autotable@3.5.25/dist/jspdf.plugin.autotable.js"></script>
+
+
+@*<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="~/Scripts/dist/jspdf-autotable.js"></script>*@
 
 <h2>Documentos triturados</h2>
 <hr />
@@ -52,7 +60,7 @@ else
         </table>
     </div>
 
-    using(Html.BeginForm("ConsolidarTrituracion", "ArchivoInactivo", FormMethod.Post, new { id = "form-triturar" }))
+    using (Html.BeginForm("ImprimirActaTrituracion", "ArchivoInactivo", FormMethod.Post, new { id = "form-triturar", onsubmit = "$('#modal-triturar').modal('hide')" }))
     {
         @Html.Hidden("lote")
         <div class="modal fade" tabindex="-1" role="dialog" id="modal-triturar">
@@ -71,7 +79,7 @@ else
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-primary" id="btn-print" onclick="print();"><i class="fa fa-save"></i> Imprimir</button>
+                        <button class="btn btn-primary" id="btn-print"><i class="fa fa-save"></i> Imprimir</button>
                     </div>
                 </div>
             </div>
@@ -94,6 +102,7 @@ else
         });
 
         function print() {
+            window.jsPDF = window.jspdf.jsPDF;
             //TODO: Generar reporte de trituracion.
             var doc = new jsPDF();
 
@@ -122,14 +131,22 @@ else
             doc.text('Documentos triturados', 10, 45);
             doc.line(10, 47, 200, 47);
             doc.setFontSize(10);
-            doc.fromHTML(
-                $('#div-docs')[0], margins.left, margins.top, { 'width': margins.width, 'elementHandlers': specialElementHandlers },
-                function (dispose) { doc.save('Trituracion.pdf'); }, margins
-            );
-            autoTable(doc, { html: '#div-docs' });
+            //doc.html(
+            //    $('#div-docs')[0], margins.left, margins.top, { 'width': margins.width, 'elementHandlers': specialElementHandlers },
+            //    function (dispose) { doc.save('Trituracion.pdf'); }, margins
+            //);
+            doc.html($('#div-docs').get(0), {
+                callback: function (doc) {
+                    doc.save('Trituracion.pdf');
+                },
+                x: 10,
+                y: 45
+            });
+            //autoTable(doc, { html: '#div-docs' });
 
+            // doc.save('Trituracion.pdf');
             //Agregar nombre del testigo al lote de trituracion.
-            $('#form-triturar').submit();
+            //$('#form-triturar').submit();
         }
     </script>
 }

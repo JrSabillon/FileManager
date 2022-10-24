@@ -62,3 +62,6 @@ D:\sytcorp\BANHCAFE\BanhcafeFileManager\SyT_FileManager\SyT_FileManager\obj\Debu
 D:\sytcorp\BANHCAFE\BanhcafeFileManager\SyT_FileManager\SyT_FileManager\obj\Debug\SyT_FileManager.csproj.CopyComplete
 D:\sytcorp\BANHCAFE\BanhcafeFileManager\SyT_FileManager\SyT_FileManager\obj\Debug\SyT_FileManager.dll
 D:\sytcorp\BANHCAFE\BanhcafeFileManager\SyT_FileManager\SyT_FileManager\obj\Debug\SyT_FileManager.pdb
+D:\sytcorp\BANHCAFE\BanhcafeFileManager\SyT_FileManager\SyT_FileManager\bin\BouncyCastle.Crypto.dll
+D:\sytcorp\BANHCAFE\BanhcafeFileManager\SyT_FileManager\SyT_FileManager\bin\itextsharp.dll
+D:\sytcorp\BANHCAFE\BanhcafeFileManager\SyT_FileManager\SyT_FileManager\bin\itextsharp.xml
