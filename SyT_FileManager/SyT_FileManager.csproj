@@ -159,6 +159,7 @@
     <Compile Include="Controllers\NavController.cs" />
     <Compile Include="Controllers\OrganizacionController.cs" />
     <Compile Include="Controllers\PrivilegiosController.cs" />
+    <Compile Include="Controllers\ReportesController.cs" />
     <Compile Include="Controllers\RolesController.cs" />
     <Compile Include="Controllers\TiposDocumentosController.cs" />
     <Compile Include="Controllers\UsuariosController.cs" />
@@ -425,9 +426,11 @@
     <Content Include="Views\ArchivoInactivo\ArmarCaja.cshtml" />
     <Content Include="Views\ArchivoInactivo\_SelectDocuments.cshtml" />
     <Content Include="Views\ArchivoInactivo\DocumentosTriturados.cshtml" />
+    <Content Include="Views\Reportes\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="Logs\" />
     <Folder Include="Views\Nav\" />
   </ItemGroup>
   <ItemGroup>

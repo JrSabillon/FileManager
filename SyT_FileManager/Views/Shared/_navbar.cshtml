@@ -13,7 +13,9 @@
         <ul class="navbar-nav mr-auto">
             @foreach (var item in Model.Where(x => x.PrivNivelOrden.Equals("0")).OrderBy(x => x.PrivPosicion))
             {
-                var childs = Model.Where(x => x.PrivId.StartsWith(item.PrivId + "_") && !x.PrivId.Equals(item.PrivId) && x.PrivNivelOrden.Equals("1"))
+                //Los nodos son todos aquellos que comienzan con el id del modulo, son de nivel 1 y tienen un controlador y una accion.
+                //Si el nodo no tiene controlador entonces es un nodo de permiso.
+                var childs = Model.Where(x => x.PrivId.StartsWith(item.PrivId + "_") && !x.PrivId.Equals(item.PrivId) && x.PrivNivelOrden.Equals("1") && !string.IsNullOrEmpty(x.PrivController))
                     .OrderBy(x => x.PrivPosicion).ToList();
 
                 if (childs.Count > 0)
@@ -37,7 +39,7 @@
                 else
                 {
                     <li class="nav-item">
-                        @Html.ActionLink(item.PrivNombre, "Index", "Home", new { @class = "nav-link" })
+                        @Html.ActionLink(item.PrivNombre, item.PrivAction, item.PrivController, null, new { @class = "nav-link" })
                     </li>
                 }
             }

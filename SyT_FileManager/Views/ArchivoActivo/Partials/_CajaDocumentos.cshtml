@@ -74,20 +74,37 @@
             </div>
         </div>
         <hr />
-        <div id="div-barCode" class="text-center">
-            <svg id="barCode"></svg>
-            <br />
-            <label>Fecha inicio: @Model.Min(x => x.DocFechaInfo).Value.ToString("dd/MM/yyyy") - Fecha Fin: @Model.Max(x => x.DocFechaInfo).Value.ToString("dd/MM/yyyy")</label>
+        <div id="div-barCode">
+            <div style="width: 300px; margin: auto;">
+                <label class="text-muted">Banco Hodureño del Café - BANHCAFE</label> <br />
+                <label>@ViewBag.AlmacenNombre - @ViewBag.CajaActivaID</label>
+                <table class="table table-sm">
+                    <tr>
+                        <td>Periodo</td>
+                        <td style="text-align:right;">@Model.Min(x => x.DocFechaInfo).Value.ToString("yyyy")</td>
+                    </tr>
+                    <tr>
+                        <td>Fecha inicial</td>
+                        <td style="text-align:right;">@Model.Min(x => x.DocFechaInfo).Value.ToString("dd/MM/yyyy")</td>
+                    </tr>
+                    <tr>
+                        <td>Fecha final</td>
+                        <td style="text-align:right;">@Model.Max(x => x.DocFechaInfo).Value.ToString("dd/MM/yyyy")</td>
+                    </tr>
+                </table>
+                <svg id="barCode"></svg>
+            </div>
         </div>
     }
 </div>
 
 <script type="text/javascript">
     $(function () {
-        JsBarcode("#barCode", `${@ViewBag.CajaActivaID}, ${'@ViewBag.AlmacenNombre'}`, {
-            width: 1,
+        JsBarcode("#barCode", `${@ViewBag.CajaID}, ${'@ViewBag.AlmacenID'}`, {
+            width: 3,
             height: 40,
-            fontSize: 12
+            fontSize: 12,
+            displayValue: false
         });
     });
 

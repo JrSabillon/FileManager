@@ -38,6 +38,13 @@
             if (responseStatus.status === 401)
                 window.location = '@Url.Action("SessionExpired", "Home")';
         }
+
+        $(function () {
+            $('tbody tr').on('click', function () {
+                $('tbody tr').removeClass('tr-selected');
+                $(this).addClass('tr-selected');
+            });
+        });
     </script>
     @Scripts.Render("~/bundles/bootstrap")
     @RenderSection("scripts", required: false)

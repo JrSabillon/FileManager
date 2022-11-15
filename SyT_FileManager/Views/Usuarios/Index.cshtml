@@ -110,7 +110,7 @@
             @Html.PagedListPager(Model, page => Url.Action("Index", new { page }), PagedListRenderOptions.OnlyShowFivePagesAtATime)
         </div>
         <div class="col-12 col-lg-6 border p-1">
-            <h4 class="text-center">Roles</h4>
+            @*<h4 class="text-center">Roles</h4>
             <hr />
             @if (Constants.Privilegios.Where(x => x.PrivId.Equals("MODI_USR_EDTROL")).Count() > 0)
             {
@@ -124,8 +124,8 @@
                     <hr />
                     <label>Solicitar accesos al administrador de permisos.</label>
                 </div>
-            }
-            <div id="div-partial" style="max-height: 500px; overflow-y: auto; overflow-x: hidden;"></div>
+            }*@
+            <div id="div-partial" style="max-height: 650px; overflow-y: auto; overflow-x: hidden;"></div>
         </div>
     </div>
 }

@@ -67,6 +67,9 @@ namespace SyT_FileManager.AppCode
         #region Constantes fijas
         public const string ADD = "Agregar";
         public const string EDIT = "Editar";
+        public const string AGENCY_USER = "Usuario de agencia";
+        public const string STORE_USER = "Usuario de almacen";
+        public const string OTHER = "Otro tipo de usuario";
         #endregion
     }
 
@@ -78,5 +81,11 @@ namespace SyT_FileManager.AppCode
         Height,
         [Integer(60)]
         Size
+    }
+
+    public enum UserLevel
+    {
+        Agency,
+        Store
     }
 }

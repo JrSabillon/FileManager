@@ -66,6 +66,22 @@ namespace SyT_FileManager.AppCode
 
             return type.GetField(name).GetCustomAttributes(false).OfType<T>().SingleOrDefault();
         }
+
+        /// <summary>
+        /// Tipo de usuario que se encuentra logueado actualmente.
+        /// </summary>
+        /// <returns>Devuelve el tipo de usuario que se encuentra logueado actualmente</returns>
+        public static UserLevel UserType()
+        {
+            var currentUser = Constants.GetUserData();
+
+            //Si tiene una agencia asignada es un usuario de agencia.
+            if (currentUser.AgenciaID.HasValue)
+                return UserLevel.Agency;
+
+            //en caso de que no sea de agencia es un usuario de bodega.
+            return UserLevel.Store;
+        }
     }
 
     /// <summary>

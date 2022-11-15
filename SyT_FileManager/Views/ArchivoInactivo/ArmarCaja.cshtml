@@ -11,7 +11,7 @@
     <div class="row">
         <div class="col-12 col-lg-4">
             <div class="form-group">
-                @Html.Label("Almacen de archivos activos")
+                @Html.Label("Almacen a enviar")
                 @Html.DropDownList("AlmacenID", null, new { @class = "form-control col-12", required = "required", id = "select-almacen", onchange = "$('#AlmacenID').val($(this).val())" })
             </div>
         </div>
@@ -63,14 +63,14 @@
         </div>
         <div class="col-12 col-sm-6 col-lg-4">
             <div class="form-group">
-                @Html.LabelFor(model => model.DocFechaInfo)
+                @Html.LabelFor(model => model.DocFechaInfo) *
                 @Html.TextBoxFor(model => model.DocFechaInfo, new { @class = "form-control col-12", type = "date", required = "required" })
             </div>
         </div>
         <div class="col-12 col-sm-6 col-lg-4">
             <div class="form-group">
-                @Html.LabelFor(model => model.DocDescripcion)
-                @Html.TextAreaFor(model => model.DocDescripcion, new { @class = "form-control col-12", rows = "3" })
+                @Html.LabelFor(model => model.DocDescripcion) *
+                @Html.TextAreaFor(model => model.DocDescripcion, new { @class = "form-control col-12", rows = "3", required = "required" })
             </div>
         </div>
         <div class="col-12 col-sm-6 col-lg-4 align-self-center">
