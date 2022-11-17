@@ -97,6 +97,16 @@
                                                 <i class="fa fa-building-o"></i>
                                             </button>
                                         }
+                                        @if(Constants.GetUserData().UserId != item.UserId)
+                                        {
+                                            if (Constants.Privilegios.Where(x => x.PrivId.Equals("MODI_USR_DLT")).Count() > 0)
+                                            {
+                                                <a onclick="return confirm(`¿Desea eliminar permanentemente a este usuario(${'@item.UserId'})?`)"
+                                                   href="@Url.Action("Delete", "Usuarios", new { UserId = item.UserId })" class="btn btn-sm shadow btn-danger" title="Eliminar usuario">
+                                                    <i class="fa fa-trash-o"></i>
+                                                </a>
+                                            }
+                                        }
                                     </td>
                                 </tr>
                             }

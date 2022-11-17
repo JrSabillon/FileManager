@@ -144,5 +144,16 @@ namespace SyT_FileManager.DataAccess
                 return data;
             }
         }
+
+        public bool Delete(string UserId)
+        {
+            using (IDbConnection context = new SqlConnection(Constants.ConnectionString))
+            {
+                var user = context.Get<UsuarioModel>(UserId);
+                var deleted = context.Delete(user);
+
+                return deleted;
+            }
+        }
     }
 }

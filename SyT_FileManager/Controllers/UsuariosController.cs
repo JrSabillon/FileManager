@@ -95,5 +95,12 @@ namespace SyT_FileManager.Controllers
             
             return RedirectToAction("Index");
         }
+
+        public ActionResult Delete(string UserId)
+        {
+            UsuarioAccess.Delete(UserId);
+
+            return RedirectToAction("Index");
+        }
     }
 }

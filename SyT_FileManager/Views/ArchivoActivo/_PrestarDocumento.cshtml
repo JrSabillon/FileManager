@@ -70,6 +70,12 @@
                 @Html.TextBoxFor(model => model.PrestPersonaRetira, new { @class = "form-control col-12", id = "input-personaRetira" })
             </div>
         </div>
+        <div class="col-12">
+            <div class="form-group">
+                @Html.LabelFor(model => model.PrestObservacion)
+                @Html.TextAreaFor(model => model.PrestObservacion, new { @class = "form-control col-12", maxlength = "250" })
+            </div>
+        </div>
     </div>
 
     <button class="btn btn-success"><i class="fa fa-save"></i> Guardar</button>

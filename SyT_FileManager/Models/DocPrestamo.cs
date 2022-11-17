@@ -43,6 +43,8 @@ namespace SyT_FileManager.Models
         public int PrestPlazoMaximoDevolucion { get; set; }
         [Display(Name = "Devolver documento antes de")]
         public DateTime PrestFechaMaximaDevolucion { get; set; }
+        [Display(Name = "Observación")]
+        public string PrestObservacion { get; set; }
 
         [Computed]
         public int? DocTipo { get; set; }

@@ -1,5 +1,5 @@
 ﻿@model SyT_FileManager.Models.DocPrestamo
-@{ 
+@{
     //Variable para identificar en el formulario si se esta entregando o recibiendo devuelta
     bool isLendingDocument = Model.PrestamoID == 0;
 }
@@ -11,7 +11,7 @@
 
 <br />
 
-@using (Html.BeginForm("_PrestarDocumento", "ArchivoInactivo", FormMethod.Post)) 
+@using (Html.BeginForm("_PrestarDocumento", "ArchivoInactivo", FormMethod.Post))
 {
     @Html.HiddenFor(model => model.CajaID)
     @Html.HiddenFor(model => model.DocID)
@@ -68,6 +68,12 @@
             <div class="form-group d-none" id="div-personaRetira">
                 @Html.LabelFor(model => model.PrestPersonaRetira)
                 @Html.TextBoxFor(model => model.PrestPersonaRetira, new { @class = "form-control col-12", id = "input-personaRetira" })
+            </div>
+        </div>
+        <div class="col-12">
+            <div class="form-group">
+                @Html.LabelFor(model => model.PrestObservacion)
+                @Html.TextAreaFor(model => model.PrestObservacion, new { @class = "form-control col-12", maxlength = "250" })
             </div>
         </div>
     </div>
