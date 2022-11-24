@@ -4,6 +4,7 @@ using System.Linq;
 using System.Web;
 using System.ComponentModel.DataAnnotations;
 using Dapper.Contrib.Extensions;
+using Newtonsoft.Json;
 
 namespace SyT_FileManager.Models
 {
@@ -28,6 +29,7 @@ namespace SyT_FileManager.Models
         [Display(Name = "Agencia")]
         public int? AgenciaID { get; set; }
         [Computed]
+        [JsonIgnore]
         public List<AgenciaModel> Agencias { get; set; }
     }
 }

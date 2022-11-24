@@ -8,6 +8,7 @@ using SyT_FileManager.Models;
 using System.Data;
 using SyT_FileManager.AppCode;
 using Dapper.Contrib.Extensions;
+using Newtonsoft.Json;
 
 namespace SyT_FileManager.DataAccess
 {
@@ -60,9 +61,27 @@ namespace SyT_FileManager.DataAccess
         {
             using (IDbConnection context = new SqlConnection(Constants.ConnectionString))
             {
-                var data = context.Update(User);
+                var oldUser = GetUsuario(User.UserId);
+                var updated = context.Update(User);
 
-                return data;
+                if (updated)
+                {
+                    BitacoraAccess bitacoraAccess = new BitacoraAccess();
+                    BitacoraModel bitacora = new BitacoraModel()
+                    {
+                        BitacoraID = bitacoraAccess.NextBitacoraID(),
+                        Entidad = "Rol",
+                        Usuario = Constants.GetUserData().UserId,
+                        Fecha = DateTime.Now,
+                        Accion = Constants.DELETE,
+                        ValorAnterior = JsonConvert.SerializeObject(oldUser),
+                        ValorActual = JsonConvert.SerializeObject(User)
+                    };
+
+                    bitacoraAccess.Add(bitacora);
+                }
+
+                return updated;
             }
         }
 
@@ -151,6 +170,23 @@ namespace SyT_FileManager.DataAccess
             {
                 var user = context.Get<UsuarioModel>(UserId);
                 var deleted = context.Delete(user);
+
+                if (deleted)
+                {
+                    BitacoraAccess bitacoraAccess = new BitacoraAccess();
+                    BitacoraModel bitacora = new BitacoraModel()
+                    {
+                        BitacoraID = bitacoraAccess.NextBitacoraID(),
+                        Entidad = "Rol",
+                        Usuario = Constants.GetUserData().UserId,
+                        Fecha = DateTime.Now,
+                        Accion = Constants.DELETE,
+                        ValorAnterior = JsonConvert.SerializeObject(user),
+                        ValorActual = ""
+                    };
+
+                    bitacoraAccess.Add(bitacora);
+                }
 
                 return deleted;
             }

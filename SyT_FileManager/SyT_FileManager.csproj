@@ -166,6 +166,7 @@
     <Compile Include="DataAccess\AgenciaAccess.cs" />
     <Compile Include="DataAccess\AlmacenAccess.cs" />
     <Compile Include="DataAccess\BancoAccess.cs" />
+    <Compile Include="DataAccess\BitacoraAccess.cs" />
     <Compile Include="DataAccess\CajaAccess.cs" />
     <Compile Include="DataAccess\CatalogoAccess.cs" />
     <Compile Include="DataAccess\DocumentoAccess.cs" />
@@ -182,6 +183,7 @@
     <Compile Include="Models\AlmacenAgenciaModel.cs" />
     <Compile Include="Models\AlmacenModel.cs" />
     <Compile Include="Models\BancoModel.cs" />
+    <Compile Include="Models\BitacoraModel.cs" />
     <Compile Include="Models\CajaHistoricaModel.cs" />
     <Compile Include="Models\CajaModel.cs" />
     <Compile Include="Models\DocCajaHistoricaModel.cs" />
@@ -427,6 +429,7 @@
     <Content Include="Views\ArchivoInactivo\_SelectDocuments.cshtml" />
     <Content Include="Views\ArchivoInactivo\DocumentosTriturados.cshtml" />
     <Content Include="Views\Reportes\Index.cshtml" />
+    <Content Include="Views\Roles\_EditRol.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

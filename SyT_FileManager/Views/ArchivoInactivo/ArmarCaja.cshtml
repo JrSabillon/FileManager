@@ -79,8 +79,12 @@
                 @Html.LabelFor(model => model.DocPaquete, new { @class = "form-check-label" })
             </div>
         </div>
-        <div class="col-12 align-self-end">
+        <div class="col-12 align-self-end" id="div-save">
             <button class="btn btn-success mb-3"><i class="fa fa-plus"></i> Agregar</button>
+        </div>
+        <div class="col-12 align-self-end d-none" id="div-edit">
+            <button class="btn btn-success mb-3" type="button" onclick="saveEdit();"><i class="fa fa-save"></i> Actualizar</button>
+            <button class="btn btn-danger mb-3" type="button" onclick="closeEdit();"><i class="fa fa-times"></i> Cancelar</button>
         </div>
     </div>
 </form>
@@ -137,6 +141,7 @@
 
 <script type="text/javascript">
     var currentIndex = 0;
+    var rowEditing = -1;
 
     $(function () {
         GetZonaIDByAgenciaID();
@@ -175,6 +180,96 @@
         $('#DocTipo').val('');
         $('#DocDescripcion').val('');
         $('#DocPaquete').prop('checked', false);
+    }
+
+    function editarDocumento(RowNumber) {
+        openEdit();
+        rowEditing = RowNumber;
+        $(`#row-${RowNumber}`).find('td').each((index, element) => {
+            switch (index) {
+                case 0:
+                    $('#DocTipo').val($(element).find('input').get(1).value);
+                    break;
+                case 1:
+                    $('#DocDescripcion').val($(element).find('input').get(0).value);
+                    break;
+                case 2:
+                    $('#DocFechaInfo').val($(element).find('span').get(0).innerText);
+                    break;
+                case 3:
+                    $('#DocBancoID').val($(element).find('input').get(0).value);
+                    break;
+                case 4:
+                    $('#DocCCCCID').val($(element).find('input').get(0).value);
+                    break;
+                case 5:
+                    $('#Agencias').val($(element).find('input').get(0).value);
+                    break;
+                case 6:
+                    $('#DocZonaID').val($(element).find('input').get(0).value);
+                    break;
+                case 7:
+                    $('#DocPaquete').prop('checked', $(element).find('input').get(0).value === 'True')
+                    break;
+
+            }
+        });
+    }
+
+    function saveEdit() {
+        var documento = $('#DocTipo option:selected'), banco = $('#DocBancoID option:selected'), fecha = $('#DocFechaInfo'),
+            descripcion = $('#DocDescripcion'), paquete = $('#DocPaquete'), centroDeCosto = $('#DocCCCCID option:selected'),
+            agencia = $('#Agencias option:selected'), zona = $('#DocZonaID option:selected');
+        $(`#row-${rowEditing}`).find('td').each((index, element) => {
+            switch (index) {
+                case 0:
+                    $(element).find('input').get(1).value = documento.val();
+                    $(element).find('span').get(0).innerText = documento.text();
+                    break;
+                case 1:
+                    $(element).find('input').get(0).value = descripcion.val();
+                    $(element).find('span').get(0).innerText = descripcion.val();
+                    break;
+                case 2:
+                    $(element).find('input').get(0).value = fecha.val();
+                    $(element).find('span').get(0).innerText = fecha.val();
+                    break;
+                case 3:
+                    $(element).find('input').get(0).value = banco.val();
+                    $(element).find('span').get(0).innerText = banco.text();
+                    break;
+                case 4:
+                    $(element).find('input').get(0).value = centroDeCosto.val();
+                    $(element).find('span').get(0).innerText = centroDeCosto.text();
+                    break;
+                case 5:
+                    $(element).find('input').get(0).value = agencia.val();
+                    $(element).find('span').get(0).innerText = agencia.text();
+                    break;
+                case 6:
+                    $(element).find('input').get(0).value = zona.val();
+                    $(element).find('span').get(0).innerText = zona.text();
+                    break;
+                case 7:
+                    $(element).find('input').get(0).value = paquete.is(':checked') ? "True" : "False";
+                    $(element).find('span').get(0).innerText = paquete.is(':checked') ? "Si" : "No";
+                    break;
+            }
+        });
+
+        closeEdit();
+    }
+
+    function openEdit() {
+        $('#div-save').addClass('d-none');
+        $('#div-edit').removeClass('d-none');
+    }
+
+    function closeEdit() {
+        resetForm();
+        $('#div-save').removeClass('d-none');
+        $('#div-edit').addClass('d-none');
+        rowEditing = -1;
     }
 </script>
 

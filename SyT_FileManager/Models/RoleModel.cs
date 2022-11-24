@@ -1,4 +1,5 @@
 ﻿using Dapper.Contrib.Extensions;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -23,6 +24,7 @@ namespace SyT_FileManager.Models
         [Display(Name = "Descripción del rol")]
         public string RolDescripcion { get; set; }
         [Computed]
+        [JsonIgnore]
         public bool Selected { get; set; }
     }
 }

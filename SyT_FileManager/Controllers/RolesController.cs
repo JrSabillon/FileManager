@@ -54,10 +54,37 @@ namespace SyT_FileManager.Controllers
             return RedirectToAction("Index");
         }
 
+        public ActionResult _Rol()
+        {
+            return PartialView("_Rol", new RoleModel());
+        }
+
         [HttpPost]
         public ActionResult _Rol(RoleModel rol)
         {
             RoleAccess.SaveRol(rol);
+
+            return RedirectToAction("Index");
+        }
+
+        public ActionResult _EditRol(string RolId)
+        {
+            var model = RoleAccess.GetRol(RolId);
+
+            return PartialView("_EditRol", model);
+        }
+
+        [HttpPost]
+        public ActionResult _EditRol(RoleModel rol)
+        {
+            RoleAccess.UpdateRol(rol);
+
+            return RedirectToAction("Index");
+        }
+
+        public ActionResult Eliminar(string RolId)
+        {
+            RoleAccess.Delete(RolId);
 
             return RedirectToAction("Index");
         }
