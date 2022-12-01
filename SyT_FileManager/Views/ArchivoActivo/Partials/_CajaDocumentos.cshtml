@@ -76,12 +76,24 @@
         <hr />
         <div id="div-barCode">
             <div style="width: 300px; margin: auto;">
+                <img src="@Url.Content("~/Content/imgs/logo.png")" width="300" /><br /><br />
                 <label class="text-muted">Banco Hondureño del Café - BANHCAFE</label> <br />
                 <label>@ViewBag.AlmacenNombre - Caja No. @ViewBag.CajaActivaID</label>
                 <table class="table table-sm">
                     <tr>
                         <td>Periodo</td>
-                        <td style="text-align:right;">@Model.Min(x => x.DocFechaInfo).Value.ToString("yyyy") - @Model.Min(x => x.DocFechaInfo).Value.ToString("yyyy")</td>
+                        @if (@Model.Min(x => x.DocFechaInfo).Value.ToString("yyyy") == @Model.Max(x => x.DocFechaInfo).Value.ToString("yyyy"))
+                        {
+                            <td style="text-align:right;">
+                                @Model.Min(x => x.DocFechaInfo).Value.ToString("yyyy") 
+                            </td>
+                        }
+                        else
+                        {
+                            <td style="text-align:right;">
+                                @Model.Min(x => x.DocFechaInfo).Value.ToString("yyyy")- @Model.Max(x => x.DocFechaInfo).Value.ToString("yyyy")
+                            </td>
+                        }
                     </tr>
                     <tr>
                         <td>Fecha inicial</td>
@@ -100,13 +112,13 @@
 
 <script type="text/javascript">
     $(function () {
-        JsBarcode("#barCode", `${@ViewBag.CajaID}, ${'@ViewBag.AlmacenID'}`, {
-            width: 3,
+                            JsBarcode("#barCode", `${@ViewBag.CajaID}, ${'@ViewBag.AlmacenID'}`, {
+                            width: 3,
             height: 40,
             fontSize: 12,
             displayValue: false
-        });
-    });
+                            });
+                        });
 
     function printQRCode() {
         var divContents = document.getElementById("div-barCode").innerHTML;

@@ -127,7 +127,6 @@ D:\SyTCorp\Proyectos\Banhcafe\AdministracionArchivos\SyT_FileManager\SyT_FileMan
 D:\SyTCorp\Proyectos\Banhcafe\AdministracionArchivos\SyT_FileManager\SyT_FileManager\bin\Newtonsoft.Json.xml
 D:\SyTCorp\Proyectos\Banhcafe\AdministracionArchivos\SyT_FileManager\SyT_FileManager\bin\Antlr3.Runtime.pdb
 D:\SyTCorp\Proyectos\Banhcafe\AdministracionArchivos\SyT_FileManager\SyT_FileManager\bin\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.xml
-D:\SyTCorp\Proyectos\Banhcafe\AdministracionArchivos\SyT_FileManager\SyT_FileManager\obj\Debug\SyT_FileManager.csproj.AssemblyReference.cache
 D:\SyTCorp\Proyectos\Banhcafe\AdministracionArchivos\SyT_FileManager\SyT_FileManager\obj\Debug\SyT_FileManager.csproj.CoreCompileInputs.cache
 D:\SyTCorp\Proyectos\Banhcafe\AdministracionArchivos\SyT_FileManager\SyT_FileManager\obj\Debug\SyT_FileManager.csproj.CopyComplete
 D:\SyTCorp\Proyectos\Banhcafe\AdministracionArchivos\SyT_FileManager\SyT_FileManager\obj\Debug\SyT_FileManager.dll
