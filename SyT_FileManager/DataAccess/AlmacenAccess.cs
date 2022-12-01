@@ -182,7 +182,7 @@ namespace SyT_FileManager.DataAccess
         {
             using (IDbConnection context = new SqlConnection(Constants.ConnectionString))
             {
-                string query = "SELECT b.* FROM AlmacenAgencia a INNER JOIN Almacen b " +
+                string query = "SELECT distinct b.* FROM AlmacenAgencia a INNER JOIN Almacen b " +
                     "ON a.AlmacenID = b.AlmacenID AND AlmacenStatus = 'AC'";
 
                 var data = context.Query<AlmacenModel>(query).ToList();

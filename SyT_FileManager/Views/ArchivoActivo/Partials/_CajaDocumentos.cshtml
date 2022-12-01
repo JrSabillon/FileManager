@@ -76,12 +76,12 @@
         <hr />
         <div id="div-barCode">
             <div style="width: 300px; margin: auto;">
-                <label class="text-muted">Banco Hodureño del Café - BANHCAFE</label> <br />
-                <label>@ViewBag.AlmacenNombre - @ViewBag.CajaActivaID</label>
+                <label class="text-muted">Banco Hondureño del Café - BANHCAFE</label> <br />
+                <label>@ViewBag.AlmacenNombre - Caja No. @ViewBag.CajaActivaID</label>
                 <table class="table table-sm">
                     <tr>
                         <td>Periodo</td>
-                        <td style="text-align:right;">@Model.Min(x => x.DocFechaInfo).Value.ToString("yyyy")</td>
+                        <td style="text-align:right;">@Model.Min(x => x.DocFechaInfo).Value.ToString("yyyy") - @Model.Min(x => x.DocFechaInfo).Value.ToString("yyyy")</td>
                     </tr>
                     <tr>
                         <td>Fecha inicial</td>
