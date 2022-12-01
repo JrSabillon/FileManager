@@ -31,5 +31,13 @@ namespace SyT_FileManager.Models
         [Computed]
         [JsonIgnore]
         public List<AgenciaModel> Agencias { get; set; }
+        [Computed]
+        [JsonIgnore]
+        public AgenciaModel SelectedAgencia {
+            get
+            {
+                return Agencias.Where(x => x.AgenciaID == AgenciaID).FirstOrDefault();
+            }
+        }
     }
 }

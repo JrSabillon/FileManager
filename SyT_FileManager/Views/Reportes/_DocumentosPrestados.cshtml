@@ -1,0 +1,82 @@
+﻿@using (Html.BeginForm("", "", FormMethod.Post, new { id = "form-search" }))
+{
+    <div class="row">
+        <label class="col-12 col-md">Filtros:</label>
+        <div class="col-12 col-md custom-control custom-switch">
+            @Html.CheckBox("searchAgency", true, new { @class = "custom-control-input", id = "chk-searchAgency" })
+            <label class="custom-control-label" for="chk-searchAgency">Filtrar por agencia</label>
+        </div>
+        <div class="col-12 col-md custom-control custom-switch">
+            @Html.CheckBox("searchDepartment", true, new { @class = "custom-control-input", id = "chk-searchDepartment" })
+            <label class="custom-control-label" for="chk-searchDepartment">Filtrar por departamento</label>
+        </div>
+        <div class="col-12 col-md custom-control custom-switch">
+            @Html.CheckBox("searchTerm", true, new { @class = "custom-control-input", id = "chk-searchTerm" })
+            <label class="custom-control-label" for="chk-searchTerm">Filtrar por plazo de retención</label>
+        </div>
+        <div class="col-12 col-md custom-control custom-switch">
+            @Html.CheckBox("searchDates", true, new { @class = "custom-control-input", id = "chk-searchDates" })
+            <label class="custom-control-label" for="chk-searchDates">Filtrar por fechas</label>
+        </div>
+    </div>
+    <hr />
+    <div class="row">
+        <div class="col-12 col-md-6 col-xl-4" id="col-searchAgency">
+            <div class="form-group">
+                <label>Agencia</label>
+                @Html.DropDownList("AgenciaID", null, "Seleccionar una agencia", new { @class = "form-control col-12" })
+            </div>
+        </div>
+        <div class="col-12 col-md-6 col-xl-4" id="col-searchDepartment">
+            <div class="form-group">
+                <label>Departamento</label>
+                @Html.DropDownList("Departamento", null, "Seleccionar un departamento", new { @class = "form-control col-12" })
+            </div>
+        </div>
+        <div class="col-12 col-md-6 col-xl-4" id="col-searchTerm">
+            <div class="form-group">
+                <label>Plazo</label>
+                @Html.DropDownList("PlazoRetencion", null, "Seleccionar un plazo de retención", new { @class = "form-control col-12" })
+            </div>
+        </div>
+        <div class="col-12 col-lg-6 col-xl-4" id="col-searchDates">
+            <div class="row">
+                <div class="form-group col">
+                    <label>Fecha inicio</label>
+                    @Html.TextBox("FechaInicio", null, "{0:yyyy-MM-dd}", new { type = "date", @class = "form-control col-12" })
+                </div>
+                <div class="form-group col">
+                    <label>Fecha fin</label>
+                    @Html.TextBox("FechaFin", null, new { type = "date", @class = "form-control col-12" })
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-md-6 align-self-end pb-3">
+            <button type="button" class="btn btn-success" onclick="search();"><i class="fa fa-search"></i> Buscar</button>
+        </div>
+    </div>
+}
+
+<div class="table-responsive" id="div-table">
+
+</div>
+
+<script type="text/javascript">
+    function search() {
+        const data = new FormData($('#form-search').get(0));
+        var payload = Object.fromEntries(data.entries());
+        payload.searchAgency = $('#chk-searchAgency').is(':checked');
+        payload.searchDepartment = $('#chk-searchDepartment').is(':checked');
+        payload.searchTerm = $('#chk-searchTerm').is(':checked');
+        payload.searchDates = $('#chk-searchDates').is(':checked');
+
+        console.log(payload);
+        $.post('@Url.Action("_DocumentosPrestados", "Reportes")', payload, function (table) {
+            $('#div-table').html(table);
+            $('#table-documentos-prestados').smpSortableTable(false, 10, 'es');
+            $('#table-documentos-prestados').removeClass('smpSortableTable--processed');
+            $('#table-documentos-prestados thead th').attr('style', 'color: black !important');
+            $('#table-documentos-prestados thead th').removeClass('smpSortableTable--sortable table-documentos-prestados--sortable');
+        }).fail((error) => console.log(error));
+    }
+</script>

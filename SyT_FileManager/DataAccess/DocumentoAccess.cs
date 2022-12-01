@@ -9,6 +9,7 @@ using SyT_FileManager.Models;
 using SyT_FileManager.AppCode;
 using Dapper.Contrib.Extensions;
 using SyT_FileManager.Business;
+using SyT_FileManager.Models.POCO;
 
 namespace SyT_FileManager.DataAccess
 {
@@ -282,6 +283,28 @@ namespace SyT_FileManager.DataAccess
                 var data = context.Execute(query, new { TrituraNombreTestigo, lote });
 
                 return data > 0;
+            }
+        }
+
+        public List<GetDocumentosPrestados_RP> GetDocumentosPrestados_RP(DocumentosPrestadosBusqueda busqueda, string UserId)
+        {
+            using (IDbConnection context = new SqlConnection(Constants.ConnectionString))
+            {
+                var values = new { busqueda.FechaInicio, busqueda.FechaFin, UserId };
+                var data = context.Query<GetDocumentosPrestados_RP>("GetDocumentosPrestados_RP", values, commandType: CommandType.StoredProcedure).ToList();
+
+                return data;
+            }
+        }
+
+        public List<GetDocumentos_RP> GetDocumentos_RP(DocumentosBusqueda busqueda, string UserId)
+        {
+            using (IDbConnection context = new SqlConnection(Constants.ConnectionString))
+            {
+                var values = new { busqueda.FechaInicio, busqueda.FechaFin, UserId };
+                var data = context.Query<GetDocumentos_RP>("GetDocumentos_RP", values, commandType: CommandType.StoredProcedure).ToList();
+
+                return data;
             }
         }
     }

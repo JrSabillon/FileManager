@@ -202,6 +202,17 @@ namespace SyT_FileManager.DataAccess
             }
         }
 
+        public List<AlmacenModel> GetAlmacenesByUsuario(string UserId)
+        {
+            using (IDbConnection context = new SqlConnection(Constants.ConnectionString))
+            {
+                string query = "SELECT a.* FROM Almacen a INNER JOIN UsuarioAlmacen b ON a.AlmacenID = b.AlmacenID WHERE b.UserId = @UserId";
+                var data = context.Query<AlmacenModel>(query, new { UserId }).ToList();
+
+                return data;
+            }
+        }
+
         public List<int> GetAlmacenIDByUserID(string UserId)
         {
             using (IDbConnection context = new SqlConnection(Constants.ConnectionString))

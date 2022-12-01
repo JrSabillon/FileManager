@@ -3,5 +3,39 @@
     ViewBag.Title = "Index";
 }
 
-<h2>Reportes</h2>
-<h4>@ViewBag.Message</h4>
+<script src="~/Scripts/dist/smpSortableTable.js"></script>
+<link rel="stylesheet" href="~/Content/smpSortableTable.css" />
+
+<h2><i class="fa fa-bookmark"></i> Reportes</h2>
+<hr />
+<div class="row">
+    <div class="col-12 col-md-6">
+        @Html.DropDownList("ReportType", null, "Seleccionar un reporte", new { @class = "form-control col-12", required = "required" })
+    </div>
+</div>
+<hr />
+<div id="div-reporte">
+
+</div>
+
+<script type="text/javascript">
+    $(function () {
+        $('#ReportType').on('change', loadReportView);
+    });
+
+    function loadReportView(event) {
+        var reportView = $(event.target).val();
+
+        if (reportView != '')
+            $.get(`@Url.Action("LoadReportView", "Reportes")?ReportView=${reportView}`, function (content) {
+                $('#div-reporte').html(content);
+                //Iniciar el evento de los checkbox de la pagina
+                var checkboxes = $('input[type=checkbox]');
+                checkboxes.on('change', handleCheckbox);
+            });
+    }
+    
+    function handleCheckbox(checkbox) {
+        $(`#col-${$(checkbox.target).attr('name')}`).toggleClass('d-none');
+    }
+</script>

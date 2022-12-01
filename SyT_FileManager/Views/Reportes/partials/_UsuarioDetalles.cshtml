@@ -1,0 +1,33 @@
+﻿<h4>
+    Nombre del usuario: @(((SyT_FileManager.Models.UsuarioModel)ViewBag.Usuario).UserNombre)
+    <br />
+    Usuario: @(((SyT_FileManager.Models.UsuarioModel)ViewBag.Usuario).UserId)
+</h4>
+<hr />
+<div class="row">
+    <div class="col-12 col-md-6">
+        <h4>Roles</h4>
+        <ul>
+            @foreach (SyT_FileManager.Models.RoleModel item in ViewBag.Roles)
+            {
+                <li>@item.RolNombre - @item.RolDescripcion</li>
+            }
+        </ul>
+    </div>
+    <div class="col-12 col-md-6">
+        <h4>Almacenes</h4>
+        @if(((List<SyT_FileManager.Models.AlmacenModel>)ViewBag.Almacenes).Count == 0)
+        {
+            <label class="text-muted text-center">Sin almacenes asignados</label>
+        }
+        else
+        {
+            <ul>
+                @foreach (SyT_FileManager.Models.AlmacenModel item in ViewBag.Almacenes)
+                {
+                    <li>@item.AlmacenLabel</li>
+                }
+            </ul>
+        }
+    </div>
+</div>

@@ -191,8 +191,15 @@
     <Compile Include="Models\DocTrituraModel.cs" />
     <Compile Include="Models\DocumentoModel.cs" />
     <Compile Include="Models\EstructuraOrganizacionalModel.cs" />
+    <Compile Include="Models\GetDocumentosPrestados_RP.cs" />
+    <Compile Include="Models\GetDocumentos_RP.cs" />
+    <Compile Include="Models\GetUsuarios_RP.cs" />
+    <Compile Include="Models\POCO\DocumentosBusqueda.cs" />
+    <Compile Include="Models\POCO\DocumentosPrestadosBusqueda.cs" />
     <Compile Include="Models\POCO\EnviarCajaBusqueda.cs" />
     <Compile Include="Models\POCO\PrestarDocumentoBusqueda.cs" />
+    <Compile Include="Models\POCO\ReportType.cs" />
+    <Compile Include="Models\POCO\UsuariosBusqueda.cs" />
     <Compile Include="Models\PrivilegioModel.cs" />
     <Compile Include="Models\RecursoItem.cs" />
     <Compile Include="Models\RecursoItemKey.cs" />
@@ -220,6 +227,7 @@
     <Content Include="Content\imgs\SyTCorp_Logo.jfif" />
     <Content Include="Content\Login.css" />
     <Content Include="Content\PagedList.css" />
+    <Content Include="Content\smpSortableTable.css" />
     <Content Include="favicon.ico" />
     <Content Include="fonts\fontawesome-webfont.svg" />
     <Content Include="Global.asax" />
@@ -235,6 +243,7 @@
     <Content Include="Scripts\dist\jspdf.js" />
     <Content Include="Scripts\dist\qrcode.js" />
     <Content Include="Scripts\dist\qrcode.min.js" />
+    <Content Include="Scripts\dist\smpSortableTable.js" />
     <Content Include="Scripts\esm\popper-utils.js" />
     <Content Include="Scripts\esm\popper-utils.min.js" />
     <Content Include="Scripts\esm\popper.js" />
@@ -430,6 +439,15 @@
     <Content Include="Views\ArchivoInactivo\DocumentosTriturados.cshtml" />
     <Content Include="Views\Reportes\Index.cshtml" />
     <Content Include="Views\Roles\_EditRol.cshtml" />
+    <Content Include="Views\Reportes\_DocumentosPrestados.cshtml" />
+    <Content Include="Views\Reportes\partials\_DocumentosPrestadosTable.cshtml" />
+    <Content Include="Views\Reportes\_Documentos.cshtml" />
+    <Content Include="Views\Reportes\partials\_DocumentosTable.cshtml" />
+    <Content Include="Views\Reportes\_Usuarios.cshtml" />
+    <Content Include="Views\Reportes\partials\_UsuariosTable.cshtml" />
+    <Content Include="Views\Reportes\partials\_UsuarioDetalles.cshtml" />
+    <Content Include="Views\Reportes\_Roles.cshtml" />
+    <Content Include="Views\Reportes\partials\_RolDetalles.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

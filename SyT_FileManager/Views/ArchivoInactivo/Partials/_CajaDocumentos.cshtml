@@ -85,11 +85,11 @@
                     </tr>
                     <tr>
                         <td>Fecha inicial</td>
-                        <td style="text-align:right;">@Model.Min(x => x.DocFechaInfo).Value.ToString("dd/MM/yyyy")</td>
+                        <td style="text-align:right;">@Model.Min(x => x.DocFechaInfo).Value.ToString("yyyy-MM-dd")</td>
                     </tr>
                     <tr>
                         <td>Fecha final</td>
-                        <td style="text-align:right;">@Model.Max(x => x.DocFechaInfo).Value.ToString("dd/MM/yyyy")</td>
+                        <td style="text-align:right;">@Model.Max(x => x.DocFechaInfo).Value.ToString("yyyy-MM-dd")</td>
                     </tr>
                 </table>
                 <svg id="barCode"></svg>

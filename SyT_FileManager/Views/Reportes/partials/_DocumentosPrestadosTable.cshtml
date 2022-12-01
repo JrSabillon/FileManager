@@ -1,0 +1,30 @@
+﻿@model List<SyT_FileManager.Models.GetDocumentosPrestados_RP>
+<table class="table table-hover" id="table-documentos-prestados">
+    <thead>
+        <tr>
+            <th id="TipoDocNombre">Documento</th>
+            <th id="PrestNombreSolicitante">Solicitante</th>
+            <th id="PrestEmailSolicitante">Correo</th>
+            <th id="PrestObservacion">Observación</th>
+            <th id="PrestFechaSolicitud">Fecha solicitó</th>
+            <th id="PrestFechaRetira">Fecha retiró</th>
+            <th id="PrestPlazoMaximoDevolucion">Dias prestado</th>
+            <th id="PrestUsuarioEntrega">Usuario entrego</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.TipoDocNombre</td>
+                <td>@item.PrestNombreSolicitante</td>
+                <td>@item.PrestEmailSolicitante</td>
+                <td>@item.PrestObservacion</td>
+                <td>@item.PrestFechaSolicitud.ToString("yyyy-MM-dd")</td>
+                <td>@item.PrestFechaRetira.ToString("yyyy-MM-dd")</td>
+                <td>@item.PrestPlazoMaximoDevolucion Dias</td>
+                <td>@item.PrestUsuarioEntrega</td>
+            </tr>
+        }
+    </tbody>
+</table>

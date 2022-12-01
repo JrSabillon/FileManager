@@ -1,0 +1,30 @@
+﻿@model List<SyT_FileManager.Models.GetDocumentos_RP>
+<table class="table table-hover" id="table-documentos">
+    <thead>
+        <tr>
+            <th id="TipoDocNombre">Documento</th>
+            <th id="PrestNombreSolicitante">Descripción</th>
+            <th id="PrestEmailSolicitante">Fecha</th>
+            <th id="PrestObservacion">Plazo</th>
+            <th id="PrestFechaSolicitud">Vencimiento</th>
+            <th id="PrestFechaRetira">#Caja</th>
+            <th id="PrestPlazoMaximoDevolucion">Agencia</th>
+            <th id="PrestUsuarioEntrega">Departamento</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.TipoDocNombre</td>
+                <td>@item.DocDescripcion</td>
+                <td>@item.DocFechaInfo.ToString("yyyy-MM-dd")</td>
+                <td>@item.TipoDocPlazo Año(s)</td>
+                <td>@item.DocFechaVencimiento.ToString("yyyy-MM-dd")</td>
+                <td>@(item.SelectedAlmacen.AlmacenTipo.Equals("ACT") ? item.CajaActivaID : item.CajaInactivaID)</td>
+                <td>@item.AgenciaNombre</td>
+                <td>@item.Departamento</td>
+            </tr>
+        }
+    </tbody>
+</table>

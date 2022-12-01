@@ -5,6 +5,7 @@ using System.Web;
 using SyT_FileManager.AppCode;
 using SyT_FileManager.DataAccess;
 using SyT_FileManager.Models;
+using SyT_FileManager.Models.POCO;
 
 namespace SyT_FileManager.Business
 {
@@ -196,6 +197,48 @@ namespace SyT_FileManager.Business
             DocumentoAccess.TriturarDocumentos(docTrituras);
 
             return TrituraID;
+        }
+
+        public List<GetDocumentosPrestados_RP> GetDocumentosPrestados_RP(DocumentosPrestadosBusqueda busqueda, string UserId)
+        {
+            if (!busqueda.searchDates)
+            {
+                busqueda.FechaInicio = null;
+                busqueda.FechaFin = null;
+            }
+            var data = DocumentoAccess.GetDocumentosPrestados_RP(busqueda, UserId);
+
+            if (busqueda.searchAgency && !string.IsNullOrEmpty(busqueda.AgenciaID))
+                data = data.Where(x => x.DocAgenciaID == busqueda.AgenciaID).ToList();
+            if (busqueda.searchDepartment && !string.IsNullOrEmpty(busqueda.Departamento))
+                data = data.Where(x => x.Departamento == busqueda.Departamento).ToList();
+            if (busqueda.searchTerm && !string.IsNullOrEmpty(busqueda.PlazoRetencion))
+                data = data.Where(x => x.TipoDocPlazo == busqueda.PlazoRetencion).ToList();
+
+            return data;
+        }
+
+        public List<GetDocumentos_RP> GetDocumentos_RP(DocumentosBusqueda busqueda, string UserId)
+        {
+            if (!busqueda.searchDates)
+            {
+                busqueda.FechaInicio = null;
+                busqueda.FechaFin = null;
+            }
+
+            var data = DocumentoAccess.GetDocumentos_RP(busqueda, UserId);
+            var almacenes = new AlmacenAccess().GetAlmacenes();
+
+            data.ForEach((GetDocumentos_RP item) => item.Almacenes = almacenes);
+
+            if (busqueda.searchAgency && !string.IsNullOrEmpty(busqueda.AgenciaID))
+                data = data.Where(x => x.DocAgenciaID == busqueda.AgenciaID).ToList();
+            if (busqueda.searchDepartment && !string.IsNullOrEmpty(busqueda.Departamento))
+                data = data.Where(x => x.CodigoDepartamento == busqueda.Departamento).ToList();
+            if (busqueda.searchTerm && !string.IsNullOrEmpty(busqueda.PlazoRetencion))
+                data = data.Where(x => x.CodigoCentroCosto == busqueda.PlazoRetencion).ToList();
+
+            return data;
         }
     }
 }

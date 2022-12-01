@@ -1,0 +1,48 @@
+﻿@model List<SyT_FileManager.Models.RoleModel>
+
+<div class="table-responsive">
+    <table class="table table-hover" id="table-roles">
+        <thead>
+            <tr>
+                <th id="RolId">ID</th>
+                <th id="RolNombre">Nombre</th>
+                <th id="RolDescripcion">Descripción</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.RolId</td>
+                    <td>@item.RolNombre</td>
+                    <td>@item.RolDescripcion</td>
+                    <td>
+                        <button class="btn btn-sm shadow btn-enterprise" title="Ver detalles" onclick="seeDetails('@item.RolId');">
+                            <i class="fa fa-eye"></i>
+                        </button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+<br />
+<div id="div-details">
+
+</div>
+
+<script type="text/javascript">
+    $(function () {
+        $('#table-roles').smpSortableTable(false, 5, 'es');
+        $('#table-roles').removeClass('smpSortableTable--processed');
+        $('#table-roles thead th').attr('style', 'color: black !important');
+        $('#table-roles thead th').removeClass('smpSortableTable--sortable table-usuarios--sortable');
+    });
+
+    function seeDetails(RolId) {
+        $.get(`@Url.Action("_RolDetalles", "Reportes")?RolId=${RolId}`, function (content) {
+            $('#div-details').html(content);
+        });
+    }
+</script>

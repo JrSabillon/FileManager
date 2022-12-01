@@ -1,0 +1,51 @@
+﻿@model List<SyT_FileManager.Models.UsuarioModel>
+<div class="table-responsive">
+    <table class="table table-hover" id="table-usuarios">
+        <thead>
+            <tr>
+                <th id="UserId">Usuario</th>
+                <th id="UserNombre">Nombre</th>
+                <th id="UserEmail">Correo</th>
+                <th id="UserStatus">Estado</th>
+                <th id="AgenciaNombre">Agencia</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.UserId</td>
+                    <td>@item.UserNombre</td>
+                    <td>@item.UserEmail</td>
+                    <td>@item.UserStatus</td>
+                    @if(item.SelectedAgencia == null)
+                    {
+                        <td>N/D</td>
+                    }
+                    else
+                    {
+                        <td>@item.SelectedAgencia.AgenciaNombre</td>
+                    }
+                    <td>
+                        <button type="button" class="btn btn-sm shadow btn-enterprise" title="Ver detalles" onclick="seeDetails('@item.UserId')">
+                            <i class="fa fa-eye"></i>
+                        </button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+<br />
+<div id="div-details">
+
+</div>
+
+<script type="text/javascript">
+    function seeDetails(UserId) {
+        $.get(`@Url.Action("_UsuarioDetalles", "Reportes")?UserId=${UserId}`, function (content) {
+            $('#div-details').html(content);
+        });
+    }
+</script>
