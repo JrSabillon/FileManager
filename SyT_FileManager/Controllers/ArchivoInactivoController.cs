@@ -157,6 +157,7 @@ namespace SyT_FileManager.Controllers
             ViewBag.Agencia = new SelectList(AgenciaAccess.GetAgencias(), "AgenciaID", "AgenciaNombre");
             ViewBag.FechaInicio = busqueda.FechaInicio;
             ViewBag.FechaFin = busqueda.FechaFin;
+            ViewBag.SelectedAgencia = busqueda.Agencia;
 
             int pageSize = Constants.PaginationSize;
             int pageNumber = (page ?? 1);
@@ -166,17 +167,18 @@ namespace SyT_FileManager.Controllers
 
         public ActionResult TransferBox(CajaModel caja)
         {
-            int AlmacenIDDestino = caja.AlmacenID; //Almacen donde sera enviada la caja.
-            var boxData = CajaAccess.GetCaja(caja.CajaID);
+            //int AlmacenIDDestino = caja.AlmacenID; //Almacen donde sera enviada la caja.
+            //var boxData = CajaAccess.GetCaja(caja.CajaID);
 
-            //Crear caja inactiva para el nuevo almacen
-            int CajaID = CajaBusiness.CreateCajaInactiva(AlmacenIDDestino, boxData.CajaID);
-            //Luego de crear la caja enviar los documentos
-            DocumentoAccess.TransferDocuments_BoxToBox(caja.CajaID, CajaID);
-            //Deshabilitar la caja de donde se enviaron los documentos
-            CajaBusiness.Disable(caja.CajaID);
+            ////Crear caja inactiva para el nuevo almacen
+            //int CajaID = CajaBusiness.CreateCajaInactiva(AlmacenIDDestino, boxData.CajaID);
+            ////Luego de crear la caja enviar los documentos
+            //DocumentoAccess.TransferDocuments_BoxToBox(caja.CajaID, CajaID);
+            ////Deshabilitar la caja de donde se enviaron los documentos
+            //CajaBusiness.Disable(caja.CajaID);
+            var TransferedBox = CajaBusiness.Transfer(caja.AlmacenID, caja.CajaID);
 
-            return RedirectToAction("CajaEnviada", new { CajaID });
+            return RedirectToAction("CajaEnviada", new { TransferedBox.CajaID });
         }
 
         public ActionResult CajaEnviada(int CajaID)
@@ -205,6 +207,9 @@ namespace SyT_FileManager.Controllers
             ViewBag.searchDate = busqueda.searchDate;
             ViewBag.searchAgency = busqueda.searchAgency;
             ViewBag.searchBank = busqueda.searchBank;
+            ViewBag.selectedAgency = busqueda.Agencia;
+            ViewBag.selectedBank = busqueda.Banco;
+            ViewBag.selectedDocumento = busqueda.TipoDocumento;
 
             ///Filtrar modelo segun criterios de busqueda
             if (busqueda.searchAgency)

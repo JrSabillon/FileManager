@@ -158,7 +158,7 @@ namespace SyT_FileManager.Controllers
             return PartialView("./Partials/_CajaDocumentos", documentos);
         }
 
-        public ActionResult _UbicacionCaja(int CajaID, int AlmacenID)
+        public ActionResult _UbicacionCaja(int CajaID, int AlmacenID, bool Optional = false)
         {
             var model = new CajaModel()
             {
@@ -172,6 +172,7 @@ namespace SyT_FileManager.Controllers
 
             ViewBag.CajaID = CajaID;
             ViewBag.AlmacenID = AlmacenID;
+            ViewBag.Optional = Optional; //Bandera para identificar si puede posicionar la caja luego(aplica para cuando arma la caja dentro del almacen).
 
             return PartialView("_UbicacionCaja", model);
         }
@@ -333,9 +334,10 @@ namespace SyT_FileManager.Controllers
             ViewBag.AlmacenID = new SelectList(almacenes.Where(x => x.AlmacenTipo.Equals("ACT")), "AlmacenID", "AlmacenLabel");
             ViewBag.searchDate = busqueda.searchDate;
             ViewBag.searchAgency = busqueda.searchAgency;
-            ViewBag.Agencia = new SelectList(AgenciaAccess.GetAgencias(), "AgenciaID", "AgenciaNombre");
+            ViewBag.Agencia = new SelectList(AgenciaAccess.GetAgencias(), "AgenciaID", "AgenciaNombre", busqueda.Agencia);
             ViewBag.FechaInicio = busqueda.FechaInicio;
             ViewBag.FechaFin = busqueda.FechaFin;
+            ViewBag.SelectedAgencia = busqueda.Agencia;
 
             int pageSize = Constants.PaginationSize;
             int pageNumber = (page ?? 1);
@@ -362,6 +364,9 @@ namespace SyT_FileManager.Controllers
             ViewBag.searchDate = busqueda.searchDate;
             ViewBag.searchAgency = busqueda.searchAgency;
             ViewBag.searchBank = busqueda.searchBank;
+            ViewBag.selectedAgency = busqueda.Agencia;
+            ViewBag.selectedBank = busqueda.Banco;
+            ViewBag.selectedDocumento = busqueda.TipoDocumento;
 
             ///Filtrar modelo segun criterios de busqueda
             if (busqueda.searchAgency)

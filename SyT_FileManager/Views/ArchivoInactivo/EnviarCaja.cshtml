@@ -96,7 +96,7 @@
 
 <label>Página @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) de @Model.PageCount</label>
 <br />
-@Html.PagedListPager(Model, page => Url.Action("EnviarCaja", new { page }), PagedListRenderOptions.OnlyShowFivePagesAtATime)
+@Html.PagedListPager(Model, page => Url.Action("EnviarCaja", new { page, searchDate, searchAgency, ViewBag.FechaInicio, ViewBag.FechaFin, Agencia = ViewBag.SelectedAgencia }), PagedListRenderOptions.OnlyShowFivePagesAtATime)
 
 <hr />
 <div id="div-box-info" class="d-none">

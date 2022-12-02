@@ -43,7 +43,16 @@
     <div class="row">
         <div class="col-12">
             <button type="button" onclick="ValidateBoxPosition();" class="btn btn-success"><i class="fa fa-save"></i> Guardar</button>
-            <button type="button" class="btn btn-danger" data-dismiss="modal"><i class="fa fa-times"></i> Cancelar</button>
+            @if ((bool)ViewBag.Optional) 
+            {
+                <button type="button" class="btn btn-danger" data-dismiss="modal" onclick="alert('No se posiciono la caja, quedara pendiente para posicionarla desde la opcion de Posicionar Caja.')">
+                    <i class="fa fa-times"></i> Cancelar
+                </button>
+            }
+            else
+            {
+                <button type="button" class="btn btn-danger" data-dismiss="modal"><i class="fa fa-times"></i> Cancelar</button>
+            }
         </div>
     </div>
 }

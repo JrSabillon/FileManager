@@ -117,7 +117,7 @@
         </table>
     </div>
     <br />
-    <button class="btn btn-success" disabled id="btn-send-box"><i class="fa fa-dropbox"></i> Armar caja</button>
+    <button class="btn btn-success" disabled id="btn-send-box"><i class="fa fa-map-marker"></i> Posicionar caja</button>
 }
 
 @if (ViewBag.CajaID != 0)
@@ -132,7 +132,7 @@
                     </button>
                 </div>
                 <div class="modal-body" id="modal-body-ubicacion-caja">
-                    @Html.Action("_UbicacionCaja", new { CajaID = ViewBag.CajaID, AlmacenID = ViewBag.AlmacenGuardado })
+                    @Html.Action("_UbicacionCaja", new { CajaID = ViewBag.CajaID, AlmacenID = ViewBag.AlmacenGuardado, Optional = true })
                 </div>
             </div>
         </div>

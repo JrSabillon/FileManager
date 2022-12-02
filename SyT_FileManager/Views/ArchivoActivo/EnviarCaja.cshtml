@@ -30,7 +30,7 @@
                 </div>
                 <div class="form-group col">
                     <label>Fecha fin</label>
-                    @Html.TextBox("FechaFin", null, new { type = "date", @class = "form-control col-12" })
+                    @Html.TextBox("FechaFin", null, "{0:yyyy-MM-dd}", new { type = "date", @class = "form-control col-12" })
                 </div>
             </div>
         </div>
@@ -97,7 +97,7 @@
 
 <label>Página @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) de @Model.PageCount</label>
 <br />
-@Html.PagedListPager(Model, page => Url.Action("EnviarCaja", new { page }), PagedListRenderOptions.OnlyShowFivePagesAtATime)
+@Html.PagedListPager(Model, page => Url.Action("EnviarCaja", new { page, searchDate, searchAgency, ViewBag.FechaInicio, ViewBag.FechaFin, Agencia = ViewBag.SelectedAgencia }), PagedListRenderOptions.OnlyShowFivePagesAtATime)
 
 <hr />
 <div id="div-box-info" class="d-none">

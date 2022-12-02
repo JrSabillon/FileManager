@@ -102,7 +102,7 @@
     </table>
 </div>
 <label>Página @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) de @Model.PageCount</label>
-@Html.PagedListPager(Model, page => Url.Action("RecibirDocumento", new { page }), PagedListRenderOptions.OnlyShowFivePagesAtATime)
+@Html.PagedListPager(Model, page => Url.Action("RecibirDocumento", new { page, searchDate, searchByMe }), PagedListRenderOptions.OnlyShowFivePagesAtATime)
 
 <hr class="mt-0" />
 

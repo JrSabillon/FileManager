@@ -62,6 +62,10 @@
     </table>
 </div>
 
+<label>Página @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) de @Model.PageCount</label>
+<br />
+@Html.PagedListPager(Model, page => Url.Action("Triturar", new { page, searchOutdated }), PagedListRenderOptions.OnlyShowFivePagesAtATime)
+
 <div id="div-partial">
 
 </div>

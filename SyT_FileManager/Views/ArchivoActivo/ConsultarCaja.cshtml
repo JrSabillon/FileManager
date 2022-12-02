@@ -48,7 +48,7 @@
         <div class="col-12 col-md-6 col-xl-4 @(searchBox ? "" : "d-none")" id="col-searchBox">
             <div class="form-group">
                 <label>No. Caja</label>
-                @Html.TextBox("Caja", "0", new { @class = "form-control col-12", type = "number", min = "1" })
+                @Html.TextBox("Caja", "0", new { @class = "form-control col-12", type = "number", min = "0" })
             </div>
         </div>
     </div>
@@ -107,7 +107,7 @@
 
 <label>Página @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) de @Model.PageCount</label>
 <br />
-@Html.PagedListPager(Model, page => Url.Action("ConsultarCaja", new { page }), PagedListRenderOptions.OnlyShowFivePagesAtATime)
+@Html.PagedListPager(Model, page => Url.Action("ConsultarCaja", new { page, searchDate, searchBox, ViewBag.FechaInicio, ViewBag.FechaFin }), PagedListRenderOptions.OnlyShowFivePagesAtATime)
 
 <div id="div-box-info">
     <div id="div-partial" class="pt-3 pb-3">
