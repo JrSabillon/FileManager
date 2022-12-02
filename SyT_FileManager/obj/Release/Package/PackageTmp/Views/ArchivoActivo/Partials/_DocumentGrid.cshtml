@@ -1,51 +1,58 @@
 ﻿@model SyT_FileManager.Models.DocumentoModel
 
-<tr>
+<tr id="row-@Model.DocID">
     <td>
         @Html.Hidden($"[{Model.DocID}].Create", Model.Create)
         @Html.Hidden($"[{Model.DocID}].DocTipo", Model.DocTipo)
-        @Model.SelectedDocumento.TipoDocNombre
+        <span>@Model.SelectedDocumento.TipoDocNombre</span>
     </td>
     <td>
         @Html.Hidden($"[{Model.DocID}].DocDescripcion", Model.DocDescripcion)
-        @Model.DocDescripcion
+        <span>@Model.DocDescripcion</span>
     </td>
+    @if(!string.IsNullOrEmpty(Model.DocStatus)) 
+    {
+        <td>@Model.SelectedEstado.RecursoItemNombre</td>
+    }
     <td>
         @Html.Hidden($"[{Model.DocID}].DocFechaInfo", Model.DocFechaInfo)
-        @Model.DocFechaInfo
+        <span>@Model.DocFechaInfo.Value.ToString("yyyy-MM-dd")</span>
     </td>
     @if (Model.DocFechaVencimiento.HasValue)
     {
         <td>
-            @Model.DocFechaVencimiento.Value.ToString("MM/dd/yyyy")
+            @Model.DocFechaVencimiento.Value.ToString("yyyy-MM-dd")
         </td>
     }
     <td>
         @Html.Hidden($"[{Model.DocID}].DocBancoID", Model.DocBancoID)
-        @Model.SelectedBanco.BancoNombre
+        <span>@Model.SelectedBanco.BancoNombre</span>
     </td>
     <td>
         @Html.Hidden($"[{Model.DocID}].DocCCCCID", Model.DocCCCCID)
-        @Model.SelectedCentroDeCosto.EstOrgaNombre
+        <span>@Model.SelectedCentroDeCosto.EstOrgaNombre</span>
     </td>
     <td>
         @Html.Hidden($"[{Model.DocID}].DocAgenciaID", Model.DocAgenciaID)
-        @Model.SelectedAgencia.AgenciaNombre
+        <span>@Model.SelectedAgencia.AgenciaNombre</span>
     </td>
     <td>
         @Html.Hidden($"[{Model.DocID}].DocZonaID", Model.DocZonaID)
-        @Model.SelectedZona.RecursoItemNombre
+        <span>@Model.SelectedZona.RecursoItemNombre</span>
     </td>
     <td>
         @Html.Hidden($"[{Model.DocID}].DocPaquete", Model.DocPaquete)
-        @(Model.DocPaquete ? "Si" : "No")
+        <span>@(Model.DocPaquete ? "Si" : "No")</span>
     </td>
     @if (Model.CajaID == 0)
     {
-        <td>
+        <td class="text-nowrap">
             <button type="button" class="btn btn-danger btn-sm shadow"
                     onclick="$(this).closest('tr').find('td input').first().val('False'); $(this).closest('tr').addClass('d-none'); if($('#table-document-body tr').not('.d-none').length == 0) $('#btn-send-box').attr('disabled', 'disabled');">
                 <i class="fa fa-trash-o"></i>
+            </button>
+            <button type="button" class="btn btn-warning btn-sm shadow" onclick="editarDocumento('@Model.DocID');">
+                <i class="fa fa-pencil"></i>
             </button>
         </td>
     }

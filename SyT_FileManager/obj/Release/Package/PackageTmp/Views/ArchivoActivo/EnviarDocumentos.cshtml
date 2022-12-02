@@ -1,7 +1,9 @@
 ﻿@model PagedList.IPagedList<SyT_FileManager.Models.CajaModel>
 @using PagedList.Mvc;
+@using SyT_FileManager.Models; 
+@using System.Configuration;
 @{
-    ViewBag.Title = "EnviarDocumentos";
+    ViewBag.Title = "Enviar Docs ACT";
     bool searchOutdated = ViewBag.searchOutdated;
 }
 
@@ -20,6 +22,9 @@
     </div>
     <button class="btn btn-success"><i class="fa fa-search"></i> Buscar</button>
 }
+<div class="alert alert-info mt-3 mb-0">
+    <label>Los documentos vencidos corresponden a los que tienen fecha menor a @(ConfigurationManager.AppSettings["DocsActiveYears"] ?? "2") año(s) [@(new DocumentoModel().FechaExpiraAlmacenActivo.ToString("yyyy-MM-dd"))]</label>
+</div>
 <div class="row" data-spy="scroll" data-target="#accordion" data-offset="0">
     <div class="col-12">
         <div class="pt-3">
@@ -69,7 +74,7 @@
                 </div>
                 <label>Página @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) de @Model.PageCount</label>
                 <br />
-                @Html.PagedListPager(Model, page => Url.Action("EnviarDocumentos", new { page }), PagedListRenderOptions.OnlyShowFivePagesAtATime)
+                @Html.PagedListPager(Model, page => Url.Action("EnviarDocumentos", new { page, searchOutdated }), PagedListRenderOptions.OnlyShowFivePagesAtATime)
                 <div id="div-partial">
 
                 </div>
@@ -80,10 +85,10 @@
 
 <script type="text/javascript">
     function seeDocuments(CajaID) {
-        $.get('@Url.Action("_SelectDocuments", "ArchivoActivo")', { CajaID: CajaID }, function (content) {
+        $.get('@Url.Action("_SelectDocuments", "ArchivoActivo")', { CajaID: CajaID }, function (content, status) {
             $('#div-partial').fadeOut(200, function () {
                 $(this).html(content).fadeIn(600);
             });
-        });
+        }).fail(handleAjaxAuth);
     }
 </script>

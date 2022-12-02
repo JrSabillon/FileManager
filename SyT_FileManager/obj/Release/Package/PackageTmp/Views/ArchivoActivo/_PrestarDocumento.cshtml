@@ -51,7 +51,7 @@
             <div class="form-group">
                 @Html.LabelFor(model => model.PrestPlazoMaximoDevolucion)
                 <div class="input-group">
-                    @Html.TextBoxFor(model => model.PrestPlazoMaximoDevolucion, new { @class = "form-control col-12", type = "number", required = "required" })
+                    @Html.TextBoxFor(model => model.PrestPlazoMaximoDevolucion, new { @class = "form-control col-12", type = "number", required = "required", min = "0" })
                     <div class="input-group-append">
                         <div class="input-group-text">Dias</div>
                     </div>
@@ -68,6 +68,12 @@
             <div class="form-group d-none" id="div-personaRetira">
                 @Html.LabelFor(model => model.PrestPersonaRetira)
                 @Html.TextBoxFor(model => model.PrestPersonaRetira, new { @class = "form-control col-12", id = "input-personaRetira" })
+            </div>
+        </div>
+        <div class="col-12">
+            <div class="form-group">
+                @Html.LabelFor(model => model.PrestObservacion)
+                @Html.TextAreaFor(model => model.PrestObservacion, new { @class = "form-control col-12", maxlength = "250" })
             </div>
         </div>
     </div>

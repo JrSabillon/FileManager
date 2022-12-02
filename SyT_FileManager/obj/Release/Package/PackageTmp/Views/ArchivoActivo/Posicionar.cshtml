@@ -1,7 +1,7 @@
 ﻿@model PagedList.IPagedList<SyT_FileManager.Models.CajaModel>
 @using PagedList.Mvc;
 @{
-    ViewBag.Title = "Posicionar";
+    ViewBag.Title = "Posicionar Cajas";
     int i = 1;
 }
 
@@ -88,13 +88,13 @@
             $('#div-partial').fadeOut(300, function () {
                 $(this).html(DocumentsGrid).fadeIn(500);
             });
-        });
+        }).fail(handleAjaxAuth);
     }
 
     function placeBox(CajaID, AlmacenID) {
         $.get('@Url.Action("_UbicacionCaja", "ArchivoActivo")', { CajaID: CajaID, AlmacenID: AlmacenID }, function (content) {
             $('#modal-body-ubicacion-caja').html(content);
             $('#modal-ubicacion-caja').modal();
-        });
+        }).fail(handleAjaxAuth);
     }
 </script>

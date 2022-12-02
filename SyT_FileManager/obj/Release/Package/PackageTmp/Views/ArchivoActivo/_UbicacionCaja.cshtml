@@ -10,31 +10,31 @@
     <div class="row">
         <div class="col-6">
             <div class="form-group">
-                @Html.LabelFor(model => model.CajaEstante)
+                @Html.LabelFor(model => model.CajaEstante) *
                 @Html.DropDownListFor(model => model.CajaEstante, new SelectList(Model.Estantes, "RecursoItemID", "RecursoItemNombre"), "Seleccionar un estante", new { @class = "form-control col-12", required = "required" })
             </div>
         </div>
         <div class="col-6">
             <div class="form-group">
-                @Html.LabelFor(model => model.CajaSeccion)
+                @Html.LabelFor(model => model.CajaSeccion) *
                 @Html.DropDownListFor(model => model.CajaSeccion, new SelectList(Model.Secciones, "RecursoItemID", "RecursoItemNombre"), "Seleccionar una sección", new { @class = "form-control col-12", required = "required" })
             </div>
         </div>
         <div class="col-6">
             <div class="form-group">
-                @Html.LabelFor(model => model.CajaNivel)
+                @Html.LabelFor(model => model.CajaNivel) *
                 @Html.DropDownListFor(model => model.CajaNivel, new SelectList(Model.Niveles, "RecursoItemID", "RecursoItemNombre"), "Seleccionar un nivel", new { @class = "form-control col-12", required = "required" })
             </div>
         </div>
         <div class="col-6">
             <div class="form-group">
-                @Html.LabelFor(model => model.CajaFila)
+                @Html.LabelFor(model => model.CajaFila) *
                 @Html.DropDownListFor(model => model.CajaFila, new SelectList(Model.Filas, "RecursoItemID", "RecursoItemNombre"), "Seleccionar una fila", new { @class = "form-control col-12", required = "required" })
             </div>
         </div>
         <div class="col-6">
             <div class="form-group">
-                @Html.LabelFor(model => model.CajaUbicacion)
+                @Html.LabelFor(model => model.CajaUbicacion) *
                 @Html.DropDownListFor(model => model.CajaUbicacion, new SelectList(Model.Ubicaciones, "RecursoItemID", "RecursoItemNombre"), "Seleccionar una ubicación", new { @class = "form-control col-12", required = "required" })
             </div>
         </div>
@@ -42,17 +42,30 @@
     <br />
     <div class="row">
         <div class="col-12">
-            <button type="button" onclick="ValidateBoxPosition(event);" class="btn btn-success"><i class="fa fa-save"></i> Guardar</button>
-            <button type="button" class="btn btn-danger" data-dismiss="modal"><i class="fa fa-times"></i> Cancelar</button>
+            <button type="button" onclick="ValidateBoxPosition();" class="btn btn-success"><i class="fa fa-save"></i> Guardar</button>
+            @if ((bool)ViewBag.Optional) 
+            {
+                <button type="button" class="btn btn-danger" data-dismiss="modal" onclick="alert('No se posiciono la caja, quedara pendiente para posicionarla desde la opcion de Posicionar Caja.')">
+                    <i class="fa fa-times"></i> Cancelar
+                </button>
+            }
+            else
+            {
+                <button type="button" class="btn btn-danger" data-dismiss="modal"><i class="fa fa-times"></i> Cancelar</button>
+            }
         </div>
     </div>
 }
 
 <script type="text/javascript">
-    function ValidateBoxPosition(event) {
+    function ValidateBoxPosition() {
         const data = new FormData(document.getElementById('form-position-box'));
         var payload = Object.fromEntries(data.entries());
-        console.log(payload);
+
+        if (payload.CajaEstante === '' || payload.CajaFila === '' || payload.CajaNivel == '' || payload.CajaSeccion === '' || payload.CajaUbicacion === '') {
+            alert('Favor llenar todos los campos antes de continuar.');
+            return;
+        }
 
         $.get('@Url.Action("ValidateBoxPosition", "ArchivoActivo")', payload, function (isAvailable) {
             if (isAvailable) {

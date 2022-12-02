@@ -3,7 +3,7 @@
 @using PagedList.Mvc;
 @using SyT_FileManager.AppCode;
 @{
-    ViewBag.Title = "Index";
+    ViewBag.Title = "Bancos";
     var Labels = new BancoModel();
 }
 
@@ -88,7 +88,7 @@
             $('#div-banks').fadeOut(100, function () {
                 $(this).html(page).fadeIn(800);
             });
-        });
+        }).fail(handleAjaxAuth);
     }
 
     function cancel() {

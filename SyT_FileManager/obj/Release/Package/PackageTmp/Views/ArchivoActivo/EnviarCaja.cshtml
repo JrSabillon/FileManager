@@ -1,7 +1,7 @@
 ﻿@model PagedList.IPagedList<SyT_FileManager.Models.CajaModel>
 @using PagedList.Mvc;
 @{
-    ViewBag.Title = "EnviarCaja";
+    ViewBag.Title = "Transferir Cajas";
     bool searchDate = ViewBag.searchDate, searchAgency = ViewBag.searchAgency;
 }
 
@@ -30,7 +30,7 @@
                 </div>
                 <div class="form-group col">
                     <label>Fecha fin</label>
-                    @Html.TextBox("FechaFin", null, new { type = "date", @class = "form-control col-12" })
+                    @Html.TextBox("FechaFin", null, "{0:yyyy-MM-dd}", new { type = "date", @class = "form-control col-12" })
                 </div>
             </div>
         </div>
@@ -76,7 +76,8 @@
                     <td>@item.SelectedUbicacion.RecursoItemNombre</td>
                     <td>@item.CajaFechaRegistro</td>
                     <td>
-                        <button type="button" class="btn btn-sm btn-enterprise" title="Enviar caja a otro almacen" onclick="seeBox(@item.CajaID, @item.AlmacenID);">
+                        <button type="button" class="btn btn-sm btn-enterprise" title="Enviar caja a otro almacen" 
+                                onclick="seeBox(@item.CajaID, @item.AlmacenID, '@item.SelectedAlmacen.AlmacenNombre', @item.CajaActivaID);">
                             <i class="fa fa-truck"></i>
                         </button>
                     </td>
@@ -96,13 +97,18 @@
 
 <label>Página @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) de @Model.PageCount</label>
 <br />
-@Html.PagedListPager(Model, page => Url.Action("EnviarCaja", new { page }), PagedListRenderOptions.OnlyShowFivePagesAtATime)
+@Html.PagedListPager(Model, page => Url.Action("EnviarCaja", new { page, searchDate, searchAgency, ViewBag.FechaInicio, ViewBag.FechaFin, Agencia = ViewBag.SelectedAgencia }), PagedListRenderOptions.OnlyShowFivePagesAtATime)
 
 <hr />
-<div id="div-box-info">
+<div id="div-box-info" class="d-none">
     @using (Html.BeginForm("TransferBox", "ArchivoActivo", FormMethod.Post))
     {
         @Html.Hidden("CajaID")
+        <hgroup>
+            <h4>Caja #<span id="span-boxId"></span></h4>
+            <h5>Almacen: <span id="span-almacen"></span></h5>
+        </hgroup>
+        <br />
         <div class="row">
             <div class="col-10">
                 <div class="form-group">
@@ -118,25 +124,25 @@
 
         </div>
     }
-    
 </div>
 
 <script type="text/javascript">
-    $(function () {
-        $('#div-box-info').fadeOut(0);
-    });
+    
 
-    function seeBox(CajaID, AlmacenID) {
-        $.get('@Url.Action("_CajaDocumentos", "ArchivoActivo")', { CajaID: CajaID, ActionType: '' }, function (content) {
+    function seeBox(CajaID, AlmacenID, NombreAlmacen, CajaActivaID) {
+        $('#span-boxId').text(CajaActivaID);
+        $('#span-almacen').text(NombreAlmacen);
+
+        $.get('@Url.Action("_CajaDocumentos", "ArchivoActivo")', { CajaID: CajaID, ActionType: 'SendToInactive' }, function (content) {
             $('#div-box-info').removeClass('d-none');
             $('#CajaID').val(CajaID);
             $('#AlmacenID option').removeAttr('disabled');
             $(`#AlmacenID option[value=${AlmacenID}]`).prop('disabled', 'disabled');
-            $('#div-box-info').fadeOut(200, function () {
-                $('#div-partial').html(content);
-                $(this).fadeIn(600);
+            $('#div-box-info').removeClass('d-none');
+            $('#div-partial').fadeOut(200, function () {
+                $(this).html(content).fadeIn(600);
             });
-        });
+        }).fail(handleAjaxAuth);
     }
 
     function handleCheckbox(element) {

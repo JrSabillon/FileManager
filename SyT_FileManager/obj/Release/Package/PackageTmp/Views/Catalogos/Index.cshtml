@@ -2,7 +2,7 @@
 @using SyT_FileManager.AppCode;
 @using PagedList.Mvc;
 @{
-    ViewBag.Title = "Index";
+    ViewBag.Title = "Catalogos";
 }
 
 <div class="row">
@@ -98,13 +98,13 @@
         $(element).closest('li').addClass('active');
         $.get('@Url.Action("_Recursos", "Catalogos")', { RecursoID: id }, function (page) {
             $('#div-recursos').html(page);
-        });
+        }).fail(handleAjaxAuth);
     }
 
     function catalogoAction(RecursoID) {
         $.get('@Url.Action("_Catalogo", "Catalogos")', { RecursoID: RecursoID }, function (page) {
             $('#div-catalogo').html(page);
             $('#modal-catalogo').modal();
-        });
+        }).fail(handleAjaxAuth);
     }
 </script>

@@ -2,7 +2,7 @@
 @using PagedList.Mvc;
 @using SyT_FileManager.AppCode;
 @{
-    
+    ViewBag.Title = "Usuarios";
 }
 
 <div class="row">
@@ -24,7 +24,7 @@
         <div class="col-12 col-lg-6 border pt-3">
             <div class="row mt-3">
                 <div class="col-12 col-lg-6">
-                    <div class="input-group">
+                    <div class="input-group form-group">
                         @Html.TextBox("searchString", null, new { @class = "form-control col-12", placeholder = "Buscar usuario..." })
                         <div class="input-group-append">
                             <button class="btn btn-info" title="Buscar usuario">
@@ -34,7 +34,7 @@
                     </div>
                 </div>
                 <div class="col-12 col-lg-6">
-                    <div class="input-group">
+                    <div class="input-group form-group">
                         @Html.DropDownList("usuarioStatus", null, "Todos", new { @class = "form-control col-12", onchange = "$('#form-user').submit();" })
                     </div>
                 </div>
@@ -78,7 +78,7 @@
                                     <td>@item.UserId</td>
                                     <td>@item.UserNombre</td>
                                     <td>@item.UserEmail</td>
-                                    <td>
+                                    <td class="text-nowrap">
                                         @if (Constants.Privilegios.Where(x => x.PrivId.Equals("MODI_USR_EDT")).Count() > 0)
                                         {
                                             <button type="button" class="btn btn-warning btn-sm shadow" title="Editar usuario" onclick="loadUserModal('@item.UserId')">
@@ -97,6 +97,16 @@
                                                 <i class="fa fa-building-o"></i>
                                             </button>
                                         }
+                                        @if(Constants.GetUserData().UserId != item.UserId)
+                                        {
+                                            if (Constants.Privilegios.Where(x => x.PrivId.Equals("MODI_USR_DLT")).Count() > 0)
+                                            {
+                                                <a onclick="return confirm(`¿Desea eliminar permanentemente a este usuario(${'@item.UserId'})?`)"
+                                                   href="@Url.Action("Delete", "Usuarios", new { UserId = item.UserId })" class="btn btn-sm shadow btn-danger" title="Eliminar usuario">
+                                                    <i class="fa fa-trash-o"></i>
+                                                </a>
+                                            }
+                                        }
                                     </td>
                                 </tr>
                             }
@@ -110,7 +120,7 @@
             @Html.PagedListPager(Model, page => Url.Action("Index", new { page }), PagedListRenderOptions.OnlyShowFivePagesAtATime)
         </div>
         <div class="col-12 col-lg-6 border p-1">
-            <h4 class="text-center">Roles</h4>
+            @*<h4 class="text-center">Roles</h4>
             <hr />
             @if (Constants.Privilegios.Where(x => x.PrivId.Equals("MODI_USR_EDTROL")).Count() > 0)
             {
@@ -124,8 +134,8 @@
                     <hr />
                     <label>Solicitar accesos al administrador de permisos.</label>
                 </div>
-            }
-            <div id="div-partial" style="max-height: 500px; overflow-y: auto; overflow-x: hidden;"></div>
+            }*@
+            <div id="div-partial" style="max-height: 650px; overflow-y: auto; overflow-x: hidden;"></div>
         </div>
     </div>
 }
@@ -146,7 +156,7 @@
         $.get('@Url.Action("_User", "Usuarios")', { UserId: UserId }, function (content) {
             $('#div-modal-user').html(content);
             $('#modal-user').modal();
-        });
+        }).fail(handleAjaxAuth);
     }
 
     function loadUserRoles(UserId) {
@@ -154,7 +164,7 @@
             $('#div-partial').fadeOut(100, function () {
                 $(this).html(content).fadeIn(800);
             })
-        });
+        }).fail(handleAjaxAuth);
     }
 
     function loadUserAlmacen(UserId) {
@@ -162,7 +172,7 @@
             $('#div-partial').fadeOut(100, function () {
                 $(this).html(content).fadeIn(800);
             })
-        });
+        }).fail(handleAjaxAuth);
     }
 
     function validateUserId(userIdControl) {
@@ -174,6 +184,6 @@
                 $('#label-user-validation').removeClass("d-none");
                 $('#label-user-validation').text("ID de usuario no disponible");
             }
-        });
+        }).fail(handleAjaxAuth);
     }
 </script>
