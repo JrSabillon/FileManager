@@ -10,7 +10,7 @@
         @Html.Hidden($"[{Model.DocID}].DocDescripcion", Model.DocDescripcion)
         <span>@Model.DocDescripcion</span>
     </td>
-    @if(!string.IsNullOrEmpty(Model.DocStatus)) 
+    @if (!string.IsNullOrEmpty(Model.DocStatus))
     {
         <td>@Model.SelectedEstado.RecursoItemNombre</td>
     }
@@ -54,6 +54,12 @@
             <button type="button" class="btn btn-warning btn-sm shadow" onclick="editarDocumento('@Model.DocID');">
                 <i class="fa fa-pencil"></i>
             </button>
+        </td>
+    }
+    @if (ViewBag.ActionType == "PositionBox")
+    {
+        <td>
+            <button class="btn btn-sm btn-danger shadow btn-removeDoc" title="Quitar documento" type="button" data-DocID="@Model.DocID"><i class="fa fa-trash-o"></i></button>
         </td>
     }
 </tr>

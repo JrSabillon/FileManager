@@ -56,4 +56,10 @@
             </button>
         </td>
     }
+    @if(ViewBag.ActionType == "PositionBox")
+    {
+        <td>
+            <button class="btn btn-sm btn-danger shadow btn-removeDoc" title="Quitar documento" type="button" data-DocID="@Model.DocID"><i class="fa fa-trash-o"></i></button>
+        </td>
+    }
 </tr>

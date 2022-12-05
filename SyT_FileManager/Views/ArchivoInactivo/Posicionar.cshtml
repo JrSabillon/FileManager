@@ -87,6 +87,7 @@
         $.get('@Url.Action("_CajaDocumentos", "ArchivoInactivo")', { CajaID: CajaID, ActionType: 'PositionBox' }, function (DocumentsGrid) {
             $('#div-partial').fadeOut(300, function () {
                 $(this).html(DocumentsGrid).fadeIn(500);
+                $('#new-CajaID').val(CajaID);
             });
         }).fail(handleAjaxAuth);
     }

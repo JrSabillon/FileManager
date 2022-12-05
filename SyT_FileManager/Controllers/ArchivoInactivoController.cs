@@ -92,6 +92,15 @@ namespace SyT_FileManager.Controllers
             ViewBag.AgenciaEnvia = UsuarioEntrego.AgenciaID.HasValue ? AgenciaAccess.GetAgencia(UsuarioEntrego.AgenciaID).AgenciaNombre : AlmacenAccess.GetAlmacen(caja.AlmacenID).AlmacenLabel;
             ViewBag.ActionType = ActionType;
 
+            if (!string.IsNullOrEmpty(ActionType))
+            {
+                if (ActionType.Equals("PositionBox"))
+                {
+                    ViewBag.Bancos = Bancos;
+                    ViewBag.CentrosDeCosto = CentrosDeCosto;
+                    ViewBag.TiposDocumentos = TiposDocumentos;
+                }
+            }
 
             return PartialView("./Partials/_CajaDocumentos", documentos);
         }
@@ -641,6 +650,48 @@ namespace SyT_FileManager.Controllers
                 Padding = 5,
                 BackgroundColor = new BaseColor(255, 255, 255)
             });
+        }
+
+        /// <summary>
+        /// Agregar nuevo documento a una caja ya creada antes de ser posicionada.
+        /// </summary>
+        /// <returns>El documento que fue agregado</returns>
+        public JsonResult AddDocumentToBox(DocumentoModel documento)
+        {
+            var newDocument = DocumentoBusiness.AddDocumentToBox(documento);
+            DocCajaHistoricaModel docCajaHistorica = new DocCajaHistoricaModel
+            {
+                DocCajaHistID = DocumentoAccess.GetNextDocCajaHistID(),
+                DocID = newDocument.DocID,
+                CajaIDOrigen = null,
+                CajaIDDestino = newDocument.CajaID,
+                DocCajaHistFechaMovimiento = DateTime.Now,
+                DocCajaHistUsuarioMovimiento = Constants.GetUserData().UserId
+            };
+            DocumentoAccess.CreateDocumentoHistorico(docCajaHistorica);
+
+            return Json(new
+            {
+                Documento = newDocument.SelectedDocumento.TipoDocNombre,
+                Descripcion = newDocument.DocDescripcion,
+                Estado = newDocument.SelectedEstado.RecursoItemNombre,
+                FechaRegistro = newDocument.DocFechaInfo.Value.ToString("yyyy-MM-dd"),
+                FechaVencimiento = newDocument.DocFechaVencimiento.Value.ToString("yyyy-MM-dd"),
+                Banco = newDocument.SelectedBanco.BancoNombre,
+                CentroCosto = newDocument.SelectedCentroDeCosto.EstOrgaNombre,
+                Agencia = newDocument.SelectedAgencia.AgenciaNombre,
+                Zona = newDocument.SelectedZona.RecursoItemNombre,
+                Paquete = newDocument.DocPaquete ? "Si" : "No"
+            });
+        }
+
+        public JsonResult RemoveDocument(int DocID)
+        {
+            var documento = DocumentoAccess.GetDocumento(DocID);
+            documento.DocStatus = "RET"; //Establecer estado retirado para el documento.
+            var updated = DocumentoAccess.Update(documento);
+
+            return Json(new { Retired = updated });
         }
     }
 }

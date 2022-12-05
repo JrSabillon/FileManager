@@ -34,7 +34,7 @@ namespace SyT_FileManager.Business
             {
                 int DocPlazoRetencion = TiposDocumentos.Where(x => x.TipoDocID == documento.DocTipo.Value).First().TipoDocPlazo;
                 int DocDepartamentoID = estructuraOrganizacional.Where(x => x.EstOrgaID == documento.DocCCCCID.Value).First().EstOrgaIDPadre.Value;
-
+                
                 documento.DocID = DocumentoAccess.GetNextDocID();
                 documento.CajaID = CajaID;
                 //Obtener ID de departamento segun centro de costo
@@ -239,6 +239,33 @@ namespace SyT_FileManager.Business
                 data = data.Where(x => x.CodigoCentroCosto == busqueda.PlazoRetencion).ToList();
 
             return data;
+        }
+
+        internal DocumentoModel AddDocumentToBox(DocumentoModel documento)
+        {
+            var documentos = DocumentoAccess.GetDocumentosByCajaID(documento.CajaID);
+            int DocPlazo = TipoDocumentoAccess.GetTipoDocumentos().Where(x => x.TipoDocID == documento.DocTipo.Value).First().TipoDocPlazo;
+            documento.DocID = DocumentoAccess.GetNextDocID();
+            documento.DocZonaID = documentos.Select(x => x.DocZonaID).FirstOrDefault();
+            documento.DocDepartamentoID = OrganizacionAccess.GetAllEstructuraOrganizacional()
+                .Where(x => x.EstOrgaID == documento.DocCCCCID.Value).First().EstOrgaIDPadre.Value;
+            documento.DocPlazoRetencion = DocPlazo.ToString();
+            documento.DocFechaVencimiento = documento.DocFechaInfo.Value.AddYears(DocPlazo);
+            documento.DocStatus = "ACT";
+            documento.DocAgenciaID = documentos.Select(x => x.DocAgenciaID).FirstOrDefault();
+
+            DocumentoAccess.CreateDocument(documento);
+
+            //Llenar dependencias
+            RecursoAccess RecursoAccess = new RecursoAccess();
+            documento.TiposDocumentos = TipoDocumentoAccess.GetTipoDocumentos();
+            documento.Estados = RecursoAccess.GetRecursoItems("DOCSTTS");
+            documento.Bancos = new BancoAccess().GetBancos();
+            documento.CentrosDeCosto = OrganizacionAccess.GetCCDropdown();
+            documento.Agencias = new AgenciaAccess().GetAgencias();
+            documento.Zonas = RecursoAccess.GetRecursoItems("ZONA");
+
+            return documento;
         }
     }
 }

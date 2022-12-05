@@ -6,6 +6,7 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using System.Configuration;
+using Newtonsoft.Json;
 
 namespace SyT_FileManager.Models
 {
@@ -20,6 +21,7 @@ namespace SyT_FileManager.Models
         [Display(Name = "Caja")]
         public int CajaID { get; set; }
         [Computed]
+        [JsonIgnore]
         public CajaModel Caja { get; set; } = new CajaModel();
         
         [Display(Name = "Fecha del documento")]
@@ -33,6 +35,7 @@ namespace SyT_FileManager.Models
         public int? DocBancoID { get; set; }
         
         [Computed]
+        [JsonIgnore]
         public List<BancoModel> Bancos { get; set; }
         [Computed]
         public BancoModel SelectedBanco { get => Bancos.Where(x => x.BancoID == DocBancoID).First(); }
@@ -41,6 +44,7 @@ namespace SyT_FileManager.Models
         [Display(Name = "Zona")]
         public string DocZonaID { get; set; }
         [Computed]
+        [JsonIgnore]
         public List<RecursoItem> Zonas { get; set; }
         [Computed]
         public RecursoItem SelectedZona { get => Zonas.Where(x => x.RecursoItemID == DocZonaID).First(); }
@@ -49,24 +53,30 @@ namespace SyT_FileManager.Models
         public int? DocDepartamentoID { get; set; }
         
         [Computed]
+        [JsonIgnore]
         public List<EstructuraOrganizacionalModel> Departamentos { get; set; }
         [Computed]
+        [JsonIgnore]
         public EstructuraOrganizacionalModel SelectedDepartamento { get => Departamentos.Where(x => x.EstOrgaID == DocDepartamentoID).First(); }
         
         [Display(Name = "Centro de costo")]
         public int? DocCCCCID { get; set; }
         
         [Computed]
+        [JsonIgnore]
         public List<EstructuraOrganizacionalModel> CentrosDeCosto { get; set; }
         [Computed]
+        [JsonIgnore]
         public EstructuraOrganizacionalModel SelectedCentroDeCosto { get => CentrosDeCosto.Where(x => x.EstOrgaID == DocCCCCID).First(); }
         
         [Display(Name = "Tipo de documento")]
         public int? DocTipo { get; set; }
         
         [Computed]
+        [JsonIgnore]
         public List<TipoDocumentoModel> TiposDocumentos { get; set; }
         [Computed]
+        [JsonIgnore]
         public TipoDocumentoModel SelectedDocumento { get => TiposDocumentos.Where(x => x.TipoDocID == DocTipo).First(); }
         
         [StringLength(10)]
@@ -74,8 +84,10 @@ namespace SyT_FileManager.Models
         public string DocPlazoRetencion { get; set; }
         
         [Computed]
+        [JsonIgnore]
         public List<RecursoItem> PlazosRetenciones { get; set; }
         [Computed]
+        [JsonIgnore]
         public RecursoItem SelectedPlazoRetencion { get => PlazosRetenciones.Where(x => x.RecursoItemID == DocPlazoRetencion).First(); }
         
         [Display(Name = "Fecha de vencimiento")]
@@ -86,8 +98,10 @@ namespace SyT_FileManager.Models
         public string DocStatus { get; set; }
 
         [Computed]
+        [JsonIgnore]
         public List<RecursoItem> Estados { get; set; }
         [Computed]
+        [JsonIgnore]
         public RecursoItem SelectedEstado { get => Estados.Where(x => x.RecursoItemID == DocStatus).First(); }
         
         [Display(Name = "Fecha de trituración")]
@@ -96,15 +110,19 @@ namespace SyT_FileManager.Models
         [Display(Name = "Paquete de documentos")]
         public bool DocPaquete { get; set; }
         [Computed]
+        [JsonIgnore]
         public bool Create { get; set; } = true;
 
         public int? DocAgenciaID { get; set; }
         [Computed]
+        [JsonIgnore]
         public List<AgenciaModel> Agencias { get; set; }
         [Computed]
+        [JsonIgnore]
         public AgenciaModel SelectedAgencia { get => Agencias.Where(x => x.AgenciaID == DocAgenciaID).First(); }
 
         [Computed]
+        [JsonIgnore]
         public DateTime FechaExpiraAlmacenActivo
         {
             get

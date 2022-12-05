@@ -1,7 +1,10 @@
 ﻿@model List<SyT_FileManager.Models.DocumentoModel>
+@{
+    var labels = new SyT_FileManager.Models.DocumentoModel();
+}
 
 <div>
-    @if(ViewBag.ActionType == "BoxPositioned")
+    @if (ViewBag.ActionType == "BoxPositioned")
     {
         <h5 class="text-center">Caja #@ViewBag.CajaInactivaID</h5>
         <hr />
@@ -25,7 +28,83 @@
         </table>
     </div>
     <br />
+    @if (ViewBag.ActionType == "PositionBox")
+    {
+        <button class="btn btn-success mb-3 float-right" data-toggle="modal" data-target="#modal-documento"><i class="fa fa-plus"></i> Agregar documento</button>
 
+        <div class="modal fade" id="modal-documento" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="modal-ubicacion-caja-title">Agregar documento</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body" id="modal-body-documento">
+                        <form id="form-document">
+                            <input type="hidden" name="CajaID" id="new-CajaID" />
+                            <div class="row">
+                                <div class="col-12 col-sm-6">
+                                    <div class="form-group">
+                                        @Html.LabelFor(model => labels.DocBancoID) *
+                                        @Html.DropDownListFor(model => labels.DocBancoID, new SelectList(ViewBag.Bancos, "BancoID", "BancoNombre"), "Seleccione una opción", new { @class = "form-control col-12", required = "required", Name = "DocBancoID" })
+                                    </div>
+                                </div>
+                                <div class="col-12 col-sm-6">
+                                    <div class="form-group">
+                                        @Html.LabelFor(model => labels.DocCCCCID) *
+                                        <select name="DocCCCCID" id="DocCCCCID" class="form-control col-12" required>
+                                            <option value="">Seleccione una opción</option>
+                                            @foreach (SyT_FileManager.Models.EstructuraOrganizacionalModel item in ViewBag.CentrosDeCosto)
+                                            {
+                                                if (item.EstOrgaIDPadre == null)
+                                                {
+                                                    <option disabled>@item.EstOrgaNombre</option>
+                                                }
+                                                else
+                                                {
+                                                    <option value="@item.EstOrgaID">&nbsp;&nbsp; @item.EstOrgaNombre</option>
+                                                }
+                                            }
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-sm-6">
+                                    <div class="form-group">
+                                        @Html.LabelFor(model => labels.DocTipo) *
+                                        @Html.DropDownListFor(model => labels.DocTipo, new SelectList(ViewBag.TiposDocumentos, "TipoDocID", "TipoDocNombre"), "Seleccione una opción", new { @class = "form-control col-12", required = "required", Name = "DocTipo" })
+                                    </div>
+                                </div>
+                                <div class="col-12 col-sm-6">
+                                    <div class="form-group">
+                                        @Html.LabelFor(model => labels.DocFechaInfo) *
+                                        @Html.TextBoxFor(model => labels.DocFechaInfo, new { @class = "form-control col-12", type = "date", required = "required", Name = "DocFechaInfo" })
+                                    </div>
+                                </div>
+                                <div class="col-12 col-sm-6">
+                                    <div class="form-group">
+                                        @Html.LabelFor(model => labels.DocDescripcion) *
+                                        @Html.TextAreaFor(model => labels.DocDescripcion, new { @class = "form-control col-12", rows = "3", required = "required", Name = "DocDescripcion" })
+                                    </div>
+                                </div>
+                                <div class="col-12 col-sm-6 align-self-center">
+                                    <div class="form-check">
+                                        @Html.CheckBoxFor(model => labels.DocPaquete, new { @class = "form-check-input", Name = "DocPaquete", id = "DocPaquete" })
+                                        @Html.LabelFor(model => labels.DocPaquete, new { @class = "form-check-label" })
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-danger" type="button" data-dismiss="modal"><i class="fa fa-times"></i> Cancelar</button>
+                        <button class="btn btn-success" type="button" onclick="addDocument();"><i class="fa fa-plus"></i> Agregar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
     <div class="table-responsive">
         <table class="table table-hover">
             <thead>
@@ -40,9 +119,13 @@
                     <th>Agencia</th>
                     <th>Zona</th>
                     <th>Es paquete</th>
+                    @if (ViewBag.ActionType == "PositionBox")
+                    {
+                        <th></th>
+                    }
                 </tr>
             </thead>
-            <tbody>
+            <tbody id="tbody-documentos">
                 @foreach (var item in Model)
                 {
                     Html.RenderPartial("Partials/_DocumentGrid", item);
@@ -60,7 +143,7 @@
         </div>
     }
 
-    @if(ViewBag.ActionType == "BoxPositioned")
+    @if (ViewBag.ActionType == "BoxPositioned")
     {
         <hr />
         <div class="row">
@@ -100,12 +183,29 @@
 
 <script type="text/javascript">
     $(function () {
-        JsBarcode("#barCode", `${@ViewBag.CajaID}, ${'@ViewBag.AlmacenID'}`, {
-            width: 3,
-            height: 40,
-            fontSize: 12,
-            displayValue: false
-        });
+        if ($('#barCode').get(0)) {
+            JsBarcode("#barCode", `${@ViewBag.CajaID}, ${'@ViewBag.AlmacenID'}`, {
+                width: 3,
+                height: 40,
+                fontSize: 12,
+                displayValue: false
+            });
+        }
+
+        if ($('#tbody-documentos').get(0)) {
+            $('#tbody-documentos .btn-removeDoc').on('click', function () {
+                var DocID = $(this).attr("data-DocID");
+                var tr = $(this).closest('tr');
+
+                if (confirm('¿Desea retirar este documento de la caja?')) {
+                    $.post('@Url.Action("RemoveDocument", "ArchivoActivo")', { DocID: DocID }, function (result) {
+                        if (result.Retired) {
+                            tr.remove();
+                        }
+                    });
+                }
+            });
+        }
     });
 
     function printQRCode() {
@@ -117,5 +217,36 @@
         a.document.write('</body></html>');
         a.document.close();
         a.print();
+    }
+
+    /**
+     * Agregar documento a la caja a posicionar en caso de que no exista
+     * */
+    function addDocument() {
+        const data = new FormData($('#form-document').get(0));
+        var payload = Object.fromEntries(data.entries());
+        payload.DocPaquete = $('#DocPaquete').is(':checked');
+
+        $.post('@Url.Action("AddDocumentToBox", "ArchivoActivo")', payload, function (documento) {
+            $('#form-document').trigger('reset');
+            $('#modal-documento').modal('hide');
+            $('#tbody-documentos').append(
+                `<tr>
+                    <td>${documento.Documento}</td>
+                    <td>${documento.Descripcion}</td>
+                    <td>${documento.Estado}</td>
+                    <td>${documento.FechaRegistro}</td>
+                    <td>${documento.FechaVencimiento}</td>
+                    <td>${documento.Banco}</td>
+                    <td>${documento.CentroCosto}</td>
+                    <td>${documento.Agencia}</td>
+                    <td>${documento.Zona}</td>
+                    <td>${documento.Paquete}</td>
+                    <td>
+                        <button class="btn btn-sm btn-danger shadow" title="Quitar documento" type="button"><i class="fa fa-trash-o"></i></button>
+                    </td>
+                </tr>`
+            );
+        });
     }
 </script>
