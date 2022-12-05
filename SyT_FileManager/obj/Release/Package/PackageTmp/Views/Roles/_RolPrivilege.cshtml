@@ -95,11 +95,9 @@
     }
 
     function checkParent(control, parentSelector, subChildSelector) {
+        if (parentSelector.includes('MODV'))
+            return;
         $(control).closest('div').closest(parentSelector).find('input[type=checkbox]')[0].checked = $(control).closest('div').find('input[type=checkbox]:checked').length > 0;
-        console.log(subChildSelector);
-        console.log($(control).closest('div'));
-        console.log($(control).closest('div').find(subChildSelector));
-        console.log($(control).closest('div').find(subChildSelector + ' input[type=checkbox]'));
         $(control).closest('div').find(subChildSelector + ' input[type=checkbox]').prop('checked', $(control).is(':checked'));
     }
 

@@ -1,7 +1,7 @@
 ﻿@model PagedList.IPagedList<SyT_FileManager.Models.DocPrestamo>
 @using PagedList.Mvc;
 @{
-    ViewBag.Title = "Recibir Documento";
+    ViewBag.Title = "Recibir Docs";
     bool searchDate = ViewBag.searchDate;
     bool searchByMe = ViewBag.searchByMe;
 }
@@ -21,10 +21,6 @@
             @Html.CheckBox("searchByMe", searchByMe, new { @class = "custom-control-input", id = "chk-searchByMe" })
             <label class="custom-control-label" for="chk-searchByMe">Prestados por mi</label>
         </div>
-        @*<div class="col-12 col-md custom-control custom-switch">
-            @Html.CheckBox("searchBank", searchBank, new { @class = "custom-control-input", id = "chk-searchBank", onchange = "handleCheckbox(this);" })
-            <label class="custom-control-label" for="chk-searchBank">Filtrar por banco</label>
-        </div>*@
     </div>
     <hr />
     <div class="form-group">
@@ -45,18 +41,6 @@
                 </div>
             </div>
         </div>
-        @*<div class="col-12 col-md-6 col-xl-4 @(searchAgency ? "" : "d-none")" id="col-searchAgency">
-            <div class="form-group">
-                <label>Agencia</label>
-                @Html.DropDownList("Agencia", null, "Seleccionar una agencia", new { @class = "form-control col-12" })
-            </div>
-        </div>
-        <div class="col-12 col-md-6 col-xl-4 @(searchBank ? "" : "d-none")" id="col-searchBank">
-            <div class="form-group">
-                <label>Banco</label>
-                @Html.DropDownList("Banco", null, "Seleccionar un banco", new { @class = "form-control col-12" })
-            </div>
-        </div>*@
     </div>
     <button class="btn btn-success"><i class="fa fa-search"></i> Buscar</button>
 }
@@ -84,7 +68,7 @@
                     <td>@item.PrestNombreSolicitante</td>
                     <td>@item.PrestFechaMaximaDevolucion.ToString("MM/dd/yyyy")</td>
                     <td>
-                        <button type="button" class="btn btn-sm btn-enterprise" title="Prestar documento" onclick="handleDocument(@item.DocID, @item.CajaID, '@item.SelectedDocumento.TipoDocNombre', @item.CajaActivaID)">
+                        <button type="button" class="btn btn-sm btn-enterprise" title="Recibir documento" onclick="handleDocument(@item.DocID, @item.CajaID, '@item.SelectedDocumento.TipoDocNombre', @item.CajaActivaID)">
                             <i class="fa fa-handshake-o"></i>
                         </button>
                     </td>
@@ -102,7 +86,7 @@
     </table>
 </div>
 <label>Página @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) de @Model.PageCount</label>
-@Html.PagedListPager(Model, page => Url.Action("RecibirDocumento", new { page }), PagedListRenderOptions.OnlyShowFivePagesAtATime)
+@Html.PagedListPager(Model, page => Url.Action("RecibirDocumento", new { page, searchDate, searchByMe }), PagedListRenderOptions.OnlyShowFivePagesAtATime)
 
 <hr class="mt-0" />
 
@@ -119,6 +103,6 @@
             $('#div-partial').fadeOut(200, function () {
                 $(this).html(content).fadeIn(500);
             });
-        });
+        }).fail(handleAjaxAuth);
     }
 </script>

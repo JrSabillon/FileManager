@@ -32,6 +32,7 @@
                 <tr>
                     <th>Documento</th>
                     <th>Descripción</th>
+                    <th>Estado</th>
                     <th>Fecha de registro</th>
                     <th>Fecha de vencimiento</th>
                     <th>Banco</th>
@@ -64,7 +65,7 @@
         <hr />
         <div class="row">
             <div class="col align-self-center">
-                <h5>Codigo QR de la caja</h5>
+                <h5>Codigo de barra</h5>
             </div>
             <div class="col text-right">
                 <button class="btn btn-enterprise">
@@ -73,24 +74,54 @@
             </div>
         </div>
         <hr />
-        <div id="qr-code">
-
+        <div id="div-barCode">
+            <div style="width: 300px; margin: auto;">
+                <img src="@Url.Content("~/Content/imgs/logo.png")" width="300" /><br /><br />
+                <label class="text-muted">Banco Hondureño del Café - BANHCAFE</label> <br />
+                <label>@ViewBag.AlmacenNombre - Caja No. @ViewBag.CajaActivaID</label>
+                <table class="table table-sm">
+                    <tr>
+                        <td>Periodo</td>
+                        @if (@Model.Min(x => x.DocFechaInfo).Value.ToString("yyyy") == @Model.Max(x => x.DocFechaInfo).Value.ToString("yyyy"))
+                        {
+                            <td style="text-align:right;">
+                                @Model.Min(x => x.DocFechaInfo).Value.ToString("yyyy") 
+                            </td>
+                        }
+                        else
+                        {
+                            <td style="text-align:right;">
+                                @Model.Min(x => x.DocFechaInfo).Value.ToString("yyyy")- @Model.Max(x => x.DocFechaInfo).Value.ToString("yyyy")
+                            </td>
+                        }
+                    </tr>
+                    <tr>
+                        <td>Fecha inicial</td>
+                        <td style="text-align:right;">@Model.Min(x => x.DocFechaInfo).Value.ToString("dd/MM/yyyy")</td>
+                    </tr>
+                    <tr>
+                        <td>Fecha final</td>
+                        <td style="text-align:right;">@Model.Max(x => x.DocFechaInfo).Value.ToString("dd/MM/yyyy")</td>
+                    </tr>
+                </table>
+                <svg id="barCode"></svg>
+            </div>
         </div>
     }
 </div>
 
 <script type="text/javascript">
     $(function () {
-        new QRCode(document.getElementById('qr-code'), {
-            text: '@ViewBag.CajaActivaID',
-            width: 128,
-            height: 128,
-            correctLevel: QRCode.CorrectLevel.H
-        });
-    });
+                            JsBarcode("#barCode", `${@ViewBag.CajaID}, ${'@ViewBag.AlmacenID'}`, {
+                            width: 3,
+            height: 40,
+            fontSize: 12,
+            displayValue: false
+                            });
+                        });
 
     function printQRCode() {
-        var divContents = document.getElementById("qr-code").innerHTML;
+        var divContents = document.getElementById("div-barCode").innerHTML;
         var a = window.open('', '', 'height=500, width=500');
         a.document.write('<html>');
         a.document.write('<body>');

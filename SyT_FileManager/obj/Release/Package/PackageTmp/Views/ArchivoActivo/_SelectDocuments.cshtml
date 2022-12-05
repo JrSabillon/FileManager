@@ -8,12 +8,14 @@
 {
     using (Html.BeginForm("_SelectDocuments", "ArchivoActivo", FormMethod.Post))
     {
+        @Html.Hidden("CajaActivaID")
+        @Html.Hidden("CajaID")
         @Html.Hidden("AlmacenIDOrigen")
         <div class="form-group">
             <hr />
-            <h5>Caja #@ViewBag.CajaID</h5>
+            <h5>Caja #@ViewBag.CajaActivaID</h5>
             <div class="custom-control custom-switch">
-                <input type="checkbox" class="custom-control-input" id="chk-sendbox" name="SendAll" onchange="handleCheckbox(this);" />
+                @Html.CheckBox("sendAll", new { @class = "custom-control-input", id = "chk-sendbox", onchange = "handleCheckbox(this);" })
                 <label class="custom-control-label" for="chk-sendbox">Enviar toda la caja</label>
             </div>
         </div>
@@ -54,8 +56,8 @@
                             <td>@Model[i].SelectedDocumento.TipoDocNombre</td>
                             <td>@Model[i].DocDescripcion</td>
                             <td>@Model[i].SelectedEstado.RecursoItemNombre</td>
-                            <td>@Model[i].DocFechaInfo</td>
-                            <td>@Model[i].DocFechaVencimiento</td>
+                            <td>@Model[i].DocFechaInfo.Value.ToString("yyyy-MM-dd")</td>
+                            <td>@Model[i].DocFechaVencimiento.Value.ToString("yyyy-MM-dd")</td>
                             <td>@Model[i].SelectedBanco.BancoNombre</td>
                             <td>@Model[i].SelectedCentroDeCosto.EstOrgaNombre</td>
                             <td>@Model[i].SelectedZona.RecursoItemNombre</td>
@@ -73,13 +75,13 @@
                     @Html.DropDownList("AlmacenID", new SelectList(ViewBag.AlmacenesInactivos, "AlmacenID", "AlmacenLabel"), "Seleccionar un almacen", new { @class = "form-control col-12", required = "required" })
                 </div>
             </div>
-            <div class="col-12 col-md-6">
+            @*<div class="col-12 col-md-6 d-none">
                 <div class="form-group">
                     <label for="CajaInactivaID">Caja inactiva para anexar documentos</label>
                     @Html.Hidden("CajaInactivaID", null, new { id = "input-CajaInactivaID" })
                     @Html.DropDownList("CajaInactivaID", new SelectList(ViewBag.CajaInactivaID, "CajaInactivaID", "CajaLabel"), "Nueva caja", new { @class = "form-control col-12", disabled = "disabled" })
                 </div>
-            </div>
+            </div>*@
         </div>
         <br />
 

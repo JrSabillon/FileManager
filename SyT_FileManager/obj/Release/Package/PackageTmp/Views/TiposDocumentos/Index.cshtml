@@ -3,7 +3,7 @@
 @using SyT_FileManager.AppCode;
 @using SyT_FileManager.Models;
 @{
-    ViewBag.Title = "Index";
+    ViewBag.Title = "Tipos Doc.";
     var Labels = new TipoDocumentoModel();
 }
 
@@ -96,7 +96,7 @@
             $('#div-docType').fadeOut(100, function () {
                 $(this).html(page).fadeIn(800);
             });
-        });
+        }).fail(handleAjaxAuth);
     }
 
     function cancel() {

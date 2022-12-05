@@ -131,3 +131,4 @@ D:\SyTCorp\Proyectos\Banhcafe\AdministracionArchivos\SyT_FileManager\SyT_FileMan
 D:\SyTCorp\Proyectos\Banhcafe\AdministracionArchivos\SyT_FileManager\SyT_FileManager\obj\Debug\SyT_FileManager.csproj.CopyComplete
 D:\SyTCorp\Proyectos\Banhcafe\AdministracionArchivos\SyT_FileManager\SyT_FileManager\obj\Debug\SyT_FileManager.dll
 D:\SyTCorp\Proyectos\Banhcafe\AdministracionArchivos\SyT_FileManager\SyT_FileManager\obj\Debug\SyT_FileManager.pdb
+D:\SyTCorp\Proyectos\Banhcafe\AdministracionArchivos\SyT_FileManager\SyT_FileManager\obj\Debug\SyT_FileManager.csproj.AssemblyReference.cache

@@ -1,6 +1,8 @@
 ﻿
-<h5 class="text-center">Usuario: @ViewBag.UserId</h5>
+<h4 class="text-center">Asignar almacen</h4>
 <hr />
+<h5 class="text-center">Usuario: @ViewBag.UserId</h5>
+<br />
 
 @using (Html.BeginForm("_UsuarioAlmacen", "Usuarios", FormMethod.Post))
 {
@@ -28,10 +30,10 @@
         </div>
     </div>
 
-    <br />
-
-    <button class="btn btn-success" onclick="setSelectedItems();"><i class="fa fa-save"></i> Guardar</button>
-    <button class="btn btn-danger" type="button" onclick="cancel();"><i class="fa fa-times"></i> Cancelar</button>
+    <div class="mt-3 mb-3 text-center">
+        <button class="btn btn-success" onclick="setSelectedItems();"><i class="fa fa-save"></i> Guardar</button>
+        <button class="btn btn-danger" type="button" onclick="cancel();"><i class="fa fa-times"></i> Cancelar</button>
+    </div>
 }
 
 <script type="text/javascript">

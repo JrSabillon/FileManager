@@ -1,10 +1,11 @@
 ﻿@model List<SyT_FileManager.Models.RoleModel>
-@{ 
+@{
     int position = 0;
 }
-
-<h5 class="text-center">Usuario: @ViewBag.UserId</h5>
+<h4 class="text-center">Asignar roles</h4>
 <hr />
+<h5 class="text-center">Usuario: @ViewBag.UserId</h5>
+<br />
 
 @using (Html.BeginForm("UserRole", "Usuarios", FormMethod.Post))
 {

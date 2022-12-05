@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@ViewBag.Title - My ASP.NET Application</title>
+    <title>@ViewBag.Title - Administración de archivos</title>
     @Styles.Render("~/Content/css")
     @Scripts.Render("~/bundles/modernizr")
     @Scripts.Render("~/bundles/jquery")
@@ -21,7 +21,7 @@
             bottom: 0;
         }
     </style>
-    <script src="~/Scripts/dist/qrcode.js"></script>
+    <script src="~/Scripts/barcode.js"></script>
 </head>
 <body>
     @Html.Action("NavBar", "Nav")
@@ -33,6 +33,19 @@
         <h6>Powered by <a href="http://www.sytcorp.com/c" target="_blank"><img src="@Url.Content("~/Content/imgs/SyTCorp_Logo.jfif")" width="80" /></a> &copy; @DateTime.Now.Year</h6>
     </footer>
 
+    <script type="text/javascript">
+        function handleAjaxAuth(responseStatus) {
+            if (responseStatus.status === 401)
+                window.location = '@Url.Action("SessionExpired", "Home")';
+        }
+
+        $(function () {
+            $('tbody tr').on('click', function () {
+                $('tbody tr').removeClass('tr-selected');
+                $(this).addClass('tr-selected');
+            });
+        });
+    </script>
     @Scripts.Render("~/bundles/bootstrap")
     @RenderSection("scripts", required: false)
 </body>

@@ -1,7 +1,7 @@
 ﻿@model List<SyT_FileManager.Models.RoleModel> 
 @using SyT_FileManager.AppCode;
 @{
-    ViewBag.Title = "Index";
+    ViewBag.Title = "Roles";
 }
 
 <style>
@@ -16,7 +16,7 @@
         @if(Constants.Privilegios.Where(x => x.PrivId.Equals("MODI_ROL_ADD")).Count() > 0)
         {
             <button class="btn btn-success rounded-circle position-absolute shadow" style="right: 18px; bottom: -18px; z-index: 9;" title="Agregar rol"
-                    data-toggle="modal" data-target="#modal-rol">
+                    onclick="NewRol();">
                 <i class="fa fa-plus"></i>
             </button>
         }
@@ -31,15 +31,28 @@
                 {
                     <li class="list-group-item list-group-item-action">
                         <div class="row">
-                            <div class="col-10">
+                            <div class="col-8">
                                 @item.RolNombre
                             </div>
-                            <div class="col-2">
+                            <div class="col-4 text-right text-nowrap">
                                 @if (Constants.Privilegios.Where(x => x.PrivId.Equals("MODI_ROL_ASGN")).Count() > 0)
                                 {
-                                    <button type="button" class="btn btn-enterprise btn-sm btn-rol shadow float-right" title="Ver privilegios" data-rol="@item.RolId">
+                                    <button type="button" class="btn btn-enterprise btn-sm btn-rol shadow" title="Ver privilegios" data-rol="@item.RolId">
                                         <i class="fa fa-chevron-circle-right"></i>
                                     </button>
+                                }
+                                @if (Constants.Privilegios.Where(x => x.PrivId.Equals("MODI_ROL_EDT")).Count() > 0)
+                                {
+                                    <button type="button" class="btn btn-warning btn-sm shadow" title="Editar privilegio" onclick="EditRol('@item.RolId')">
+                                        <i class="fa fa-pencil"></i>
+                                    </button>
+                                }
+                                @if (Constants.Privilegios.Where(x => x.PrivId.Equals("MODI_ROL_DLT")).Count() > 0)
+                                {
+                                    <a href="@Url.Action("Eliminar", "Roles", new { item.RolId })" onclick="return confirm('¿Esta seguro que desea eliminar este rol?')"
+                                       class="btn btn-sm btn-danger shadow" title="Eliminar rol">
+                                        <i class="fa fa-trash-o"></i>
+                                    </a>
                                 }
                             </div>
                         </div>
@@ -47,30 +60,6 @@
                         
                 }
             </ul>
-            @*<table class="table table-hover">
-            <thead>
-                <tr>
-                    <th>Rol</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var item in Model)
-                {
-                    <tr>
-                        <td>@item.RolNombre</td>
-                        <td>
-                            @if (Constants.Privilegios.Where(x => x.PrivId.Equals("MODI_ROL_ASGN")).Count() > 0)
-                            {
-                                <button type="button" class="btn btn-secondary btn-sm btn-rol shadow" title="Ver privilegios" data-rol="@item.RolId">
-                                    <i class="fa fa-chevron-circle-right"></i>
-                                </button>
-                            }
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>*@
         </div>
     </div>
     <div class="col-12 col-lg-8 border p-1">
@@ -81,7 +70,22 @@
     </div>
 </div>
 
-@Html.Partial("_Rol", new SyT_FileManager.Models.RoleModel())
+<div class="modal fade" id="modal-rol" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modal-rol-title">Rol</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div id="div-modal-rol">
+
+            </div>
+        </div>
+    </div>
+</div>
+@*@Html.Partial("_Rol", new SyT_FileManager.Models.RoleModel())*@
 
 <script type="text/javascript">
     $(function () {
@@ -90,7 +94,27 @@
             $(this).closest('li').addClass('active');
             $.get('@Url.Action("_RolPrivilege", "Roles")', { RolId: $(this).data('rol') }, function (data) {
                 $('#div-role-privilege').html(data);
-            });
+            }).fail(handleAjaxAuth);
+        });
+
+        $('.btn-edit-rol').on('click', function () {
+            $('ul.list-group-flush li').removeClass('active');
+            $(this).closest('li').addClass('active');
+
         });
     });
+
+    function NewRol() {
+        $.get('@Url.Action("_Rol", "Roles")', {}, function (content) {
+            $('#div-modal-rol').html(content);
+            $('#modal-rol').modal();
+        }).fail(handleAjaxAuth);
+    }
+
+    function EditRol(RolId) {
+        $.get('@Url.Action("_EditRol", "Roles")', { RolId: RolId }, function (content) {
+            $('#div-modal-rol').html(content);
+            $('#modal-rol').modal();
+        }).fail(handleAjaxAuth);
+    }
 </script>
