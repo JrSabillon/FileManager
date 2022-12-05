@@ -153,6 +153,7 @@
     <Compile Include="Controllers\ArchivoActivoController.cs" />
     <Compile Include="Controllers\ArchivoInactivoController.cs" />
     <Compile Include="Controllers\BancosController.cs" />
+    <Compile Include="Controllers\BitacoraController.cs" />
     <Compile Include="Controllers\CatalogosController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\LoginController.cs" />
@@ -448,6 +449,7 @@
     <Content Include="Views\Reportes\partials\_UsuarioDetalles.cshtml" />
     <Content Include="Views\Reportes\_Roles.cshtml" />
     <Content Include="Views\Reportes\partials\_RolDetalles.cshtml" />
+    <Content Include="Views\Bitacora\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

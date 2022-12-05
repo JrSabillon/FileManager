@@ -1,4 +1,5 @@
 ﻿using Dapper.Contrib.Extensions;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -17,8 +18,10 @@ namespace SyT_FileManager.Models
         [Display(Name = "Departamento solicitante")]
         public int PrestDepartamentoSolicitanteID { get; set; }
         [Computed]
+        [JsonIgnore]
         public List<EstructuraOrganizacionalModel> Departamentos { get; set; }
         [Computed]
+        [JsonIgnore]
         public EstructuraOrganizacionalModel SelectedDepartamento { get => Departamentos.Where(x => x.EstOrgaID == PrestDepartamentoSolicitanteID).FirstOrDefault(); }
         [Display(Name = "Nombre solicitante")]
         public string PrestNombreSolicitante { get; set; }
@@ -32,6 +35,7 @@ namespace SyT_FileManager.Models
         public string PrestPersonaRetira { get; set; }
         [Display(Name = "Otra persona retira")]
         [Computed]
+        [JsonIgnore]
         public bool OtraPersonaRetira { get; set; } = false;
         public string PrestUsuarioEntrega { get; set; }
         [Display(Name = "Fecha de devolución")]
@@ -47,14 +51,19 @@ namespace SyT_FileManager.Models
         public string PrestObservacion { get; set; }
 
         [Computed]
+        [JsonIgnore]
         public int? DocTipo { get; set; }
         [Computed]
+        [JsonIgnore]
         public List<TipoDocumentoModel> TiposDocumentos { get; set; }
         [Computed]
+        [JsonIgnore]
         public TipoDocumentoModel SelectedDocumento { get => TiposDocumentos.Where(x => x.TipoDocID == DocTipo).FirstOrDefault(); }
         [Computed]
+        [JsonIgnore]
         public int CajaActivaID { get; set; }
         [Computed]
+        [JsonIgnore]
         public int CajaInactivaID { get; set; }
     }
 }

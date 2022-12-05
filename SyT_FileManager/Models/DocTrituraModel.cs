@@ -1,4 +1,5 @@
 ﻿using Dapper.Contrib.Extensions;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,6 +13,7 @@ namespace SyT_FileManager.Models
         public int TrituraID { get; set; }
         public int DocID { get; set; }
         [Computed]
+        [JsonIgnore]
         public DocumentoModel Documento { get; set; }
         public int CajaID { get; set; }
         public int AlmacenID { get; set; }

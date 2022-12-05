@@ -1,4 +1,5 @@
 ﻿using Dapper.Contrib.Extensions;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -27,6 +28,7 @@ namespace SyT_FileManager.Models
         [Display(Name = "Estado")]
         public string EstOrgaStatus { get; set; }
         [Computed]
+        [JsonIgnore]
         public List<EstructuraOrganizacionalModel> Estructuras { get; set; }
 
         public EstructuraOrganizacionalModel(int EstOrgaID, int EstOrgaIDPadre, string EstOrgaNombre, string EstOrgaAbreviatura, string EstOrgaStatus, List<EstructuraOrganizacionalModel> Estructuras)

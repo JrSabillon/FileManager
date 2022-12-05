@@ -9,6 +9,7 @@ using SyT_FileManager.Models;
 using SyT_FileManager.AppCode;
 using Dapper.Contrib.Extensions;
 using System.Web.Mvc;
+using Newtonsoft.Json;
 
 namespace SyT_FileManager.DataAccess
 {
@@ -57,9 +58,27 @@ namespace SyT_FileManager.DataAccess
         {
             using (IDbConnection context = new SqlConnection(Constants.ConnectionString))
             {
-                var data = context.Update(agencia);
+                var oldAgencia = context.Get<AgenciaModel>(agencia.AgenciaID);
+                var updated = context.Update(agencia);
 
-                return data;
+                if (updated)
+                {
+                    BitacoraAccess bitacoraAccess = new BitacoraAccess();
+                    BitacoraModel bitacora = new BitacoraModel()
+                    {
+                        BitacoraID = bitacoraAccess.NextBitacoraID(),
+                        Entidad = "Agencia",
+                        Usuario = Constants.GetUserData().UserId,
+                        Fecha = DateTime.Now,
+                        Accion = Constants.EDIT,
+                        ValorAnterior = JsonConvert.SerializeObject(oldAgencia),
+                        ValorActual = JsonConvert.SerializeObject(agencia)
+                    };
+
+                    bitacoraAccess.Add(bitacora);
+                }
+
+                return updated;
             }
         }
 

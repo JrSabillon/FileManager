@@ -32,6 +32,16 @@ namespace SyT_FileManager.DataAccess
             }
         }
 
+        internal List<BitacoraModel> GetAll()
+        {
+            using (IDbConnection context = new SqlConnection(Constants.ConnectionString))
+            {
+                var data = context.GetAll<BitacoraModel>().ToList();
+
+                return data;
+            }
+        }
+
         public int NextBitacoraID()
         {
             using (IDbConnection context = new SqlConnection(Constants.ConnectionString))

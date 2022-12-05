@@ -1,4 +1,5 @@
 ﻿using Dapper.Contrib.Extensions;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -30,6 +31,7 @@ namespace SyT_FileManager.Models
         [Display(Name = "Estado de la agencia")]
         public string AgenciaStatus { get; set; }
         [Computed]
+        [JsonIgnore]
         [Display(Name = "Nombre de la zona")]
         public string RecursoItemNombre { get; set; }
     }

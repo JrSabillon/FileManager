@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -15,7 +16,7 @@ namespace SyT_FileManager.Models
         public string PrivAction { get; set; }
         public string PrivController { get; set; }
         public int PrivPosicion { get; set; }
-
+        [JsonIgnore]
         public bool Selected { get; set; }
     }
 }

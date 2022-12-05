@@ -1,4 +1,5 @@
 ﻿using Dapper.Contrib.Extensions;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -21,8 +22,10 @@ namespace SyT_FileManager.Models
         public string AlmacenTipo { get; set; }
 
         [Computed]
+        [JsonIgnore]
         public List<RecursoItem> TipoAlmacenes { get; set; } = new List<RecursoItem>();
         [Computed]
+        [JsonIgnore]
         public RecursoItem SelectedTipoAlmacen { get => TipoAlmacenes.Where(x => x.RecursoItemID.Equals(AlmacenTipo)).First(); }
         
         [Display(Name = "Dirección")]
@@ -36,8 +39,10 @@ namespace SyT_FileManager.Models
         public int? AgenciaID { get; set; }
 
         [Computed]
+        [JsonIgnore]
         public List<AgenciaModel> Agencias { get; set; } = new List<AgenciaModel>();
         [Computed]
+        [JsonIgnore]
         public AgenciaModel SelectedAgencia { get => Agencias.Where(x => x.AgenciaID.Equals(AgenciaID)).First(); }
         
         [Display(Name = "Zona")]
@@ -45,11 +50,14 @@ namespace SyT_FileManager.Models
         public string ZonaId { get; set; }
 
         [Computed]
+        [JsonIgnore]
         public List<RecursoItem> Zonas { get; set; } = new List<RecursoItem>();
         [Computed]
+        [JsonIgnore]
         public RecursoItem SelectedZona { get => Zonas.Where(x => x.RecursoItemID.Equals(ZonaId)).First(); }
         
         [Computed]
+        [JsonIgnore]
         public string AlmacenLabel { get => AlmacenNombre + " - " + AlmacenDireccion; }
     }
 }

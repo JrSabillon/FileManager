@@ -9,6 +9,7 @@ using SyT_FileManager.Models;
 using System.Data;
 using System.Data.SqlClient;
 using System.Web.Mvc;
+using Newtonsoft.Json;
 
 namespace SyT_FileManager.DataAccess
 {
@@ -65,9 +66,27 @@ namespace SyT_FileManager.DataAccess
         {
             using (IDbConnection context = new SqlConnection(Constants.ConnectionString))
             {
-                var data = context.Update(tipoDocumento);
+                var oldTipoDocumento = context.Get<TipoDocumentoModel>(tipoDocumento.TipoDocID);
+                var updated = context.Update(tipoDocumento);
 
-                return data;
+                if (updated)
+                {
+                    BitacoraAccess bitacoraAccess = new BitacoraAccess();
+                    BitacoraModel bitacora = new BitacoraModel()
+                    {
+                        BitacoraID = bitacoraAccess.NextBitacoraID(),
+                        Entidad = "TipoDocumento",
+                        Usuario = Constants.GetUserData().UserId,
+                        Fecha = DateTime.Now,
+                        Accion = Constants.EDIT,
+                        ValorAnterior = JsonConvert.SerializeObject(oldTipoDocumento),
+                        ValorActual = JsonConvert.SerializeObject(tipoDocumento)
+                    };
+
+                    bitacoraAccess.Add(bitacora);
+                }
+
+                return updated;
             }
         }
 
