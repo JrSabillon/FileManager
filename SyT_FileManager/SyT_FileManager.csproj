@@ -195,6 +195,7 @@
     <Compile Include="Models\GetDocumentosPrestados_RP.cs" />
     <Compile Include="Models\GetDocumentos_RP.cs" />
     <Compile Include="Models\GetUsuarios_RP.cs" />
+    <Compile Include="Models\POCO\BitacoraAuditoriaBusqueda.cs" />
     <Compile Include="Models\POCO\DocumentosBusqueda.cs" />
     <Compile Include="Models\POCO\DocumentosPrestadosBusqueda.cs" />
     <Compile Include="Models\POCO\EnviarCajaBusqueda.cs" />

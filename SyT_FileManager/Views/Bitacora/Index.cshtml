@@ -2,12 +2,49 @@
 @using PagedList.Mvc;
 @{
     ViewBag.Title = "Index";
+    bool SearchDate = ViewBag.SearchDate;
+    bool SearchActionType = ViewBag.SearchActionType;
 }
 
-<h2>Bitacora de auditorias</h2>
-<hr />
-
 <div class="container">
+    <h2>Bitacora de auditorias</h2>
+    <hr />
+    @using (Html.BeginForm("Index", "Bitacora", FormMethod.Post))
+    {
+        <div class="row">
+            <label class="col-12 col-md">Filtros: </label>
+            <div class="col-12 col-md custom-control custom-switch">
+                @Html.CheckBox("SearchDate", SearchDate, new { @class = "custom-control-input", id = "chk-searchDate", onchange = "handleCheckbox(this);" })
+                <label class="custom-control-label" for="chk-searchDate">Filtrar por fecha</label>
+            </div>
+            <div class="col-12 col-md custom-control custom-switch">
+                @Html.CheckBox("SearchActionType", SearchActionType, new { @class = "custom-control-input", id = "chk-searchActionType", onchange = "handleCheckbox(this);" })
+                <label class="custom-control-label" for="chk-searchActionType">Filtrar por accion</label>
+            </div>
+        </div>
+        <div class="row" id="div-advanced-search">
+            <div class="col-12 col-md-6 @(SearchDate ? "" : "d-none")" id="col-SearchDate">
+                <div class="row">
+                    <div class="form-group col">
+                        <label>Fecha inicio</label>
+                        @Html.TextBox("FechaInicio", null, new { type = "date", @class = "form-control col-12" })
+                    </div>
+                    <div class="form-group col">
+                        <label>Fecha fin</label>
+                        @Html.TextBox("FechaFin", null, new { type = "date", @class = "form-control col-12" })
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-md-6 @(SearchActionType ? "" : "d-none")" id="col-SearchActionType">
+                <div class="form-group">
+                    <label>Acción</label>
+                    @Html.DropDownList("Accion", null, "Seleccionar una accion", new { @class = "form-control col-12" })
+                </div>
+            </div>
+        </div>
+        <button class="btn btn-success"><i class="fa fa-search"></i> Buscar</button>
+    }
+    <br />
     <div class="table-responsive">
         <table class="table table-hover">
             <thead>
@@ -44,7 +81,7 @@
     </div>
     <label>Página @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) de @Model.PageCount</label>
     <br />
-    @Html.PagedListPager(Model, page => Url.Action("Index", new { page }), PagedListRenderOptions.OnlyShowFivePagesAtATime)
+    @Html.PagedListPager(Model, page => Url.Action("Index", new { page, SearchDate, SearchActionType, Accion = ViewBag.SelectedAccion, ViewBag.FechaInicio, ViewBag.FechaFin }), PagedListRenderOptions.OnlyShowFivePagesAtATime)
 </div>
 
 <div class="modal fade" id="modal-detalle" tabindex="-1" role="dialog" aria-hidden="true">
@@ -150,4 +187,9 @@
             });
         });
     });
+
+    function handleCheckbox(element) {
+        console.log($(element).attr('name'));
+        $(`#col-${$(element).attr('name')}`).toggleClass('d-none');
+    }
 </script>

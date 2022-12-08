@@ -227,6 +227,11 @@
         var payload = Object.fromEntries(data.entries());
         payload.DocPaquete = $('#DocPaquete').is(':checked');
 
+        if (!canAddDocument(payload)) {
+            alert('Favor llenar todos los campos para continuar.');
+            return;
+        }
+
         $.post('@Url.Action("AddDocumentToBox", "ArchivoActivo")', payload, function (documento) {
             $('#form-document').trigger('reset');
             $('#modal-documento').modal('hide');
@@ -248,5 +253,9 @@
                 </tr>`
             );
         });
+    }
+
+    function canAddDocument(document) {
+        return document.DocBancoID != '' && document.DocCCCCID != '' && document.DocDescripcion != '' && document.DocFechaInfo != '' && document.DocTipo != '';
     }
 </script>
