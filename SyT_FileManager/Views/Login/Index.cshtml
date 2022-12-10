@@ -45,8 +45,7 @@
                                     <label for="password">
                                         Contraseña
                                     </label>
-                                    <input id="password" type="password" class="form-control col-12" name="UserEmail" required data-eye>
-                                    @Html.ValidationMessageFor(x => x.UserEmail, "", new { @class = "text-danger" })
+                                    <input id="password" type="password" class="form-control col-12" name="UserPassword" required data-eye>
                                 </div>
 
                                 if (!string.IsNullOrEmpty(ViewBag.Message))

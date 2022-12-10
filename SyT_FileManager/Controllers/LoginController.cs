@@ -8,6 +8,7 @@ using System.Web.Mvc;
 using System.Web.Security;
 using SyT_FileManager.Models;
 using SyT_FileManager.DataAccess;
+using System.DirectoryServices.AccountManagement;
 
 namespace SyT_FileManager.Controllers
 {
@@ -27,20 +28,39 @@ namespace SyT_FileManager.Controllers
         }
 
         [HttpPost]
-        public ActionResult Index(UsuarioModel User)
+        public ActionResult Index(UsuarioModel User, string UserPassword)
         {
             //TODO: Agregar validacion de active directory
-            var authUser = UsuarioAccess.GetUsuario(User.UserId);
+            string ActiveDomain = ConfigurationManager.AppSettings["domain"] ?? string.Empty;
 
-            if(authUser != null)
+            try
             {
-                CreateUserCookie(authUser);
+                using (PrincipalContext pc = new PrincipalContext(ContextType.Domain, ActiveDomain))
+                {
+                    if (pc.ValidateCredentials(User.UserId, UserPassword))
+                    {
+                        var authUser = UsuarioAccess.GetUsuario(User.UserId);
 
-                return RedirectToAction("Index", "Home");
+                        if (authUser != null)
+                        {
+                            CreateUserCookie(authUser);
+
+                            return RedirectToAction("Index", "Home");
+                        }
+
+                        ViewBag.Message = "Usuario no registrado";
+                        return View(User);
+                    }
+
+                    ViewBag.Message = "Usuario ó Contraseña incorrectos";
+                    return View(User);
+                }
             }
-
-            ViewBag.Message = "Usuario no registrado";
-            return View(User);
+            catch(PrincipalServerDownException LDAPexc)
+            {
+                ViewBag.Message = "Servidor de Active Directory no disponible.";
+                return View(User);
+            }
         }
 
         void CreateUserCookie(UsuarioModel User)
