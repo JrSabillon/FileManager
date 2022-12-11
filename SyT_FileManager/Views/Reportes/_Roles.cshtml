@@ -1,32 +1,46 @@
 ﻿@model List<SyT_FileManager.Models.RoleModel>
 
-<div class="table-responsive">
-    <table class="table table-hover" id="table-roles">
-        <thead>
-            <tr>
-                <th id="RolId">ID</th>
-                <th id="RolNombre">Nombre</th>
-                <th id="RolDescripcion">Descripción</th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in Model)
-            {
+@using (Html.BeginForm("PrintRoles", "Reportes", FormMethod.Post, new { target = "_blank" }))
+{
+    <div id="div-payload">
+        @for (int i = 0; i < Model.Count; i++)
+        {
+            @Html.HiddenFor(x => Model[i].RolId)
+            @Html.HiddenFor(x => Model[i].RolNombre)
+            @Html.HiddenFor(x => Model[i].RolDescripcion)
+        }
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-hover" id="table-roles">
+            <thead>
                 <tr>
-                    <td>@item.RolId</td>
-                    <td>@item.RolNombre</td>
-                    <td>@item.RolDescripcion</td>
-                    <td>
-                        <button class="btn btn-sm shadow btn-enterprise" title="Ver detalles" onclick="seeDetails('@item.RolId');">
-                            <i class="fa fa-eye"></i>
-                        </button>
-                    </td>
+                    <th id="RolId">ID</th>
+                    <th id="RolNombre">Rol</th>
+                    <th id="RolDescripcion">Descripción</th>
+                    <th>
+                        <button type="submit" class="btn btn-enterprise btn-sm shadow" title="Imprimir"><i class="fa fa-print"></i></button>
+                    </th>
                 </tr>
-            }
-        </tbody>
-    </table>
-</div>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.RolId</td>
+                        <td>@item.RolNombre</td>
+                        <td>@item.RolDescripcion</td>
+                        <td>
+                            <button type="button" class="btn btn-sm shadow btn-enterprise" title="Ver detalles" onclick="seeDetails('@item.RolId');">
+                                <i class="fa fa-eye"></i>
+                            </button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
 <br />
 <div id="div-details">
 
@@ -43,6 +57,6 @@
     function seeDetails(RolId) {
         $.get(`@Url.Action("_RolDetalles", "Reportes")?RolId=${RolId}`, function (content) {
             $('#div-details').html(content);
-        });
+        }).fail(handleAjaxAuth);
     }
 </script>

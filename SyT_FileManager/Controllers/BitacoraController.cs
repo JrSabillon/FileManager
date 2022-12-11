@@ -30,7 +30,7 @@ namespace SyT_FileManager.Controllers
 
             if (busqueda.SearchDate && busqueda.FechaInicio.HasValue && busqueda.FechaFin.HasValue)
                 model = model.Where(x => x.Fecha >= busqueda.FechaInicio && x.Fecha <= busqueda.FechaFin).ToList();
-            if (busqueda.SearchDate && !string.IsNullOrEmpty(busqueda.Accion))
+            if (busqueda.SearchActionType && !string.IsNullOrEmpty(busqueda.Accion))
                 model = model.Where(x => x.Accion == busqueda.Accion).ToList();
 
             int pageSize = Constants.PaginationSize;

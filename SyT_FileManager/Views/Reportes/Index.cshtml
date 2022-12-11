@@ -32,7 +32,7 @@
                 //Iniciar el evento de los checkbox de la pagina
                 var checkboxes = $('input[type=checkbox]');
                 checkboxes.on('change', handleCheckbox);
-            });
+            }).fail(handleAjaxAuth);
     }
     
     function handleCheckbox(checkbox) {

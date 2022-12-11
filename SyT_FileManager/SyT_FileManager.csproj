@@ -142,6 +142,7 @@
     <Compile Include="AppCode\AuthorizationHandler.cs" />
     <Compile Include="AppCode\BarcodeHandler.cs" />
     <Compile Include="AppCode\Constants.cs" />
+    <Compile Include="AppCode\CustomPdfPageEventHandler.cs" />
     <Compile Include="AppCode\ExceptionHandler.cs" />
     <Compile Include="AppCode\StaticHelpers.cs" />
     <Compile Include="App_Start\BundleConfig.cs" />

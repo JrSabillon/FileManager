@@ -1,42 +1,65 @@
 ﻿@model List<SyT_FileManager.Models.UsuarioModel>
-<div class="table-responsive">
-    <table class="table table-hover" id="table-usuarios">
-        <thead>
-            <tr>
-                <th id="UserId">Usuario</th>
-                <th id="UserNombre">Nombre</th>
-                <th id="UserEmail">Correo</th>
-                <th id="UserStatus">Estado</th>
-                <th id="AgenciaNombre">Agencia</th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in Model)
-            {
+@using (Html.BeginForm("PrintUsers", "Reportes", FormMethod.Post, new { target = "_blank" }))
+{
+    <div class="table-responsive">
+        <table class="table table-hover" id="table-usuarios">
+            <thead>
                 <tr>
-                    <td>@item.UserId</td>
-                    <td>@item.UserNombre</td>
-                    <td>@item.UserEmail</td>
-                    <td>@item.UserStatus</td>
-                    @if(item.SelectedAgencia == null)
+                    <th id="UserId">Usuario</th>
+                    <th id="UserNombre">Nombre</th>
+                    <th id="UserEmail">Correo</th>
+                    <th id="UserStatus">Estado</th>
+                    <th id="AgenciaNombre">Agencia</th>
+                    <th>
+                        @if (Model.Count > 0)
+                        {
+                            <button type="submit" class="btn btn-enterprise btn-sm shadow" title="Imprimir"><i class="fa fa-print"></i></button>
+                        }
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (int i = 0; i < Model.Count; i++)
+                {
+                <tr>
+                    <td>
+                        @Html.HiddenFor(x => Model[i].AgenciaID)
+                        @Html.HiddenFor(x => Model[i].UserId)
+                        @Model[i].UserId
+                    </td>
+                    <td>
+                        @Html.HiddenFor(x => Model[i].UserNombre)
+                        @Model[i].UserNombre
+                    </td>
+                    <td>
+                        @Html.HiddenFor(x => Model[i].UserEmail)
+                        @Model[i].UserEmail
+                    </td>
+                    <td>
+                        @Html.HiddenFor(x => Model[i].UserStatus)
+                        @Model[i].UserStatus
+                    </td>
+                    @if (Model[i].SelectedAgencia == null)
                     {
                         <td>N/D</td>
                     }
                     else
                     {
-                        <td>@item.SelectedAgencia.AgenciaNombre</td>
+                        <td>
+                            @Model[i].SelectedAgencia.AgenciaNombre
+                        </td>
                     }
                     <td>
-                        <button type="button" class="btn btn-sm shadow btn-enterprise" title="Ver detalles" onclick="seeDetails('@item.UserId')">
+                        <button type="button" class="btn btn-sm shadow btn-enterprise" title="Ver detalles" onclick="seeDetails('@Model[i].UserId')">
                             <i class="fa fa-eye"></i>
                         </button>
                     </td>
                 </tr>
-            }
-        </tbody>
-    </table>
-</div>
+                }
+            </tbody>
+        </table>
+    </div>
+}
 <br />
 <div id="div-details">
 
@@ -46,6 +69,6 @@
     function seeDetails(UserId) {
         $.get(`@Url.Action("_UsuarioDetalles", "Reportes")?UserId=${UserId}`, function (content) {
             $('#div-details').html(content);
-        });
+        }).fail(handleAjaxAuth);
     }
 </script>

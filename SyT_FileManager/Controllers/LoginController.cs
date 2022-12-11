@@ -30,7 +30,6 @@ namespace SyT_FileManager.Controllers
         [HttpPost]
         public ActionResult Index(UsuarioModel User, string UserPassword)
         {
-            //TODO: Agregar validacion de active directory
             string ActiveDomain = ConfigurationManager.AppSettings["domain"] ?? string.Empty;
 
             try

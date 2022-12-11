@@ -70,7 +70,6 @@
         payload.searchTerm = $('#chk-searchTerm').is(':checked');
         payload.searchDates = $('#chk-searchDates').is(':checked');
 
-        console.log(payload);
         $.post('@Url.Action("_Documentos", "Reportes")', payload, function (table) {
             $('#div-table').html(table);
             $('#table-documentos').smpSortableTable(false, 10, 'es');

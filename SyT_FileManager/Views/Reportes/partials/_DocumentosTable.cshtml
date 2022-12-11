@@ -1,30 +1,78 @@
 ﻿@model List<SyT_FileManager.Models.GetDocumentos_RP>
-<table class="table table-hover" id="table-documentos">
-    <thead>
-        <tr>
-            <th id="TipoDocNombre">Documento</th>
-            <th id="PrestNombreSolicitante">Descripción</th>
-            <th id="PrestEmailSolicitante">Fecha</th>
-            <th id="PrestObservacion">Plazo</th>
-            <th id="PrestFechaSolicitud">Vencimiento</th>
-            <th id="PrestFechaRetira">#Caja</th>
-            <th id="PrestPlazoMaximoDevolucion">Agencia</th>
-            <th id="PrestUsuarioEntrega">Departamento</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
+@using (Html.BeginForm("PrintDocuments", "Reportes", FormMethod.Post, new { target = "_blank" }))
+{
+    <div id="div-payload">
+        @for (int i = 0; i < Model.Count; i++)
         {
-            <tr>
-                <td>@item.TipoDocNombre</td>
-                <td>@item.DocDescripcion</td>
-                <td>@item.DocFechaInfo.ToString("yyyy-MM-dd")</td>
-                <td>@item.TipoDocPlazo Año(s)</td>
-                <td>@item.DocFechaVencimiento.ToString("yyyy-MM-dd")</td>
-                <td>@(item.SelectedAlmacen.AlmacenTipo.Equals("ACT") ? item.CajaActivaID : item.CajaInactivaID)</td>
-                <td>@item.AgenciaNombre</td>
-                <td>@item.Departamento</td>
-            </tr>
+            @Html.HiddenFor(x => Model[i].TipoDocNombre)
+            @Html.HiddenFor(x => Model[i].DocDescripcion)
+            @Html.HiddenFor(x => Model[i].DocFechaInfo)
+            @Html.HiddenFor(x => Model[i].TipoDocPlazo)
+            @Html.HiddenFor(x => Model[i].DocFechaVencimiento)
+            @Html.HiddenFor(x => Model[i].CajaActivaID)
+            @Html.HiddenFor(x => Model[i].CajaInactivaID)
+            @Html.HiddenFor(x => Model[i].AlmacenID)
+            @Html.HiddenFor(x => Model[i].AgenciaNombre)
+            @Html.HiddenFor(x => Model[i].Departamento)
         }
-    </tbody>
-</table>
+    </div>
+    <table class="table table-hover" id="table-documentos">
+        <thead>
+            <tr>
+                <th id="TipoDocNombre">Documento</th>
+                <th id="DocDescripcion">Descripción</th>
+                <th id="DocFechaInfo">Fecha</th>
+                <th id="TipoDocPlazo">Plazo</th>
+                <th id="DocFechaVencimiento">Vencimiento</th>
+                <th id="CajaID">#Caja</th>
+                <th id="AgenciaNombre">Agencia</th>
+                <th id="Departamento">Departamento</th>
+                <th>
+                    @if (Model.Count > 0)
+                    {
+                        <button type="submit" class="btn btn-enterprise btn-sm shadow" title="Imprimir"><i class="fa fa-print"></i></button>
+                    }
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @for (int i = 0; i < Model.Count; i++)
+            {
+                <tr>
+                    <td>
+                        @Model[i].TipoDocNombre
+                    </td>
+                    <td>
+                        
+                        @Model[i].DocDescripcion
+                    </td>
+                    <td>
+                        
+                        @Model[i].DocFechaInfo.ToString("yyyy-MM-dd")
+                    </td>
+                    <td>
+                        
+                        @Model[i].TipoDocPlazo Año(s)
+                    </td>
+                    <td>
+                        
+                        @Model[i].DocFechaVencimiento.ToString("yyyy-MM-dd")
+                    </td>
+                    <td>
+                        
+                        @(Model[i].SelectedAlmacen.AlmacenTipo.Equals("ACT") ? Model[i].CajaActivaID : Model[i].CajaInactivaID)
+                    </td>
+                    <td>
+                        
+                        @Model[i].AgenciaNombre
+                    </td>
+                    <td>
+                        
+                        @Model[i].Departamento
+                    </td>
+                    <td>&nbsp;</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

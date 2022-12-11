@@ -538,7 +538,9 @@ namespace SyT_FileManager.Controllers
             doc.SetMargins(25f, 25f, 10f, 10f);
 
             PdfPTable tableLayout = new PdfPTable(6);
-            PdfWriter.GetInstance(doc, workStream).CloseStream = false;
+            var writer = PdfWriter.GetInstance(doc, workStream);
+            writer.CloseStream = false;
+            writer.PageEvent = new CustomPdfPageEventHandler();
             doc.Open();
 
             var title = new Paragraph("Acta de Trituración", new Font() { Size = 15 }) { Alignment = Element.ALIGN_CENTER };
