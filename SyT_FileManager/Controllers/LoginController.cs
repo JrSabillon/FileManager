@@ -34,9 +34,9 @@ namespace SyT_FileManager.Controllers
 
             try
             {
-                using (PrincipalContext pc = new PrincipalContext(ContextType.Domain, ActiveDomain))
+                //using (PrincipalContext pc = new PrincipalContext(ContextType.Domain, ActiveDomain))
                 {
-                    if (pc.ValidateCredentials(User.UserId, UserPassword))
+                    //if (pc.ValidateCredentials(User.UserId, UserPassword))
                     {
                         var authUser = UsuarioAccess.GetUsuario(User.UserId);
 

@@ -3,6 +3,7 @@
     ViewBag.Title = "DocumentosTriturados";
     var user = SyT_FileManager.AppCode.Constants.GetUserData();
     var fechaTrituracion = Model != null ? Model.Select(x => x.TrituraFecha).First().ToString("yyyy-MM-dd") : "";
+    var tituraTestigo = Model.Select(x => x.TrituraNombreTestigo).FirstOrDefault();
 }
 
 <script src="~/Scripts/dist/html2canvas.js"></script>
@@ -19,13 +20,16 @@
     </div>
     <a href="@Url.Action("Triturar", "ArchivoInactivo")" class="btn btn-primary">Ir a trituración de Docs.</a>
 
-
     <br />
 }
 else
 {
-    <button type="button" class="btn btn-success" data-target="#modal-triturar" data-toggle="modal"><i class="fa fa-print"></i> Imprimir reporte</button>
-    <a class="btn btn-primary" href="@Url.Action("Triturar", "ArchivoInactivo", new { lote = ViewBag.lote })"><i class="fa fa-trash-o"></i> Seguir triturando</a>
+    <button type="button" class="btn btn-success" data-target="#modal-triturar" data-toggle="modal" id="btn-printAct">
+        <i class="fa fa-print"></i> Imprimir reporte
+    </button>
+    <a class="btn btn-primary" href="@Url.Action("Triturar", "ArchivoInactivo", new { lote = ViewBag.lote })" id="btn-keepDeleting">
+        <i class="fa fa-trash-o"></i> Seguir triturando
+    </a>
     <div class="table-responsive mt-3" id="div-docs">
         <table class="table table-hover">
             <thead>
@@ -36,6 +40,7 @@ else
                     <th>Agencia</th>
                     <th>Fecha trituración</th>
                     <th>Fecha vencimiento</th>
+                    <th></th>
                 </tr>
             </thead>
             <tbody>
@@ -50,6 +55,21 @@ else
                             <td>@item.Documento.SelectedAgencia.AgenciaNombre</td>
                             <td>@item.Documento.DocFechaTrituracion.Value.ToString("yyyy-MM-dd")</td>
                             <td>@item.Documento.DocFechaVencimiento.Value.ToString("yyyy-MM-dd")</td>
+                            <td>
+                                @if (string.IsNullOrEmpty(tituraTestigo))
+                                {
+                                    //Si no hay nombre de testigo todavia no ha impreso el acta de trituracion.
+                                    using (Html.BeginForm("ReversarTrituracion", "ArchivoInactivo", FormMethod.Post, new { id = "form-undo" }))
+                                    {
+                                        @Html.Hidden("DocID")
+                                        @Html.Hidden("lote")
+                                        <button type="button" class="btn btn-sm shadow btn-enterprise btn-undo" title="Reversar trituración"
+                                                onclick="reversarTrituracion('@item.DocID', '@item.Documento.SelectedDocumento.TipoDocNombre')">
+                                            <i class="fa fa-undo"></i>
+                                        </button>
+                                    }
+                                }
+                            </td>
                         </tr>
                     }
                 }
@@ -57,7 +77,7 @@ else
         </table>
     </div>
 
-    using (Html.BeginForm("ImprimirActaTrituracion", "ArchivoInactivo", FormMethod.Post, new { id = "form-triturar", onsubmit = "$('#modal-triturar').modal('hide')" }))
+    using (Html.BeginForm("ImprimirActaTrituracion", "ArchivoInactivo", FormMethod.Post, new { id = "form-triturar", onsubmit = "submitForm();" }))
     {
         @Html.Hidden("lote")
         <div class="modal fade" tabindex="-1" role="dialog" id="modal-triturar">
@@ -76,7 +96,10 @@ else
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button class="btn btn-primary" id="btn-print"><i class="fa fa-save"></i> Imprimir</button>
+                        <button class="btn btn-primary" id="btn-print"
+                                onclick="return confirm('Una vez imprima el acta no podra reversar la trituracion.\n ¿desea continuar?')">
+                            <i class="fa fa-save"></i> Imprimir
+                        </button>
                     </div>
                 </div>
             </div>
@@ -144,6 +167,20 @@ else
             // doc.save('Trituracion.pdf');
             //Agregar nombre del testigo al lote de trituracion.
             //$('#form-triturar').submit();
+        }
+
+        function reversarTrituracion(DocID, DocNombre) {
+            console.log(DocID);
+            if (confirm(`¿Desea reversar la trituracion de este documento[${DocNombre}]?`)) {
+                $('#DocID').val(DocID);
+                $('#form-undo').submit();
+            }
+        }
+
+        function submitForm() {
+            $('#modal-triturar').modal('hide');
+            $('.btn-undo').addClass('d-none');
+            $('#btn-keepDeleting').attr('style', 'pointer-events: none; cursor: not-allowed;');
         }
     </script>
 }

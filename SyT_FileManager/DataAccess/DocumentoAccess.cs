@@ -264,6 +264,33 @@ namespace SyT_FileManager.DataAccess
             }
         }
 
+        public bool ReversarTrituracion(int DocID, int lote)
+        {
+            using (IDbConnection context = new SqlConnection(Constants.ConnectionString))
+            {
+                string query = "DELETE FROM DocTritura WHERE DocID = @DocID AND TrituraID = @lote";
+                var values = new { DocID, lote };
+
+                int affectedRows = context.Execute(query, values);
+
+                if(affectedRows > 0)
+                {
+                    query = "UPDATE Documento SET DocStatus = 'ACT', DocFechaTrituracion = NULL WHERE DocID = @DocID";
+                    int affectedRowsDoc = context.Execute(query, values);
+
+                    if(affectedRowsDoc > 0)
+                    {
+                        var documento = GetDocumento(DocID);
+                        query = "UPDATE Caja SET CajaStatus = 'ACT' WHERE CajaID = @CajaID";
+
+                        context.Execute(query, new { documento.CajaID });
+                    }
+                }
+
+                return affectedRows > 0;
+            }
+        }
+
         internal List<DocTrituraModel> GetDocTrituraByTrituraID(int? lote)
         {
             using (IDbConnection context = new SqlConnection(Constants.ConnectionString))
