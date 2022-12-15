@@ -49,10 +49,13 @@
                                 }
                                 @if (Constants.Privilegios.Where(x => x.PrivId.Equals("MODI_ROL_DLT")).Count() > 0)
                                 {
-                                    <a href="@Url.Action("Eliminar", "Roles", new { item.RolId })" onclick="return confirm('¿Esta seguro que desea eliminar este rol?')"
-                                       class="btn btn-sm btn-danger shadow" title="Eliminar rol">
-                                        <i class="fa fa-trash-o"></i>
-                                    </a>
+                                    if (!item.RolId.Equals("SECADM"))
+                                    {
+                                        <a href="@Url.Action("Eliminar", "Roles", new { item.RolId })" onclick="return confirm('¿Esta seguro que desea eliminar este rol?')"
+                                           class="btn btn-sm btn-danger shadow" title="Eliminar rol">
+                                            <i class="fa fa-trash-o"></i>
+                                        </a>
+                                    }
                                 }
                             </div>
                         </div>

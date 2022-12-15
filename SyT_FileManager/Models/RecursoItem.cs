@@ -10,7 +10,7 @@ namespace SyT_FileManager.Models
     [Table("RecursoItem")]
     public class RecursoItem
     {
-        [ExplicitKey]
+        //[ExplicitKey]
         [StringLength(10)]
         public string RecursoID { get; set; }
         [ExplicitKey]

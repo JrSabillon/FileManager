@@ -144,7 +144,7 @@ namespace SyT_FileManager.DataAccess
             });
         }
 
-        public List<DocumentoModel> GetDocumentosByDocTipoAndDocStatusAnd_CajaAlmacenID(int DocTipo, string DocStatus, int[] AlmacenID)
+        public List<DocumentoModel> GetDocumentosByDocTipoAndDocStatusAnd_CajaAlmacenID(int DocTipo, string DocStatus, int[] AlmacenID, int? CajaID, string Source = "INA")
         {
             List<DocumentoModel> data = new List<DocumentoModel>();
 
@@ -153,7 +153,10 @@ namespace SyT_FileManager.DataAccess
                 string query = "SELECT * FROM Documento d INNER JOIN Caja c " +
                     "ON d.CajaID = c.CajaID " +
                     "WHERE d.DocStatus = @DocStatus AND d.DocTipo = @DocTipo AND c.AlmacenID IN @AlmacenID AND c.CajaStatus = 'ACT'";
-                data = context.Query<DocumentoModel>(query, new { DocTipo, DocStatus, AlmacenID }).ToList();
+                query += CajaID.HasValue ? 
+                        Source == "ACT" ? " AND c.CajaActivaID = @CajaID" : " AND c.CajaInactivaID = @CajaID" 
+                    : string.Empty;
+                data = context.Query<DocumentoModel>(query, new { DocTipo, DocStatus, AlmacenID, CajaID }).ToList();
             }
 
             var CajaAccess = new CajaAccess();
