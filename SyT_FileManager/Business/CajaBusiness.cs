@@ -130,5 +130,12 @@ namespace SyT_FileManager.Business
             caja.CajaStatus = "INA";
             CajaAccess.Update(caja);
         }
+
+        public List<GetCajasByAlmacenTipo_RP> GetCajasByAlmacenTipo_RP(string UserId, string AlmacenTipo)
+        {
+            List<GetCajasByAlmacenTipo_RP> data = CajaAccess.GetCajasByAlmacenTipo_RP(UserId, AlmacenTipo);
+
+            return data;
+        }
     }
 }

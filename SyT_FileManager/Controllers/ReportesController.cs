@@ -23,6 +23,7 @@ namespace SyT_FileManager.Controllers
         RecursoAccess RecursoAccess;
         DocumentoBusiness DocumentoBusiness;
         UsuarioAccess UsuarioAccess;
+        CajaBusiness CajaBusiness;
        
         // GET: Reportes
         public ActionResult Index()
@@ -34,15 +35,12 @@ namespace SyT_FileManager.Controllers
 
         List<ReportType> ReportTypes()
         {
-            List<ReportType> reports = new List<ReportType>
-            {
-                new ReportType { ReportCode = "USERS", ReportName = "Usuarios" },
-                new ReportType { ReportCode = "DOCS", ReportName = "Documentos" },
-                new ReportType { ReportCode = "DOC_PREST", ReportName = "Documentos prestados" },
-                new ReportType { ReportCode = "ROLES", ReportName = "Roles" }
-            };
-
-            return reports;
+            return Constants.Privilegios.Where(x => x.PrivId.StartsWith("MODV_REP_"))
+                .Select(x => new ReportType
+                {
+                    ReportCode = x.PrivId,
+                    ReportName = x.PrivNombre
+                }).ToList();
         }
 
         public ActionResult LoadReportView(string ReportView)
@@ -57,19 +55,42 @@ namespace SyT_FileManager.Controllers
 
             switch (ReportView)
             {
-                case "DOC_PREST":
+                case "MODV_REP_DOCPREST":
                     return PartialView("_DocumentosPrestados");
-                case "DOCS":
+                case "MODV_REP_DOCS":
                     return PartialView("_Documentos");
-                case "USERS":
+                case "MODV_REP_USR":
                     ViewBag.status = new SelectList(RecursoAccess.GetRecursoItems("USREST"), "RecursoItemID", "RecursoItemNombre");
                     return PartialView("_Usuarios");
-                case "ROLES":
+                case "MODV_REP_ROLES":
                     var model = new RoleAccess().GetRoles();
                     return PartialView("_Roles", model);
+                case "MODV_REP_DOCTRIT":
+                    return PartialView("_DocumentosTriturados");
+                case "MODV_REP_ARCACT":
+                    return PartialView("_ArchivoActivo");
+                case "MODV_REP_ARCINA":
+                    return PartialView("_ArchivoInactivo");
+
             }
 
             return null;
+        }
+
+        public ActionResult _ArchivoActivo()
+        {
+            CajaBusiness = new CajaBusiness();
+            var model = CajaBusiness.GetCajasByAlmacenTipo_RP(Constants.GetUserData().UserId, "ACT");
+            
+            return PartialView("./partials/_ArchivoActivoTable", model);
+        }
+
+        public ActionResult _DocumentosTriturados(DocumentosTrituradosBusqueda busqueda)
+        {
+            DocumentoBusiness = new DocumentoBusiness();
+            var model = DocumentoBusiness.GetDocumentosTriturados_RP(busqueda, Constants.GetUserData().UserId);
+
+            return PartialView("./partials/_DocumentosTrituradosTable", model);
         }
 
         [HttpPost]
@@ -260,6 +281,55 @@ namespace SyT_FileManager.Controllers
                 AddCellToBody(tableLayout, item.PrestFechaRetira.ToString("yyyy-MM-dd"));
                 AddCellToBody(tableLayout, $"{item.PrestPlazoMaximoDevolucion} dia(s)");
                 AddCellToBody(tableLayout, item.PrestUsuarioEntrega);
+            }
+
+            doc.Add(table);
+            doc.Add(new Paragraph($"Total de registros: {documentos.Count}", new Font { Size = 10 }));
+
+            doc.Close();
+
+            byte[] byteInfo = workStream.ToArray();
+            workStream.Write(byteInfo, 0, byteInfo.Length);
+            workStream.Position = 0;
+
+            return File(workStream, "application/pdf", fileName);
+        }
+
+        public FileResult PrintDocumentosTriturados(List<GetDocumentosTriturados_RP> documentos)
+        {
+            MemoryStream workStream = new MemoryStream();
+            var today = DateTime.Now;
+
+            string fileName = $"DocumentosTriturados_{today:yyyyMMddHHmmss}.pdf";
+            Document doc = new Document(PageSize.A4);
+            doc.SetMargins(25f, 25f, 10f, 10f);
+
+            string[] columnNames = new string[] { "#Acta", "Documento", "Plazo", "Fecha trit.", "Usuario", "Testigo", "Agencia", "Departamento" };
+            float[] columnWidths = new float[] { 10, 15, 10, 15, 10, 10, 15, 15 };
+            PdfPTable tableLayout = new PdfPTable(columnWidths.Length);
+            var writer = PdfWriter.GetInstance(doc, workStream);
+            writer.CloseStream = false;
+            writer.PageEvent = new CustomPdfPageEventHandler();
+
+            doc.Open();
+
+            var title = new Paragraph("Reporte de documentos triturados", new Font() { Size = 15 }) { Alignment = Element.ALIGN_CENTER };
+            doc.Add(title);
+            doc.Add(new Chunk("\n"));
+            doc.Add(new Paragraph($"Encargado de impresión: {Constants.GetUserData().UserNombre}", new Font() { Size = 10 }));
+            doc.Add(new Paragraph($"Fecha de generación: {DateTime.Now:yyyy-MM-dd}", new Font() { Size = 10 }));
+            var table = GenerateTable(tableLayout, "\n", columnNames, columnWidths);
+
+            foreach (var item in documentos)
+            {
+                AddCellToBody(tableLayout, item.TrituraID);
+                AddCellToBody(tableLayout, item.TipoDocNombre);
+                AddCellToBody(tableLayout, $"{item.TipoDocPlazo} año(s)");
+                AddCellToBody(tableLayout, item.TrituraFecha.ToString("yyyy-MM-dd"));
+                AddCellToBody(tableLayout, item.TrituraUsuario);
+                AddCellToBody(tableLayout, item.TrituraNombreTestigo);
+                AddCellToBody(tableLayout, item.AgenciaNombre);
+                AddCellToBody(tableLayout, item.Departamento);
             }
 
             doc.Add(table);

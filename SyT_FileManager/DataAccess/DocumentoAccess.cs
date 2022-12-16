@@ -316,6 +316,17 @@ namespace SyT_FileManager.DataAccess
             }
         }
 
+        public List<GetDocumentosTriturados_RP> GetDocumentosTriturados_RP(DocumentosTrituradosBusqueda busqueda, string UserId)
+        {
+            using (IDbConnection context = new SqlConnection(Constants.ConnectionString))
+            {
+                var values = new { busqueda.FechaInicio, busqueda.FechaFin, UserId };
+                var data = context.Query<GetDocumentosTriturados_RP>("GetDocumentosTriturados_RP", values, commandType: CommandType.StoredProcedure).ToList();
+
+                return data;
+            }
+        }
+
         public List<GetDocumentosPrestados_RP> GetDocumentosPrestados_RP(DocumentosPrestadosBusqueda busqueda, string UserId)
         {
             using (IDbConnection context = new SqlConnection(Constants.ConnectionString))

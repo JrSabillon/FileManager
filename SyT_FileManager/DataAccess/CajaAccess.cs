@@ -134,6 +134,17 @@ namespace SyT_FileManager.DataAccess
             }
         }
 
+        internal List<GetCajasByAlmacenTipo_RP> GetCajasByAlmacenTipo_RP(string UserId, string AlmacenTipo)
+        {
+            using (IDbConnection context = new SqlConnection(Constants.ConnectionString))
+            {
+                var values = new { UserId, AlmacenTipo };
+                var data = context.Query<GetCajasByAlmacenTipo_RP>("GetCajasByAlmacenTipo_RP", values, commandType: CommandType.StoredProcedure).ToList();
+
+                return data;
+            }
+        }
+
         /// <summary>
         /// Obtener cajas vencidas segun parametros establecidos para documentos en almacen activo.
         /// </summary>

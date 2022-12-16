@@ -194,12 +194,15 @@
     <Compile Include="Models\DocTrituraModel.cs" />
     <Compile Include="Models\DocumentoModel.cs" />
     <Compile Include="Models\EstructuraOrganizacionalModel.cs" />
+    <Compile Include="Models\GetCajasByAlmacenTipo_RP.cs" />
     <Compile Include="Models\GetDocumentosPrestados_RP.cs" />
+    <Compile Include="Models\GetDocumentosTriturados_RP.cs" />
     <Compile Include="Models\GetDocumentos_RP.cs" />
     <Compile Include="Models\GetUsuarios_RP.cs" />
     <Compile Include="Models\POCO\BitacoraAuditoriaBusqueda.cs" />
     <Compile Include="Models\POCO\DocumentosBusqueda.cs" />
     <Compile Include="Models\POCO\DocumentosPrestadosBusqueda.cs" />
+    <Compile Include="Models\POCO\DocumentosTrituradosBusqueda.cs" />
     <Compile Include="Models\POCO\EnviarCajaBusqueda.cs" />
     <Compile Include="Models\POCO\PrestarDocumentoBusqueda.cs" />
     <Compile Include="Models\POCO\ReportType.cs" />
@@ -453,6 +456,12 @@
     <Content Include="Views\Reportes\_Roles.cshtml" />
     <Content Include="Views\Reportes\partials\_RolDetalles.cshtml" />
     <Content Include="Views\Bitacora\Index.cshtml" />
+    <Content Include="Views\Reportes\_DocumentosTriturados.cshtml" />
+    <Content Include="Views\Reportes\partials\_DocumentosTrituradosTable.cshtml" />
+    <Content Include="Views\Reportes\_ArchivoActivo.cshtml" />
+    <Content Include="Views\Reportes\_ArchivoInactivo.cshtml" />
+    <Content Include="Views\Reportes\partials\_ArchivoActivoTable.cshtml" />
+    <Content Include="Views\Reportes\partials\_ArchivoInactivoTable.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

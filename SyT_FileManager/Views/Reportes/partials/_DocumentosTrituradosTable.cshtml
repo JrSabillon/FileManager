@@ -1,0 +1,53 @@
+﻿@model List<SyT_FileManager.Models.GetDocumentosTriturados_RP>
+@using (Html.BeginForm("PrintDocumentosTriturados", "Reportes", FormMethod.Post, new { target = "_blank" }))
+{
+    <div id="div-payload">
+        @for (int i = 0; i < Model.Count; i++)
+        {
+            @Html.HiddenFor(x => Model[i].AgenciaNombre)
+            @Html.HiddenFor(x => Model[i].Departamento)
+            @Html.HiddenFor(x => Model[i].TipoDocNombre)
+            @Html.HiddenFor(x => Model[i].TipoDocPlazo)
+            @Html.HiddenFor(x => Model[i].TrituraFecha)
+            @Html.HiddenFor(x => Model[i].TrituraID)
+            @Html.HiddenFor(x => Model[i].TrituraNombreTestigo)
+            @Html.HiddenFor(x => Model[i].TrituraUsuario)
+        }
+    </div>
+    <table class="table table-hover" id="table-documentos-triturados">
+        <thead>
+            <tr>
+                <th id="TrituraID">#Acta</th>
+                <th id="TipoDocNombre">Documento</th>
+                <th id="TipoDocPlazo">Plazo</th>
+                <th id="TrituraFecha">Fecha trit.</th>
+                <th id="TrituraUsuario">Usuario</th>
+                <th id="TrituraNombreTestigo">Testigo</th>
+                <th id="AgenciaNombre">Agencia</th>
+                <th id="Departamento">Departamento</th>
+                <th>
+                    @if (Model.Count > 0)
+                    {
+                        <button type="submit" class="btn btn-enterprise btn-sm shadow" title="Imprimir"><i class="fa fa-print"></i></button>
+                    }
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.TrituraID</td>
+                    <td>@item.TipoDocNombre</td>
+                    <td>@item.TipoDocPlazo Año(s)</td>
+                    <td>@item.TrituraFecha.ToString("yyyy-MM-dd")</td>
+                    <td>@item.TrituraUsuario</td>
+                    <td>@item.TrituraNombreTestigo</td>
+                    <td>@item.AgenciaNombre</td>
+                    <td>@item.Departamento</td>
+                    <td>&nbsp;</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
