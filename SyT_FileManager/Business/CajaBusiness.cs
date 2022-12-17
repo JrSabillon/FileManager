@@ -5,6 +5,7 @@ using System.Web;
 using SyT_FileManager.AppCode;
 using SyT_FileManager.DataAccess;
 using SyT_FileManager.Models;
+using SyT_FileManager.Models.POCO;
 
 namespace SyT_FileManager.Business
 {
@@ -131,9 +132,14 @@ namespace SyT_FileManager.Business
             CajaAccess.Update(caja);
         }
 
-        public List<GetCajasByAlmacenTipo_RP> GetCajasByAlmacenTipo_RP(string UserId, string AlmacenTipo)
+        public List<GetCajasByAlmacenTipo_RP> GetCajasByAlmacenTipo_RP(CajasByAlmacenBusqueda busqueda, string UserId, string AlmacenTipo)
         {
-            List<GetCajasByAlmacenTipo_RP> data = CajaAccess.GetCajasByAlmacenTipo_RP(UserId, AlmacenTipo);
+            List<GetCajasByAlmacenTipo_RP> data = CajaAccess.GetCajasByAlmacenTipo_RP(busqueda, UserId, AlmacenTipo);
+
+            if (busqueda.SearchUser && !string.IsNullOrEmpty(busqueda.User))
+                data = data.Where(x => x.CajaPersonaEntrega.ToLower().Contains(busqueda.User.ToLower())).ToList();
+            if(busqueda.SearchBox && busqueda.CajaID.HasValue)
+                data = AlmacenTipo.Equals("ACT") ? data.Where(x => x.CajaActivaID.Equals(busqueda.CajaID.Value)).ToList() : data.Where(x => x.CajaInactivaID.Equals(busqueda.CajaID.Value)).ToList();
 
             return data;
         }

@@ -1,9 +1,11 @@
 ﻿@model List<SyT_FileManager.Models.GetCajasByAlmacenTipo_RP>
-@using (Html.BeginForm("PrintDocumentosTriturados", "Reportes", FormMethod.Post, new { target = "_blank" }))
+@using (Html.BeginForm("PrintCajasAlmacen", "Reportes", FormMethod.Post, new { target = "_blank" }))
 {
+    @Html.Hidden("TipoAlmacen", "ACT")
     <div id="div-payload">
         @for (int i = 0; i < Model.Count; i++)
         {
+            @Html.HiddenFor(x => Model[i].CajaID)
             @Html.HiddenFor(x => Model[i].CajaActivaID)
             @Html.HiddenFor(x => Model[i].CajaFechaRecepcion)
             @Html.HiddenFor(x => Model[i].CajaPersonaEntrega)

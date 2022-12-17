@@ -77,12 +77,20 @@ namespace SyT_FileManager.Controllers
             return null;
         }
 
-        public ActionResult _ArchivoActivo()
+        public ActionResult _ArchivoActivo(CajasByAlmacenBusqueda busqueda)
         {
             CajaBusiness = new CajaBusiness();
-            var model = CajaBusiness.GetCajasByAlmacenTipo_RP(Constants.GetUserData().UserId, "ACT");
+            var model = CajaBusiness.GetCajasByAlmacenTipo_RP(busqueda, Constants.GetUserData().UserId, "ACT");
             
             return PartialView("./partials/_ArchivoActivoTable", model);
+        }
+
+        public ActionResult _ArchivoInactivo(CajasByAlmacenBusqueda busqueda)
+        {
+            CajaBusiness = new CajaBusiness();
+            var model = CajaBusiness.GetCajasByAlmacenTipo_RP(busqueda, Constants.GetUserData().UserId, "INA");
+
+            return PartialView("./partials/_ArchivoInactivoTable", model);
         }
 
         public ActionResult _DocumentosTriturados(DocumentosTrituradosBusqueda busqueda)
@@ -391,6 +399,68 @@ namespace SyT_FileManager.Controllers
             return File(workStream, "application/pdf", fileName);
         }
 
+        public FileResult PrintCajasAlmacen(List<GetCajasByAlmacenTipo_RP> cajas, string TipoAlmacen)
+        {
+            DocumentoAccess documentoAccess = new DocumentoAccess();
+            TipoDocumentoAccess tipoDocumentoAccess = new TipoDocumentoAccess();
+            MemoryStream workStream = new MemoryStream();
+            var today = DateTime.Now;
+
+            string fileName = TipoAlmacen.Equals("ACT") ? $"CajasArchivoActivo_{today:yyyyMMddHHmmss}.pdf" : $"CajasArchivoInactivo_{today:yyyyMMddHHmmss}.pdf";
+            Document doc = new Document(PageSize.A4);
+            doc.SetMargins(25f, 25f, 10f, 50f);
+
+            //string[] columnNames = new string[] { "#Caja", "Fecha", "Usuario envío", "Almacen", "Estante", "Sección", "Nivel", "Fila", "Ubicación" };
+            //float[] columnWidths = new float[] { 8, 15, 10, 10, 15, 12, 10, 10, 10 };
+            var writer = PdfWriter.GetInstance(doc, workStream);
+            writer.CloseStream = false;
+            writer.PageEvent = new CustomPdfPageEventHandler();
+
+            doc.Open();
+
+            string tipoReporte = TipoAlmacen.Equals("ACT") ? "Almacen Activo" : "Almacen Inactivo";
+            var title = new Paragraph($"Reporte de cajas - {tipoReporte}", new Font() { Size = 15 }) { Alignment = Element.ALIGN_CENTER };
+            doc.Add(title);
+            doc.Add(new Chunk("\n"));
+            doc.Add(new Paragraph($"Encargado de impresión: {Constants.GetUserData().UserNombre}", new Font() { Size = 10 }));
+            doc.Add(new Paragraph($"Fecha de generación: {DateTime.Now:yyyy-MM-dd}", new Font() { Size = 10 }));
+            //doc.Add(new Chunk("\n"));
+            
+            var tiposDocumentos = tipoDocumentoAccess.GetTipoDocumentos();
+            foreach (var item in cajas)
+            {
+                var documentos = documentoAccess.GetDocumentosByCajaID(item.CajaID);
+                documentos.ForEach(x => x.TiposDocumentos = tiposDocumentos);
+                PdfPTable tableLayout = new PdfPTable(2);
+                var table = GenerateTable(tableLayout, "", new string[] { TipoAlmacen.Equals("ACT") ? $"#Caja: {item.CajaActivaID}" : $"#Caja: {item.CajaInactivaID}", $"Fecha: {item.CajaFechaRecepcion:yyyy-MM-dd}"}, new float[] { 50, 50 });
+                doc.Add(new Chunk("\n"));
+                doc.Add(table);
+                tableLayout = new PdfPTable(5);
+                table = GenerateTable(tableLayout, "", new string[] { "Estante", "Sección", "Nivel", "Fila", "Ubicación" }, new float[] { 20, 20, 20, 20, 20 });
+                AddCellToBody(tableLayout, item.Estante);
+                AddCellToBody(tableLayout, item.Seccion);
+                AddCellToBody(tableLayout, item.Nivel);
+                AddCellToBody(tableLayout, item.Fila);
+                AddCellToBody(tableLayout, item.Ubicacion);
+                doc.Add(table);
+                tableLayout = new PdfPTable(1);
+                table = GenerateTable(tableLayout, "", new string[] { "Documentos" }, new float[] { 100 });
+                AddCellToBody(tableLayout, string.Join(", ", documentos.Select(x => x.SelectedDocumento.TipoDocNombre)));
+                doc.Add(table);
+            }
+
+            //doc.Add(table);
+            doc.Add(new Paragraph($"Total de registros: {cajas.Count}", new Font { Size = 10 }));
+
+            doc.Close();
+
+            byte[] byteInfo = workStream.ToArray();
+            workStream.Write(byteInfo, 0, byteInfo.Length);
+            workStream.Position = 0;
+
+            return File(workStream, "application/pdf", fileName);
+        }
+
         /// <summary>
         /// Generar la plantilla de una tabla para agregarla al PDF
         /// </summary>
@@ -423,7 +493,7 @@ namespace SyT_FileManager.Controllers
 
         private void AddCellToHeader(PdfPTable tableLayout, string columnName)
         {
-            tableLayout.AddCell(new PdfPCell(new Phrase(columnName, new Font() { Color = BaseColor.WHITE }))
+            tableLayout.AddCell(new PdfPCell(new Phrase(columnName, new Font() { Color = BaseColor.WHITE, Size = 10 }))
             {
                 HorizontalAlignment = Element.ALIGN_LEFT,
                 Padding = 5,

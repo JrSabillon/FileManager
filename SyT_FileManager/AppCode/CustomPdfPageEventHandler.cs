@@ -33,6 +33,7 @@ namespace SyT_FileManager.AppCode
             imgHead.Alignment = Image.RIGHT_ALIGN;
 
             document.Add(imgHead);
+            //document.Add(new Chunk("\n"));
          
             base.OnStartPage(writer, document);
         }
