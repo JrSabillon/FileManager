@@ -1,5 +1,6 @@
 ﻿using iTextSharp.text;
 using iTextSharp.text.pdf;
+using OfficeOpenXml;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -154,12 +155,54 @@ namespace SyT_FileManager.Controllers
             return PartialView("./partials/_RolDetalles");
         }
 
-        public FileResult PrintUsers(List<UsuarioModel> usuarios)
+        private byte[] PrintUsersExcel(List<UsuarioModel> data)
         {
-            MemoryStream workStream = new MemoryStream();
-            var today = DateTime.Now;
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+            ExcelPackage Ep = new ExcelPackage();
 
-            string fileName = $"Usuarios_{today:yyyyMMddHHmmss}.pdf";
+            ExcelWorksheet sheet = Ep.Workbook.Worksheets.Add("Usuarios");
+            sheet.Cells["A1:G1"].Style.Font.Bold = true;
+            sheet.Cells["A1"].Value = "Usuario";
+            sheet.Cells["B1"].Value = "Nombre";
+            sheet.Cells["C1"].Value = "Correo";
+            sheet.Cells["D1"].Value = "Estado";
+            sheet.Cells["E1"].Value = "Agencia";
+            sheet.Cells["F1"].Value = "Roles";
+            sheet.Cells["G1"].Value = "Almacenes";
+
+            var agencias = new AgenciaAccess().GetAgencias();
+            int row = 2;
+            foreach (var item in data)
+            {
+                sheet.Cells[$"A{row}"].Value = item.UserId;
+                sheet.Cells[$"B{row}"].Value = item.UserNombre;
+                sheet.Cells[$"C{row}"].Value = item.UserEmail;
+                sheet.Cells[$"D{row}"].Value = item.UserStatus;
+                sheet.Cells[$"E{row}"].Value = agencias.Where(x => x.AgenciaID == item.AgenciaID).FirstOrDefault()?.AgenciaNombre ?? "N/D";
+                sheet.Cells[$"F{row}"].Value = string.Join(", ", new RoleAccess().GetRolesUsuarios(item.UserId).Where(x => x.Selected).Select(x => x.RolNombre));
+                sheet.Cells[$"G{row}"].Value = string.Join(", ", new AlmacenAccess().GetAlmacenesByUsuario(item.UserId).Select(x => x.AlmacenNombre));
+
+                row++;
+            }
+            sheet.Cells["A:AZ"].AutoFitColumns();
+
+            return Ep.GetAsByteArray();
+        }
+
+        public FileResult PrintUsers(List<UsuarioModel> usuarios, string extension)
+        {
+            var today = DateTime.Now;
+            string fileName = $"Usuarios_{today:yyyyMMddHHmmss}{extension}";
+
+            if (extension.Equals(Constants.ExcelExtension))
+            {
+                var excelFile = PrintUsersExcel(usuarios);
+
+                return File(excelFile, "Application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
+            }
+
+            MemoryStream workStream = new MemoryStream();
+
             Document doc = new Document(PageSize.A4);
             doc.SetMargins(25f, 25f, 10f, 10f);
 
@@ -203,12 +246,57 @@ namespace SyT_FileManager.Controllers
             return File(workStream, "application/pdf", fileName);
         }
 
-        public FileResult PrintDocuments(List<GetDocumentos_RP> documentos)
+        private byte[] PrintDocumentsExcel(List<GetDocumentos_RP> data)
         {
-            MemoryStream workStream = new MemoryStream();
-            var today = DateTime.Now;
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+            ExcelPackage Ep = new ExcelPackage();
 
-            string fileName = $"Documentos_{today:yyyyMMddHHmmss}.pdf";
+            ExcelWorksheet sheet = Ep.Workbook.Worksheets.Add("Usuarios");
+            sheet.Cells["A1:H1"].Style.Font.Bold = true;
+            sheet.Cells["A1"].Value = "Documento";
+            sheet.Cells["B1"].Value = "Descripción";
+            sheet.Cells["C1"].Value = "Fecha";
+            sheet.Cells["D1"].Value = "Plazo";
+            sheet.Cells["E1"].Value = "Vencimiento";
+            sheet.Cells["F1"].Value = "#Caja";
+            sheet.Cells["G1"].Value = "Agencia";
+            sheet.Cells["H1"].Value = "Departamento";
+
+            var almacenes = new AlmacenAccess().GetAlmacenes();
+            int row = 2;
+            foreach (var item in data)
+            {
+                sheet.Cells[$"A{row}"].Value = item.TipoDocNombre;
+                sheet.Cells[$"B{row}"].Value = item.DocDescripcion;
+                sheet.Cells[$"C{row}"].Value = item.DocFechaInfo;
+                sheet.Cells[$"C{row}"].Style.Numberformat.Format = "yyyy-MM-dd";
+                sheet.Cells[$"D{row}"].Value = item.TipoDocPlazo;
+                sheet.Cells[$"E{row}"].Value = item.DocFechaVencimiento;
+                sheet.Cells[$"E{row}"].Style.Numberformat.Format = "yyyy-MM-dd";
+                sheet.Cells[$"F{row}"].Value = (almacenes.Where(x => x.AlmacenID == item.AlmacenID).FirstOrDefault()?.AlmacenTipo ?? "ACT") == "ACT" ? item.CajaActivaID : item.CajaInactivaID;
+                sheet.Cells[$"G{row}"].Value = item.AgenciaNombre;
+                sheet.Cells[$"H{row}"].Value = item.Departamento;
+
+                row++;
+            }
+            sheet.Cells["A:AZ"].AutoFitColumns();
+
+            return Ep.GetAsByteArray();
+        }
+
+        public FileResult PrintDocuments(List<GetDocumentos_RP> documentos, string extension)
+        {
+            var today = DateTime.Now;
+            string fileName = $"Documentos_{today:yyyyMMddHHmmss}{extension}";
+
+            if (extension.Equals(Constants.ExcelExtension))
+            {
+                var excelFile = PrintDocumentsExcel(documentos);
+
+                return File(excelFile, "Application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
+            }
+
+            MemoryStream workStream = new MemoryStream();
             Document doc = new Document(PageSize.A4);
             doc.SetMargins(25f, 25f, 10f, 10f);
 
@@ -254,12 +342,56 @@ namespace SyT_FileManager.Controllers
             return File(workStream, "application/pdf", fileName);
         }
 
-        public FileResult PrintDocumentosPrestados(List<GetDocumentosPrestados_RP> documentos)
+        private byte[] PrintDocumentosPrestadosExcel(List<GetDocumentosPrestados_RP> data)
         {
-            MemoryStream workStream = new MemoryStream();
-            var today = DateTime.Now;
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+            ExcelPackage Ep = new ExcelPackage();
 
-            string fileName = $"DocumentosPrestados_{today:yyyyMMddHHmmss}.pdf";
+            ExcelWorksheet sheet = Ep.Workbook.Worksheets.Add("Usuarios");
+            sheet.Cells["A1:H1"].Style.Font.Bold = true;
+            sheet.Cells["A1"].Value = "Documento";
+            sheet.Cells["B1"].Value = "Solicitante";
+            sheet.Cells["C1"].Value = "Correo";
+            sheet.Cells["D1"].Value = "Observación";
+            sheet.Cells["E1"].Value = "Fecha solicitó";
+            sheet.Cells["F1"].Value = "Fecha retiró";
+            sheet.Cells["G1"].Value = "Dias prestados";
+            sheet.Cells["H1"].Value = "Usuario entrego";
+
+            int row = 2;
+            foreach (var item in data)
+            {
+                sheet.Cells[$"A{row}"].Value = item.TipoDocNombre;
+                sheet.Cells[$"B{row}"].Value = item.PrestNombreSolicitante;
+                sheet.Cells[$"C{row}"].Value = item.PrestEmailSolicitante;
+                sheet.Cells[$"D{row}"].Value = item.PrestObservacion ?? "";
+                sheet.Cells[$"E{row}"].Value = item.PrestFechaSolicitud;
+                sheet.Cells[$"E{row}"].Style.Numberformat.Format = "yyyy-MM-dd";
+                sheet.Cells[$"F{row}"].Value = item.PrestFechaRetira;
+                sheet.Cells[$"F{row}"].Style.Numberformat.Format = "yyyy-MM-dd";
+                sheet.Cells[$"G{row}"].Value = item.PrestPlazoMaximoDevolucion;
+                sheet.Cells[$"H{row}"].Value = item.PrestUsuarioEntrega;
+
+                row++;
+            }
+            sheet.Cells["A:AZ"].AutoFitColumns();
+
+            return Ep.GetAsByteArray();
+        }
+
+        public FileResult PrintDocumentosPrestados(List<GetDocumentosPrestados_RP> documentos, string extension)
+        {
+            var today = DateTime.Now;
+            string fileName = $"DocumentosPrestados_{today:yyyyMMddHHmmss}{extension}";
+
+            if (extension.Equals(Constants.ExcelExtension))
+            {
+                var excelFile = PrintDocumentosPrestadosExcel(documentos);
+
+                return File(excelFile, "Application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
+            }
+
+            MemoryStream workStream = new MemoryStream();
             Document doc = new Document(PageSize.A4);
             doc.SetMargins(25f, 25f, 10f, 10f);
 
@@ -303,12 +435,55 @@ namespace SyT_FileManager.Controllers
             return File(workStream, "application/pdf", fileName);
         }
 
-        public FileResult PrintDocumentosTriturados(List<GetDocumentosTriturados_RP> documentos)
+        private byte[] PrintDocumentosTrituradosExcel(List<GetDocumentosTriturados_RP> data)
         {
-            MemoryStream workStream = new MemoryStream();
-            var today = DateTime.Now;
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+            ExcelPackage Ep = new ExcelPackage();
 
-            string fileName = $"DocumentosTriturados_{today:yyyyMMddHHmmss}.pdf";
+            ExcelWorksheet sheet = Ep.Workbook.Worksheets.Add("Usuarios");
+            sheet.Cells["A1:H1"].Style.Font.Bold = true;
+            sheet.Cells["A1"].Value = "#Acta";
+            sheet.Cells["B1"].Value = "Documentos";
+            sheet.Cells["C1"].Value = "Plazo";
+            sheet.Cells["D1"].Value = "Fecha trit.";
+            sheet.Cells["E1"].Value = "Usuario";
+            sheet.Cells["F1"].Value = "Testigo";
+            sheet.Cells["G1"].Value = "Agencia";
+            sheet.Cells["H1"].Value = "Departamento";
+
+            int row = 2;
+            foreach (var item in data)
+            {
+                sheet.Cells[$"A{row}"].Value = item.TrituraID;
+                sheet.Cells[$"B{row}"].Value = item.TipoDocNombre;
+                sheet.Cells[$"C{row}"].Value = item.TipoDocPlazo;
+                sheet.Cells[$"D{row}"].Value = item.TrituraFecha;
+                sheet.Cells[$"D{row}"].Style.Numberformat.Format = "yyyy-MM-dd";
+                sheet.Cells[$"E{row}"].Value = item.TrituraUsuario;
+                sheet.Cells[$"F{row}"].Value = item.TrituraNombreTestigo;
+                sheet.Cells[$"G{row}"].Value = item.AgenciaNombre;
+                sheet.Cells[$"H{row}"].Value = item.Departamento;
+
+                row++;
+            }
+            sheet.Cells["A:AZ"].AutoFitColumns();
+
+            return Ep.GetAsByteArray();
+        }
+
+        public FileResult PrintDocumentosTriturados(List<GetDocumentosTriturados_RP> documentos, string extension)
+        {
+            var today = DateTime.Now;
+            string fileName = $"DocumentosTriturados_{today:yyyyMMddHHmmss}{extension}";
+
+            if (extension.Equals(Constants.ExcelExtension))
+            {
+                var excelFile = PrintDocumentosTrituradosExcel(documentos);
+
+                return File(excelFile, "Application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
+            }
+
+            MemoryStream workStream = new MemoryStream();
             Document doc = new Document(PageSize.A4);
             doc.SetMargins(25f, 25f, 10f, 10f);
 
@@ -352,12 +527,46 @@ namespace SyT_FileManager.Controllers
             return File(workStream, "application/pdf", fileName);
         }
 
-        public FileResult PrintRoles(List<RoleModel> roles)
+        private byte[] PrintRolesExcel(List<RoleModel> data)
         {
-            MemoryStream workStream = new MemoryStream();
-            var today = DateTime.Now;
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+            ExcelPackage Ep = new ExcelPackage();
 
-            string fileName = $"Roles_{today:yyyyMMddHHmmss}.pdf";
+            ExcelWorksheet sheet = Ep.Workbook.Worksheets.Add("Usuarios");
+            sheet.Cells["A1:D1"].Style.Font.Bold = true;
+            sheet.Cells["A1"].Value = "ID";
+            sheet.Cells["B1"].Value = "Rol";
+            sheet.Cells["C1"].Value = "Descripción";
+            sheet.Cells["D1"].Value = "Privilegios";
+
+            int row = 2;
+            foreach (var item in data)
+            {
+                sheet.Cells[$"A{row}"].Value = item.RolId;
+                sheet.Cells[$"B{row}"].Value = item.RolNombre;
+                sheet.Cells[$"C{row}"].Value = item.RolDescripcion;
+                sheet.Cells[$"D{row}"].Value = string.Join(", ", new PrivilegioAccess().GetPrivilegiosByRol(item.RolId).Select(x => x.PrivNombre));
+                
+                row++;
+            }
+            sheet.Cells["A:AZ"].AutoFitColumns();
+
+            return Ep.GetAsByteArray();
+        }
+
+        public FileResult PrintRoles(List<RoleModel> roles, string extension)
+        {
+            var today = DateTime.Now;
+            string fileName = $"Roles_{today:yyyyMMddHHmmss}{extension}";
+
+            if (extension.Equals(Constants.ExcelExtension))
+            {
+                var excelFile = PrintRolesExcel(roles);
+
+                return File(excelFile, "Application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
+            }
+
+            MemoryStream workStream = new MemoryStream();
             Document doc = new Document(PageSize.A4);
             doc.SetMargins(25f, 25f, 10f, 10f);
 
@@ -399,14 +608,67 @@ namespace SyT_FileManager.Controllers
             return File(workStream, "application/pdf", fileName);
         }
 
-        public FileResult PrintCajasAlmacen(List<GetCajasByAlmacenTipo_RP> cajas, string TipoAlmacen)
+        private byte[] PrintCajasAlmacenExcel(List<GetCajasByAlmacenTipo_RP> data, string TipoAlmacen)
         {
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+            ExcelPackage Ep = new ExcelPackage();
+            TipoDocumentoAccess tipoDocumentoAccess = new TipoDocumentoAccess();
+            DocumentoAccess documentoAccess = new DocumentoAccess();
+
+            ExcelWorksheet sheet = Ep.Workbook.Worksheets.Add("Usuarios");
+            sheet.Cells["A1:J1"].Style.Font.Bold = true;
+            sheet.Cells["A1"].Value = "#Caja";
+            sheet.Cells["B1"].Value = "Fecha";
+            sheet.Cells["C1"].Value = "Usuario envío";
+            sheet.Cells["D1"].Value = "Almacen";
+            sheet.Cells["E1"].Value = "Estante";
+            sheet.Cells["F1"].Value = "Sección";
+            sheet.Cells["G1"].Value = "Nivel";
+            sheet.Cells["H1"].Value = "Fila";
+            sheet.Cells["I1"].Value = "Ubicación";
+            sheet.Cells["J1"].Value = "Documentos";
+
+            var tiposDocumentos = tipoDocumentoAccess.GetTipoDocumentos();
+            int row = 2;
+            foreach (var item in data)
+            {
+                var documentos = documentoAccess.GetDocumentosByCajaID(item.CajaID);
+                documentos.ForEach(x => x.TiposDocumentos = tiposDocumentos);
+
+                sheet.Cells[$"A{row}"].Value = TipoAlmacen.Equals("ACT") ? item.CajaActivaID : item.CajaInactivaID;
+                sheet.Cells[$"B{row}"].Value = item.CajaFechaRecepcion;
+                sheet.Cells[$"B{row}"].Style.Numberformat.Format = "yyyy-MM-dd";
+                sheet.Cells[$"C{row}"].Value = item.CajaPersonaEntrega;
+                sheet.Cells[$"D{row}"].Value = item.AlmacenNombre;
+                sheet.Cells[$"E{row}"].Value = item.Estante;
+                sheet.Cells[$"F{row}"].Value = item.Seccion;
+                sheet.Cells[$"G{row}"].Value = item.Nivel;
+                sheet.Cells[$"H{row}"].Value = item.Fila;
+                sheet.Cells[$"I{row}"].Value = item.Ubicacion;
+                sheet.Cells[$"J{row}"].Value = string.Join(", ", documentos.Select(x => x.SelectedDocumento.TipoDocNombre));
+
+                row++;
+            }
+            sheet.Cells["A:AZ"].AutoFitColumns();
+
+            return Ep.GetAsByteArray();
+        }
+
+        public FileResult PrintCajasAlmacen(List<GetCajasByAlmacenTipo_RP> cajas, string TipoAlmacen, string extension)
+        {
+            var today = DateTime.Now;
+            string fileName = TipoAlmacen.Equals("ACT") ? $"CajasArchivoActivo_{today:yyyyMMddHHmmss}{extension}" : $"CajasArchivoInactivo_{today:yyyyMMddHHmmss}{extension}";
+
+            if (extension.Equals(Constants.ExcelExtension))
+            {
+                var excelFile = PrintCajasAlmacenExcel(cajas, TipoAlmacen);
+
+                return File(excelFile, "Application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
+            }
+
             DocumentoAccess documentoAccess = new DocumentoAccess();
             TipoDocumentoAccess tipoDocumentoAccess = new TipoDocumentoAccess();
             MemoryStream workStream = new MemoryStream();
-            var today = DateTime.Now;
-
-            string fileName = TipoAlmacen.Equals("ACT") ? $"CajasArchivoActivo_{today:yyyyMMddHHmmss}.pdf" : $"CajasArchivoInactivo_{today:yyyyMMddHHmmss}.pdf";
             Document doc = new Document(PageSize.A4);
             doc.SetMargins(25f, 25f, 10f, 50f);
 

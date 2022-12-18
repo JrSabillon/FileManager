@@ -13,16 +13,16 @@ namespace SyT_FileManager.Models
     {
         [Required]
         [StringLength(20, ErrorMessage = "Maximo 20 caracteres")]
-        [Display(Name = "Usuario *")]
+        [Display(Name = "Usuario")]
         [ExplicitKey]
         public string UserId { get; set; }
         [Required]
         [StringLength(50, ErrorMessage = "Maximo 50 caracteres")]
-        [Display(Name = "Nombre de usuario *")]
+        [Display(Name = "Nombre de usuario")]
         public string UserNombre { get; set; }
         [Required]
         [StringLength(50, ErrorMessage = "Maximo 50 caracteres")]
-        [Display(Name = "Correo de usuario *")]
+        [Display(Name = "Correo de usuario")]
         public string UserEmail { get; set; }
         [Display(Name = "Estatus")]
         public string UserStatus { get; set; }

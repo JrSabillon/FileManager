@@ -132,3 +132,7 @@ D:\SyTCorp\Proyectos\Banhcafe\AdministracionArchivos\SyT_FileManager\SyT_FileMan
 D:\SyTCorp\Proyectos\Banhcafe\AdministracionArchivos\SyT_FileManager\SyT_FileManager\obj\Debug\SyT_FileManager.dll
 D:\SyTCorp\Proyectos\Banhcafe\AdministracionArchivos\SyT_FileManager\SyT_FileManager\obj\Debug\SyT_FileManager.pdb
 D:\SyTCorp\Proyectos\Banhcafe\AdministracionArchivos\SyT_FileManager\SyT_FileManager\obj\Debug\SyT_FileManager.csproj.AssemblyReference.cache
+D:\sytcorp\BANHCAFE\BanhcafeFileManager\SyT_FileManager\SyT_FileManager\bin\EPPlus.dll
+D:\sytcorp\BANHCAFE\BanhcafeFileManager\SyT_FileManager\SyT_FileManager\bin\EPPlus.Interfaces.dll
+D:\sytcorp\BANHCAFE\BanhcafeFileManager\SyT_FileManager\SyT_FileManager\bin\EPPlus.System.Drawing.dll
+D:\sytcorp\BANHCAFE\BanhcafeFileManager\SyT_FileManager\SyT_FileManager\bin\EPPlus.xml

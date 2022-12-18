@@ -1,7 +1,8 @@
 ﻿@model List<SyT_FileManager.Models.RoleModel>
 
-@using (Html.BeginForm("PrintRoles", "Reportes", FormMethod.Post, new { target = "_blank" }))
+@using (Html.BeginForm("PrintRoles", "Reportes", FormMethod.Post, new { target = "_blank", id = "form-print-rol" }))
 {
+    @Html.Hidden("extension");
     <div id="div-payload">
         @for (int i = 0; i < Model.Count; i++)
         {
@@ -19,7 +20,18 @@
                     <th id="RolNombre">Rol</th>
                     <th id="RolDescripcion">Descripción</th>
                     <th>
-                        <button type="submit" class="btn btn-enterprise btn-sm shadow" title="Imprimir"><i class="fa fa-print"></i></button>
+                        <div class="btn-toolbar" role="toolbar">
+                            <div class="btn-group" role="group">
+                                <button type="button" class="btn btn-enterprise btn-sm shadow" title="Imprimir"
+                                        onclick="$('#extension').val('@SyT_FileManager.AppCode.Constants.PDFExtension'); $('#form-print-rol').submit();">
+                                    <i class="fa fa-print"></i>
+                                </button>
+                                <button type="button" class="btn btn-success btn-sm shadow" title="Exportar a excel"
+                                        onclick="$('#extension').val('@SyT_FileManager.AppCode.Constants.ExcelExtension'); $('#form-print-rol').submit();">
+                                    <i class="fa fa-file-excel-o"></i>
+                                </button>
+                            </div>
+                        </div>
                     </th>
                 </tr>
             </thead>
@@ -48,7 +60,7 @@
 
 <script type="text/javascript">
     $(function () {
-        $('#table-roles').smpSortableTable(false, 5, 'es');
+        $('#table-roles').smpSortableTable(false, 10, 'es');
         $('#table-roles').removeClass('smpSortableTable--processed');
         $('#table-roles thead th').attr('style', 'color: black !important');
         $('#table-roles thead th').removeClass('smpSortableTable--sortable table-usuarios--sortable');

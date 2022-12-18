@@ -71,6 +71,8 @@ namespace SyT_FileManager.AppCode
         public const string AGENCY_USER = "Usuario de agencia";
         public const string STORE_USER = "Usuario de almacen";
         public const string OTHER = "Otro tipo de usuario";
+        public const string ExcelExtension = ".xlsx";
+        public const string PDFExtension = ".pdf";
         #endregion
     }
 

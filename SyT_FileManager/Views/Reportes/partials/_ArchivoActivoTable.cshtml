@@ -1,6 +1,7 @@
 ﻿@model List<SyT_FileManager.Models.GetCajasByAlmacenTipo_RP>
-@using (Html.BeginForm("PrintCajasAlmacen", "Reportes", FormMethod.Post, new { target = "_blank" }))
+@using (Html.BeginForm("PrintCajasAlmacen", "Reportes", FormMethod.Post, new { target = "_blank", id = "form-print-cajas" }))
 {
+    @Html.Hidden("extension");
     @Html.Hidden("TipoAlmacen", "ACT")
     <div id="div-payload">
         @for (int i = 0; i < Model.Count; i++)
@@ -32,7 +33,18 @@
                 <th>
                     @if (Model.Count > 0)
                     {
-                        <button type="submit" class="btn btn-enterprise btn-sm shadow" title="Imprimir"><i class="fa fa-print"></i></button>
+                        <div class="btn-toolbar" role="toolbar">
+                            <div class="btn-group" role="group">
+                                <button type="button" class="btn btn-enterprise btn-sm shadow" title="Imprimir"
+                                        onclick="$('#extension').val('@SyT_FileManager.AppCode.Constants.PDFExtension'); $('#form-print-cajas').submit();">
+                                    <i class="fa fa-print"></i>
+                                </button>
+                                <button type="button" class="btn btn-success btn-sm shadow" title="Exportar a excel"
+                                        onclick="$('#extension').val('@SyT_FileManager.AppCode.Constants.ExcelExtension'); $('#form-print-cajas').submit();">
+                                    <i class="fa fa-file-excel-o"></i>
+                                </button>
+                            </div>
+                        </div>
                     }
                 </th>
             </tr>
