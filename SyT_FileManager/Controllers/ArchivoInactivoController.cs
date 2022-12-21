@@ -3,6 +3,7 @@ using iTextSharp.text.pdf;
 using PagedList;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -207,7 +208,7 @@ namespace SyT_FileManager.Controllers
         public ActionResult Prestar(int? page, PrestarDocumentoBusqueda busqueda, string id = "INA")
         {
             List<AlmacenModel> usuarioAlmacen = AlmacenAccess.GetAlmacenesByUsuarioAndTipoAlmacen(id, Constants.GetUserData().UserId);
-            var model = DocumentoAccess.GetDocumentosByDocTipoAndDocStatusAnd_CajaAlmacenID(busqueda.TipoDocumento, "ACT", usuarioAlmacen.Select(x => x.AlmacenID).ToArray());
+            var model = DocumentoAccess.GetDocumentosByDocTipoAndDocStatusAnd_CajaAlmacenID(busqueda.TipoDocumento, "ACT", usuarioAlmacen.Select(x => x.AlmacenID).ToArray(), busqueda.CajaID);
 
             ViewBag.TipoDocumento = new SelectList(TipoDocumentoAccess.GetTipoDocumentos(), "TipoDocID", "TipoDocNombre", busqueda.TipoDocumento);
             ViewBag.Agencia = new SelectList(AgenciaAccess.GetAgencias(), "AgenciaID", "AgenciaNombre", busqueda.Agencia);
@@ -216,9 +217,11 @@ namespace SyT_FileManager.Controllers
             ViewBag.searchDate = busqueda.searchDate;
             ViewBag.searchAgency = busqueda.searchAgency;
             ViewBag.searchBank = busqueda.searchBank;
+            ViewBag.searchBox = busqueda.searchBox;
             ViewBag.selectedAgency = busqueda.Agencia;
             ViewBag.selectedBank = busqueda.Banco;
             ViewBag.selectedDocumento = busqueda.TipoDocumento;
+            ViewBag.CajaID = busqueda.CajaID;
 
             ///Filtrar modelo segun criterios de busqueda
             if (busqueda.searchAgency)
@@ -253,6 +256,16 @@ namespace SyT_FileManager.Controllers
             model.PrestFechaSolicitud = DateTime.Now;
             model.CajaID = CajaID;
             model.DocID = DocID;
+            var caja = CajaAccess.GetCaja(CajaID);
+            var recursos = RecursoAccess.Get();
+            var almacen = AlmacenAccess.GetAlmacen(caja.AlmacenID);
+
+            ViewBag.Almacen = almacen?.AlmacenNombre;
+            ViewBag.Estante = recursos.Where(x => x.RecursoItemID == caja.CajaEstante && x.RecursoID == "STNTNUM").FirstOrDefault().RecursoItemNombre;
+            ViewBag.Seccion = recursos.Where(x => x.RecursoItemID == caja.CajaSeccion && x.RecursoID == "STNTSEC").FirstOrDefault().RecursoItemNombre;
+            ViewBag.Nivel = recursos.Where(x => x.RecursoItemID == caja.CajaNivel && x.RecursoID == "STNTNIV").FirstOrDefault().RecursoItemNombre;
+            ViewBag.Fila = recursos.Where(x => x.RecursoItemID == caja.CajaFila && x.RecursoID == "STNTFIL").FirstOrDefault().RecursoItemNombre;
+            ViewBag.Ubicacion = recursos.Where(x => x.RecursoItemID == caja.CajaUbicacion && x.RecursoID == "STNTUBI").FirstOrDefault().RecursoItemNombre;
 
             ViewBag.NombreDocumento = NombreDocumento;
             ViewBag.CajaInactivaID = CajaInactivaID;
@@ -433,13 +446,16 @@ namespace SyT_FileManager.Controllers
 
         public ActionResult DocumentosTriturados(int? lote)
         {
-            if (!lote.HasValue)
-            {
-                ViewBag.Message = "No se selecciono un No. de lote";
-                return View();
-            }
+            //if (!lote.HasValue)
+            //{
+            //    ViewBag.Message = "No se selecciono un No. de lote";
+            //    return View();
+            //}
             
             var model = DocumentoAccess.GetDocTrituraByTrituraID(lote);
+            if (model.Count == 0)
+                return RedirectToAction("Triturar");
+
             var agencias = AgenciaAccess.GetAgencias();
             var bancos = BancoAccess.GetBancos();
             ViewBag.Message = model.Count == 0 ? $"No hay documentos en este lote No. de lote [{lote}]" : null;
@@ -454,6 +470,13 @@ namespace SyT_FileManager.Controllers
             });
 
             return View(model);
+        }
+
+        public ActionResult ReversarTrituracion(int DocID, int lote)
+        {
+            DocumentoAccess.ReversarTrituracion(DocID, lote);
+
+            return RedirectToAction("DocumentosTriturados", new { lote });
         }
 
         public ActionResult ArmarCaja(int? CajaID)
@@ -528,34 +551,44 @@ namespace SyT_FileManager.Controllers
             DocumentoAccess.UpdateDocTrituraSetTrituraNombreTestigo(TrituraNombreTestigo, lote);
 
             var pdfData = DocumentoAccess.GetDocTrituraByTrituraID(lote);
+            var almacen = AlmacenAccess.GetAlmacen(pdfData.FirstOrDefault()?.AlmacenID ?? 0);
 
             MemoryStream workStream = new MemoryStream();
             StringBuilder status = new StringBuilder("");
             var today = DateTime.Now;
 
+            var fontBody = new Font { Size = 10, };
+            
             string fileName = $"DocumentosTriturados_{today:yyyyMMddHHmmss}.pdf";
             Document doc = new Document(PageSize.A4);
             doc.SetMargins(25f, 25f, 10f, 10f);
 
-            PdfPTable tableLayout = new PdfPTable(6);
+            PdfPTable tableLayout = new PdfPTable(8);
             var writer = PdfWriter.GetInstance(doc, workStream);
             writer.CloseStream = false;
             writer.PageEvent = new CustomPdfPageEventHandler();
             doc.Open();
 
-            var title = new Paragraph("Acta de Trituración", new Font() { Size = 15 }) { Alignment = Element.ALIGN_CENTER };
+            var title = new Paragraph($"Acta de Eliminación Documental No. {lote}", new Font() { Size = 15 }) { Alignment = Element.ALIGN_CENTER };
             doc.Add(title);
             doc.Add(new Chunk("\n"));
-            doc.Add(new Paragraph($"Nombre del testigo: {TrituraNombreTestigo}", new Font() { Size = 10 }));
-            doc.Add(new Paragraph($"Persona que tritura: {Constants.GetUserData().UserNombre}", new Font() { Size = 10 }));
-            doc.Add(new Paragraph($"Fecha de generación del acta: {DateTime.Now:yyyy-MM-dd}", new Font() { Size = 10 }));
+            doc.Add(new Paragraph($"Nombre del testigo: {TrituraNombreTestigo}", fontBody));
+            doc.Add(new Paragraph($"Persona que tritura: {Constants.GetUserData().UserNombre}", fontBody));
+            doc.Add(new Paragraph($"Fecha de generación del acta: {DateTime.Now:yyyy-MM-dd}", fontBody));
             doc.Add(new Chunk("\n"));
-
+            var body = new Paragraph($"En las instalaciones del Archivo Inactivo ubicadas en {almacen.AlmacenDireccion}, a los {today:dd} días del mes de {today.ToString("MMMM", new CultureInfo("es-ES"))} del año {today:yyyy}, siendo las {today:hh tt}, se reunieron los siguientes funcionarios: {TrituraNombreTestigo} de la unidad de Audítoria Interna y, {Constants.GetUserData().UserNombre} de {almacen.AlmacenNombre} con el fin de realizar el proceso de destrucción de los documentos relacionados, mediante Acta No. {lote} del {today:dd} de {today.ToString("MMMM", new CultureInfo("es-ES"))} de {today:yyyy}. Por lo anterior se procede a la destrucción de los siguientes documentos:", fontBody);
+            body.Alignment = Element.ALIGN_JUSTIFIED;
+            doc.Add(body);
+            doc.Add(new Chunk("\n"));
+            
             PdfPTable table = AddTableContent(pdfData, tableLayout);
             doc.Add(table);
+            doc.Add(new Chunk("\n"));
+            doc.Add(new Paragraph("Lo anterior se elimina porque agoto sus valores primarios y carece de valores secundarios, y/o ha cumplido el tiempo establecido.", fontBody) { Alignment = Element.ALIGN_JUSTIFIED });
+            doc.Add(new Chunk("\n"));
+            doc.Add(new Paragraph("Metodo de eliminación:", fontBody));
+            doc.Add(new Paragraph("PICADO                   TRITURADO   X               RASGADO                   INCINERADO", fontBody));
 
-            doc.Add(new Chunk("\n"));
-            doc.Add(new Chunk("\n"));
             doc.Add(new Chunk("\n"));
             doc.Add(AddSignatures());
 
@@ -570,45 +603,134 @@ namespace SyT_FileManager.Controllers
 
         private PdfPTable AddSignatures()
         {
-            PdfPTable signaturesLayout = new PdfPTable(2);
-            float[] widths = { 50, 50 };
-            signaturesLayout.SetWidths(widths);
+            PdfPTable signaturesLayout = new PdfPTable(4);
+            signaturesLayout.SetWidths(new float[] { 25, 25, 25, 25 });
             signaturesLayout.WidthPercentage = 100;
             signaturesLayout.HeaderRows = 0;
 
-            signaturesLayout.AddCell(new PdfPCell(new Phrase("__________________________________ \n\nFirma del testigo", new Font(Font.FontFamily.HELVETICA, 10f)))
+            signaturesLayout.AddCell(new PdfPCell(new Phrase("II.  FIRMAS REQUERIDAS", new Font { Color = BaseColor.WHITE, Size = 10 }))
             {
-                HorizontalAlignment = Element.ALIGN_CENTER,
-                BackgroundColor = new BaseColor(255, 255, 255),
-                Border = Rectangle.NO_BORDER
+                Colspan = 4,
+                BackgroundColor = new BaseColor(134, 4, 20)
             });
 
-            signaturesLayout.AddCell(new PdfPCell(new Phrase("__________________________________ \n\nFirma del encargado de trituración", new Font(Font.FontFamily.HELVETICA, 10f)))
+            signaturesLayout.AddCell(new PdfPCell(new Phrase("ELABORADO POR", new Font { Size = 10, Color = BaseColor.WHITE }))
             {
+                Colspan = 2,
                 HorizontalAlignment = Element.ALIGN_CENTER,
-                BackgroundColor = new BaseColor(255, 255, 255),
-                Border = Rectangle.NO_BORDER
+                BackgroundColor = new BaseColor(89, 89, 89)
             });
+
+            signaturesLayout.AddCell(new PdfPCell(new Phrase("REVISADO POR", new Font { Size = 10, Color = BaseColor.WHITE }))
+            {
+                Colspan = 2,
+                HorizontalAlignment = Element.ALIGN_CENTER,
+                BackgroundColor = new BaseColor(89, 89, 89),
+            });
+
+            signaturesLayout.AddCell(new PdfPCell(new Phrase("FIRMA:", new Font { Size = 10 }))
+            {
+                VerticalAlignment = Element.ALIGN_BASELINE,
+                BackgroundColor = new BaseColor(242, 242, 242),
+                MinimumHeight = 35
+            });
+
+            signaturesLayout.AddCell(new PdfPCell());
+
+            signaturesLayout.AddCell(new PdfPCell(new Phrase("FIRMA:", new Font { Size = 10 }))
+            {
+                VerticalAlignment = Element.ALIGN_BASELINE,
+                BackgroundColor = new BaseColor(242, 242, 242)
+            });
+
+            signaturesLayout.AddCell(new PdfPCell());
+            
+            signaturesLayout.AddCell(new PdfPCell(new Phrase("Area Relacionada", new Font { Size = 10 }))
+            {
+                HorizontalAlignment = Element.ALIGN_RIGHT,
+                Rowspan = 4,
+                Colspan = 2
+            });
+
+            signaturesLayout.AddCell(new PdfPCell(new Phrase("Unidad de auditoria", new Font { Size = 10 }))
+            {
+                Colspan = 2,
+                HorizontalAlignment = Element.ALIGN_RIGHT,
+                BackgroundColor = new BaseColor(250, 250, 250)
+            });
+
+            signaturesLayout.AddCell(new PdfPCell(new Phrase("FIRMA:", new Font { Size = 10 }))
+            {
+                VerticalAlignment = Element.ALIGN_BASELINE,
+                BackgroundColor = new BaseColor(242, 242, 242),
+                MinimumHeight = 35
+            });
+
+            signaturesLayout.AddCell(new PdfPCell());
+
+            signaturesLayout.AddCell(new PdfPCell(new Phrase("Jefe de Contabilidad", new Font { Size = 10 }))
+            {
+                Colspan = 2,
+                HorizontalAlignment = Element.ALIGN_RIGHT,
+                BackgroundColor = new BaseColor(250, 250, 250)
+            });
+
+            signaturesLayout.AddCell(new PdfPCell(new Phrase("FIRMA:", new Font { Size = 10 }))
+            {
+                VerticalAlignment = Element.ALIGN_BASELINE,
+                BackgroundColor = new BaseColor(242, 242, 242),
+                MinimumHeight = 35
+            });
+
+            signaturesLayout.AddCell(new PdfPCell());
+
+            signaturesLayout.AddCell(new PdfPCell(new Phrase("Nombre:", new Font { Size = 10 })) { 
+                BackgroundColor = new BaseColor(242, 242, 242)
+            });
+
+            signaturesLayout.AddCell(new PdfPCell(new Phrase(Constants.GetUserData().UserNombre, new Font { Size = 10 })));
+
+            signaturesLayout.AddCell(new PdfPCell(new Phrase("Encargado Archivo Inactivo", new Font { Size = 10 }))
+            {
+                Colspan = 2,
+                HorizontalAlignment = Element.ALIGN_RIGHT
+            });
+
+            signaturesLayout.AddCell(new PdfPCell(new Phrase("FECHA (DDMMAAAA):", new Font { Size = 10 }))
+            {
+                BackgroundColor = new BaseColor(242, 242, 242)
+            });
+
+            signaturesLayout.AddCell(new PdfPCell());
+
+            signaturesLayout.AddCell(new PdfPCell(new Phrase("FECHA (DDMMAAAA):", new Font { Size = 10 }))
+            {
+                BackgroundColor = new BaseColor(242, 242, 242)
+            });
+
+            signaturesLayout.AddCell(new PdfPCell());
 
             return signaturesLayout;
         }
 
         private PdfPTable AddTableContent(List<DocTrituraModel> pdfData, PdfPTable tableLayout)
         {
-            float[] headers = { 15, 15, 20, 20, 15, 15 };
+            float[] headers = { 10, 15, 10, 15, 15, 10, 10, 10 };
             tableLayout.SetWidths(headers);
             tableLayout.WidthPercentage = 100;
             tableLayout.HeaderRows = 1;
 
-            tableLayout.AddCell(new PdfPCell(new Phrase("Documentos triturados"))
+            tableLayout.AddCell(new PdfPCell(new Phrase("I.  Documentos triturados"))
             {
-                Colspan = 6,
+                Colspan = 8,
                 Border = 0,
                 PaddingBottom = 5,
                 HorizontalAlignment = Element.ALIGN_LEFT
             });
 
+            AddCellToHeader(tableLayout, columnName: "#Caja");
             AddCellToHeader(tableLayout, columnName: "Doc.");
+            AddCellToHeader(tableLayout, columnName: "Fecha");
             AddCellToHeader(tableLayout, columnName: "Descripcion");
             AddCellToHeader(tableLayout, columnName: "Banco");
             AddCellToHeader(tableLayout, columnName: "Agencia");
@@ -621,9 +743,12 @@ namespace SyT_FileManager.Controllers
 
             foreach (var item in pdfData)
             {
-                var documentoTriturado = DocumentoAccess.GetDocumento(item.DocID); 
+                var documentoTriturado = DocumentoAccess.GetDocumento(item.DocID);
+                var caja = CajaAccess.GetCaja(item.CajaID);
 
+                AddCellToBody(tableLayout, value: caja.CajaInactivaID);
                 AddCellToBody(tableLayout, value: documentos.Find(x => x.TipoDocID.Equals(documentoTriturado.DocTipo)).TipoDocNombre); //Nombre del documento.
+                AddCellToBody(tableLayout, value: documentoTriturado.DocFechaInfo.Value.ToString("yyyy-MM-dd"));
                 AddCellToBody(tableLayout, value: documentoTriturado.DocDescripcion);
                 AddCellToBody(tableLayout, value: bancos.Find(x => x.BancoID.Equals(documentoTriturado.DocBancoID)).BancoNombre); //Tipo de banco.
                 AddCellToBody(tableLayout, value: agencias.Find(x => x.AgenciaID.Equals(documentoTriturado.DocAgenciaID)).AgenciaNombre); //Agencia de origen del documento.
@@ -636,7 +761,7 @@ namespace SyT_FileManager.Controllers
 
         private void AddCellToHeader(PdfPTable tableLayout, string columnName)
         {
-            tableLayout.AddCell(new PdfPCell(new Phrase(columnName, new Font() { Color = BaseColor.WHITE }))
+            tableLayout.AddCell(new PdfPCell(new Phrase(columnName, new Font() { Color = BaseColor.WHITE, Size = 9 }))
             {
                 HorizontalAlignment = Element.ALIGN_LEFT,
                 Padding = 5,
@@ -646,7 +771,7 @@ namespace SyT_FileManager.Controllers
 
         private void AddCellToBody(PdfPTable tableLayout, object value)
         {
-            tableLayout.AddCell(new PdfPCell(new Phrase(value.ToString(), new Font(Font.FontFamily.HELVETICA, 8f)))
+            tableLayout.AddCell(new PdfPCell(new Phrase(value.ToString(), new Font() { Size = 8 }))
             {
                 HorizontalAlignment = Element.ALIGN_LEFT,
                 Padding = 5,

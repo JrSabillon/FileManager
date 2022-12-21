@@ -20,6 +20,16 @@ namespace SyT_FileManager.DataAccess
 
         }
 
+        public List<RecursoItem> Get()
+        {
+            using (IDbConnection context = new SqlConnection(Constants.ConnectionString))
+            {
+                var data = context.GetAll<RecursoItem>().ToList();
+
+                return data;
+            }
+        }
+
         public List<RecursoItem> GetRecursoItems(string RecursoID)
         {
             using (IDbConnection context = new SqlConnection(Constants.ConnectionString))

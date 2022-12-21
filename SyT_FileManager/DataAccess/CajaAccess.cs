@@ -8,6 +8,7 @@ using Dapper;
 using SyT_FileManager.Models;
 using SyT_FileManager.AppCode;
 using Dapper.Contrib.Extensions;
+using SyT_FileManager.Models.POCO;
 
 namespace SyT_FileManager.DataAccess
 {
@@ -129,6 +130,17 @@ namespace SyT_FileManager.DataAccess
                     "ON c.AlmacenID = a.AlmacenID " +
                     "WHERE d.DocFechaVencimiento <= @Fecha AND c.CajaStatus = 'ACT' AND a.AlmacenTipo = @AlmacenTipo";
                 var data = context.Query<CajaModel>(query, new { Fecha = DateTime.Now.ToString("yyyy-MM-dd"), AlmacenTipo }).ToList();
+
+                return data;
+            }
+        }
+
+        internal List<GetCajasByAlmacenTipo_RP> GetCajasByAlmacenTipo_RP(CajasByAlmacenBusqueda busqueda, string UserId, string AlmacenTipo)
+        {
+            using (IDbConnection context = new SqlConnection(Constants.ConnectionString))
+            {
+                var values = new { UserId, AlmacenTipo, busqueda.FechaInicio, busqueda.FechaFin };
+                var data = context.Query<GetCajasByAlmacenTipo_RP>("GetCajasByAlmacenTipo_RP", values, commandType: CommandType.StoredProcedure).ToList();
 
                 return data;
             }

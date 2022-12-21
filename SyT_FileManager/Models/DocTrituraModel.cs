@@ -8,9 +8,11 @@ using SyT_FileManager.DataAccess;
 
 namespace SyT_FileManager.Models
 {
+    [Table("DocTritura")]
     public class DocTrituraModel
     {
         public int TrituraID { get; set; }
+        [ExplicitKey] //Llave explicita solo para borrar documentos(reversarlos de la trituración)
         public int DocID { get; set; }
         [Computed]
         [JsonIgnore]

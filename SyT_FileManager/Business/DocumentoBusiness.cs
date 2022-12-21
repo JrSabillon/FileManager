@@ -199,6 +199,22 @@ namespace SyT_FileManager.Business
             return TrituraID;
         }
 
+        public List<GetDocumentosTriturados_RP> GetDocumentosTriturados_RP(DocumentosTrituradosBusqueda busqueda, string UserId)
+        {
+            List<GetDocumentosTriturados_RP> data = DocumentoAccess.GetDocumentosTriturados_RP(busqueda, UserId);
+
+            if (busqueda.SearchTestigo && !string.IsNullOrEmpty(busqueda.NombreTestigo))
+                data = data.Where(x => x.TrituraNombreTestigo.ToLower().Contains(busqueda.NombreTestigo.ToLower())).ToList();
+            if (busqueda.SearchUser && !string.IsNullOrEmpty(busqueda.Usuario))
+                data = data.Where(x => x.TrituraUsuario.ToLower().Contains(busqueda.Usuario.ToLower())).ToList();
+            if (busqueda.SearchDocument && !string.IsNullOrEmpty(busqueda.TipoDocumento))
+                data = data.Where(x => x.TipoDocNombre.ToLower().Contains(busqueda.TipoDocumento.ToLower())).ToList();
+            if (busqueda.SearchAct && busqueda.TrituraID.HasValue)
+                data = data.Where(x => x.TrituraID == busqueda.TrituraID).ToList();
+
+            return data;
+        }
+
         public List<GetDocumentosPrestados_RP> GetDocumentosPrestados_RP(DocumentosPrestadosBusqueda busqueda, string UserId)
         {
             if (!busqueda.searchDates)

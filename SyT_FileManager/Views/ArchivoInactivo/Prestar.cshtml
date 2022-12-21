@@ -5,6 +5,7 @@
     bool searchDate = ViewBag.searchDate;
     bool searchAgency = ViewBag.searchAgency;
     bool searchBank = ViewBag.searchBank;
+    bool searchBox = ViewBag.searchBox;
 }
 
 <h2><i class="fa fa-handshake-o"></i> Prestar documentos</h2>
@@ -12,21 +13,25 @@
 
 @using (Html.BeginForm("Prestar", "ArchivoInactivo", FormMethod.Post))
 {
-    <div class="row">
-        <label class="col-12 col-md">Filtros: </label>
-        <div class="col-12 col-md custom-control custom-switch">
-            @Html.CheckBox("searchDate", searchDate, new { @class = "custom-control-input", id = "chk-searchDate", onchange = "handleCheckbox(this);" })
-            <label class="custom-control-label" for="chk-searchDate">Filtrar por fecha</label>
-        </div>
-        <div class="col-12 col-md custom-control custom-switch">
-            @Html.CheckBox("searchAgency", searchAgency, new { @class = "custom-control-input", id = "chk-searchAgency", onchange = "handleCheckbox(this);" })
-            <label class="custom-control-label" for="chk-searchAgency">Filtrar por agencia</label>
-        </div>
-        <div class="col-12 col-md custom-control custom-switch">
-            @Html.CheckBox("searchBank", searchBank, new { @class = "custom-control-input", id = "chk-searchBank", onchange = "handleCheckbox(this);" })
-            <label class="custom-control-label" for="chk-searchBank">Filtrar por banco</label>
-        </div>
+<div class="row">
+    <label class="col-12 col-md">Filtros: </label>
+    <div class="col-12 col-md custom-control custom-switch">
+        @Html.CheckBox("searchDate", searchDate, new { @class = "custom-control-input", id = "chk-searchDate", onchange = "handleCheckbox(this);" })
+        <label class="custom-control-label" for="chk-searchDate">Filtrar por fecha</label>
     </div>
+    <div class="col-12 col-md custom-control custom-switch">
+        @Html.CheckBox("searchAgency", searchAgency, new { @class = "custom-control-input", id = "chk-searchAgency", onchange = "handleCheckbox(this);" })
+        <label class="custom-control-label" for="chk-searchAgency">Filtrar por agencia</label>
+    </div>
+    <div class="col-12 col-md custom-control custom-switch">
+        @Html.CheckBox("searchBank", searchBank, new { @class = "custom-control-input", id = "chk-searchBank", onchange = "handleCheckbox(this);" })
+        <label class="custom-control-label" for="chk-searchBank">Filtrar por banco</label>
+    </div>
+    <div class="col-12 col-md custom-control custom-switch">
+        @Html.CheckBox("searchBox", searchBox, new { @class = "custom-control-input", id = "chk-searchBox", onchange = "handleCheckbox(this);" })
+        <label class="custom-control-label" for="chk-searchBox">Filtrar por No. caja</label>
+    </div>
+</div>
     <hr />
     <div class="form-group">
         <label>Documento a prestar</label>
@@ -57,6 +62,12 @@
             <div class="form-group">
                 <label>Banco</label>
                 @Html.DropDownList("Banco", null, "Seleccionar un banco", new { @class = "form-control col-12" })
+            </div>
+        </div>
+        <div class="col-12 col-md-6 col-xl-4 @(searchBox ? "" : "d-none")" id="col-searchBox">
+            <div class="form-group">
+                <label>#Caja</label>
+                @Html.TextBox("CajaID", null, new { @class = "form-control" })
             </div>
         </div>
     </div>
@@ -105,7 +116,7 @@
     </table>
 </div>
 <label>Página @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) de @Model.PageCount</label>
-@Html.PagedListPager(Model, page => Url.Action("Prestar", new { page, searchDate, searchBank, searchAgency, Agencia = ViewBag.selectedAgencia, Banco = ViewBag.selectedBank, TipoDocumento = ViewBag.selectedDocumento }), PagedListRenderOptions.OnlyShowFivePagesAtATime)
+@Html.PagedListPager(Model, page => Url.Action("Prestar", new { page, searchDate, searchBank, searchAgency, searchBox, Agencia = ViewBag.selectedAgencia, Banco = ViewBag.selectedBank, TipoDocumento = ViewBag.selectedDocumento, ViewBag.CajaID }), PagedListRenderOptions.OnlyShowFivePagesAtATime)
 <hr class="mt-0" />
 <div id="div-partial">
 

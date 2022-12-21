@@ -144,7 +144,7 @@ namespace SyT_FileManager.DataAccess
             });
         }
 
-        public List<DocumentoModel> GetDocumentosByDocTipoAndDocStatusAnd_CajaAlmacenID(int DocTipo, string DocStatus, int[] AlmacenID)
+        public List<DocumentoModel> GetDocumentosByDocTipoAndDocStatusAnd_CajaAlmacenID(int DocTipo, string DocStatus, int[] AlmacenID, int? CajaID, string Source = "INA")
         {
             List<DocumentoModel> data = new List<DocumentoModel>();
 
@@ -153,7 +153,10 @@ namespace SyT_FileManager.DataAccess
                 string query = "SELECT * FROM Documento d INNER JOIN Caja c " +
                     "ON d.CajaID = c.CajaID " +
                     "WHERE d.DocStatus = @DocStatus AND d.DocTipo = @DocTipo AND c.AlmacenID IN @AlmacenID AND c.CajaStatus = 'ACT'";
-                data = context.Query<DocumentoModel>(query, new { DocTipo, DocStatus, AlmacenID }).ToList();
+                query += CajaID.HasValue ? 
+                        Source == "ACT" ? " AND c.CajaActivaID = @CajaID" : " AND c.CajaInactivaID = @CajaID" 
+                    : string.Empty;
+                data = context.Query<DocumentoModel>(query, new { DocTipo, DocStatus, AlmacenID, CajaID }).ToList();
             }
 
             var CajaAccess = new CajaAccess();
@@ -264,6 +267,33 @@ namespace SyT_FileManager.DataAccess
             }
         }
 
+        public bool ReversarTrituracion(int DocID, int lote)
+        {
+            using (IDbConnection context = new SqlConnection(Constants.ConnectionString))
+            {
+                string query = "DELETE FROM DocTritura WHERE DocID = @DocID AND TrituraID = @lote";
+                var values = new { DocID, lote };
+
+                int affectedRows = context.Execute(query, values);
+
+                if(affectedRows > 0)
+                {
+                    query = "UPDATE Documento SET DocStatus = 'ACT', DocFechaTrituracion = NULL WHERE DocID = @DocID";
+                    int affectedRowsDoc = context.Execute(query, values);
+
+                    if(affectedRowsDoc > 0)
+                    {
+                        var documento = GetDocumento(DocID);
+                        query = "UPDATE Caja SET CajaStatus = 'ACT' WHERE CajaID = @CajaID";
+
+                        context.Execute(query, new { documento.CajaID });
+                    }
+                }
+
+                return affectedRows > 0;
+            }
+        }
+
         internal List<DocTrituraModel> GetDocTrituraByTrituraID(int? lote)
         {
             using (IDbConnection context = new SqlConnection(Constants.ConnectionString))
@@ -283,6 +313,17 @@ namespace SyT_FileManager.DataAccess
                 var data = context.Execute(query, new { TrituraNombreTestigo, lote });
 
                 return data > 0;
+            }
+        }
+
+        public List<GetDocumentosTriturados_RP> GetDocumentosTriturados_RP(DocumentosTrituradosBusqueda busqueda, string UserId)
+        {
+            using (IDbConnection context = new SqlConnection(Constants.ConnectionString))
+            {
+                var values = new { busqueda.FechaInicio, busqueda.FechaFin, UserId };
+                var data = context.Query<GetDocumentosTriturados_RP>("GetDocumentosTriturados_RP", values, commandType: CommandType.StoredProcedure).ToList();
+
+                return data;
             }
         }
 

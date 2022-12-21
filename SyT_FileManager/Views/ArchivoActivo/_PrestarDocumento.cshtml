@@ -11,6 +11,34 @@
 
 <br />
 
+<div class="card mb-2">
+    <div class="card-header">
+        Ubicación de la caja
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-12">
+                <label class="font-weight-bold">Almacen:</label> @ViewBag.Almacen
+            </div>
+            <div class="col-6 col-md-4">
+                <label class="font-weight-bold">Estante:</label> @ViewBag.Estante
+            </div>
+            <div class="col-6 col-md-4">
+                <label class="font-weight-bold">Seccion:</label> @ViewBag.Seccion
+            </div>
+            <div class="col-6 col-md-4">
+                <label class="font-weight-bold">Nivel:</label> @ViewBag.Nivel
+            </div>
+            <div class="col-6 col-md-4">
+                <label class="font-weight-bold">Fila:</label> @ViewBag.Fila
+            </div>
+            <div class="col-6 col-md-4">
+                <label class="font-weight-bold">Ubicacion:</label> @ViewBag.Ubicacion
+            </div>
+        </div>
+    </div>
+</div>
+
 @using (Html.BeginForm("_PrestarDocumento", "ArchivoActivo", FormMethod.Post)) 
 {
     @Html.HiddenFor(model => model.CajaID)

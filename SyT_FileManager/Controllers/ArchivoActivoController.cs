@@ -364,7 +364,7 @@ namespace SyT_FileManager.Controllers
         public ActionResult Prestar(int? page, PrestarDocumentoBusqueda busqueda, string id = "ACT")
         {
             List<AlmacenModel> usuarioAlmacen = AlmacenAccess.GetAlmacenesByUsuarioAndTipoAlmacen(id, Constants.GetUserData().UserId);
-            var model = DocumentoAccess.GetDocumentosByDocTipoAndDocStatusAnd_CajaAlmacenID(busqueda.TipoDocumento, "ACT", usuarioAlmacen.Select(x => x.AlmacenID).ToArray());
+            var model = DocumentoAccess.GetDocumentosByDocTipoAndDocStatusAnd_CajaAlmacenID(busqueda.TipoDocumento, "ACT", usuarioAlmacen.Select(x => x.AlmacenID).ToArray(), busqueda.searchBox ? busqueda.CajaID : null, "ACT");
 
             ViewBag.TipoDocumento = new SelectList(TipoDocumentoAccess.GetTipoDocumentos(), "TipoDocID", "TipoDocNombre", busqueda.TipoDocumento);
             ViewBag.Agencia = new SelectList(AgenciaAccess.GetAgencias(), "AgenciaID", "AgenciaNombre", busqueda.Agencia);
@@ -373,9 +373,11 @@ namespace SyT_FileManager.Controllers
             ViewBag.searchDate = busqueda.searchDate;
             ViewBag.searchAgency = busqueda.searchAgency;
             ViewBag.searchBank = busqueda.searchBank;
+            ViewBag.searchBox = busqueda.searchBox;
             ViewBag.selectedAgency = busqueda.Agencia;
             ViewBag.selectedBank = busqueda.Banco;
             ViewBag.selectedDocumento = busqueda.TipoDocumento;
+            ViewBag.CajaID = busqueda.CajaID;
 
             ///Filtrar modelo segun criterios de busqueda
             if (busqueda.searchAgency)
@@ -405,11 +407,23 @@ namespace SyT_FileManager.Controllers
 
         public ActionResult _PrestarDocumento(int CajaID, int DocID, string NombreDocumento, int? CajaActivaID)
         {
-            var model = new DocPrestamo();
-            model.Departamentos = OrganizacionAccess.GetEstructuraInicial();
-            model.PrestFechaSolicitud = DateTime.Now;
-            model.CajaID = CajaID;
-            model.DocID = DocID;
+            var model = new DocPrestamo
+            {
+                Departamentos = OrganizacionAccess.GetEstructuraInicial(),
+                PrestFechaSolicitud = DateTime.Now,
+                CajaID = CajaID,
+                DocID = DocID
+            };
+            var caja = CajaAccess.GetCaja(CajaID);
+            var recursos = RecursoAccess.Get();
+            var almacen = AlmacenAccess.GetAlmacen(caja.AlmacenID);
+
+            ViewBag.Almacen = almacen?.AlmacenNombre;
+            ViewBag.Estante = recursos.Where(x => x.RecursoItemID == caja.CajaEstante && x.RecursoID == "STNTNUM").FirstOrDefault().RecursoItemNombre;
+            ViewBag.Seccion = recursos.Where(x => x.RecursoItemID == caja.CajaSeccion && x.RecursoID == "STNTSEC").FirstOrDefault().RecursoItemNombre;
+            ViewBag.Nivel = recursos.Where(x => x.RecursoItemID == caja.CajaNivel && x.RecursoID == "STNTNIV").FirstOrDefault().RecursoItemNombre;
+            ViewBag.Fila = recursos.Where(x => x.RecursoItemID == caja.CajaFila && x.RecursoID == "STNTFIL").FirstOrDefault().RecursoItemNombre;
+            ViewBag.Ubicacion = recursos.Where(x => x.RecursoItemID == caja.CajaUbicacion && x.RecursoID == "STNTUBI").FirstOrDefault().RecursoItemNombre;
 
             ViewBag.NombreDocumento = NombreDocumento;
             ViewBag.CajaActivaID = CajaActivaID;

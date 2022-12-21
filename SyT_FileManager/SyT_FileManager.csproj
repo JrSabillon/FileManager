@@ -56,6 +56,15 @@
     <Reference Include="Dapper.Contrib, Version=1.60.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Dapper.Contrib.1.60.1\lib\net451\Dapper.Contrib.dll</HintPath>
     </Reference>
+    <Reference Include="EPPlus, Version=6.1.1.0, Culture=neutral, PublicKeyToken=ea159fdaa78159a1, processorArchitecture=MSIL">
+      <HintPath>..\packages\EPPlus.6.1.1\lib\net35\EPPlus.dll</HintPath>
+    </Reference>
+    <Reference Include="EPPlus.Interfaces, Version=6.1.1.0, Culture=neutral, PublicKeyToken=a694d7f3b0907a61, processorArchitecture=MSIL">
+      <HintPath>..\packages\EPPlus.Interfaces.6.1.1\lib\net35\EPPlus.Interfaces.dll</HintPath>
+    </Reference>
+    <Reference Include="EPPlus.System.Drawing, Version=6.1.1.0, Culture=neutral, PublicKeyToken=2308d35469c9bac0, processorArchitecture=MSIL">
+      <HintPath>..\packages\EPPlus.System.Drawing.6.1.1\lib\net35\EPPlus.System.Drawing.dll</HintPath>
+    </Reference>
     <Reference Include="itextsharp, Version=5.5.13.2, Culture=neutral, PublicKeyToken=8354ae6d2174ddca, processorArchitecture=MSIL">
       <HintPath>..\packages\iTextSharp.5.5.13.2\lib\itextsharp.dll</HintPath>
     </Reference>
@@ -66,11 +75,14 @@
     <Reference Include="PagedList.Mvc, Version=4.5.0.0, Culture=neutral, PublicKeyToken=abbb863e9397c5e1, processorArchitecture=MSIL">
       <HintPath>..\packages\PagedList.Mvc.4.5.0.0\lib\net40\PagedList.Mvc.dll</HintPath>
     </Reference>
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Data.Linq" />
     <Reference Include="System.DirectoryServices.AccountManagement" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Security" />
     <Reference Include="System.Web.DynamicData" />
     <Reference Include="System.Web.Entity" />
     <Reference Include="System.Web.ApplicationServices" />
@@ -132,6 +144,7 @@
       <Private>True</Private>
       <HintPath>..\packages\Antlr.3.5.0.2\lib\Antlr3.Runtime.dll</HintPath>
     </Reference>
+    <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Microsoft.CodeDom.Providers.DotNetCompilerPlatform">
@@ -194,12 +207,16 @@
     <Compile Include="Models\DocTrituraModel.cs" />
     <Compile Include="Models\DocumentoModel.cs" />
     <Compile Include="Models\EstructuraOrganizacionalModel.cs" />
+    <Compile Include="Models\GetCajasByAlmacenTipo_RP.cs" />
     <Compile Include="Models\GetDocumentosPrestados_RP.cs" />
+    <Compile Include="Models\GetDocumentosTriturados_RP.cs" />
     <Compile Include="Models\GetDocumentos_RP.cs" />
     <Compile Include="Models\GetUsuarios_RP.cs" />
+    <Compile Include="Models\POCO\CajasByAlmacenBusqueda.cs" />
     <Compile Include="Models\POCO\BitacoraAuditoriaBusqueda.cs" />
     <Compile Include="Models\POCO\DocumentosBusqueda.cs" />
     <Compile Include="Models\POCO\DocumentosPrestadosBusqueda.cs" />
+    <Compile Include="Models\POCO\DocumentosTrituradosBusqueda.cs" />
     <Compile Include="Models\POCO\EnviarCajaBusqueda.cs" />
     <Compile Include="Models\POCO\PrestarDocumentoBusqueda.cs" />
     <Compile Include="Models\POCO\ReportType.cs" />
@@ -454,6 +471,12 @@
     <Content Include="Views\Reportes\_Roles.cshtml" />
     <Content Include="Views\Reportes\partials\_RolDetalles.cshtml" />
     <Content Include="Views\Bitacora\Index.cshtml" />
+    <Content Include="Views\Reportes\_DocumentosTriturados.cshtml" />
+    <Content Include="Views\Reportes\partials\_DocumentosTrituradosTable.cshtml" />
+    <Content Include="Views\Reportes\_ArchivoActivo.cshtml" />
+    <Content Include="Views\Reportes\_ArchivoInactivo.cshtml" />
+    <Content Include="Views\Reportes\partials\_ArchivoActivoTable.cshtml" />
+    <Content Include="Views\Reportes\partials\_ArchivoInactivoTable.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
