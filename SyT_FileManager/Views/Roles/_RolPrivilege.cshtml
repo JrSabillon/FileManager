@@ -16,55 +16,76 @@
 
                     if (childrens.Count() > 0)
                     {
-                        <li class="list-group-item" id="list-@item.PrivId">
-                            <label>@(position + 1).-</label>
-                            @Html.HiddenFor(model => model[position].PrivId)
-                            @Html.CheckBoxFor(model => model[position].Selected, new { onclick = $"checkAll(this, '#collapse-{item.PrivId}');" })
-                            <span>@item.PrivNombre</span> <button class="btn btn-enterprise btn-sm float-right shadow" type="button" data-toggle="collapse" data-target="#collapse-@item.PrivId"><i class="fa fa-chevron-circle-down"></i></button>
-                            <div class="collapse" id="collapse-@item.PrivId">
-                                <ul class="list-group mt-3">
-                                    @foreach (var child in childrens)
-                                    {
-                                        position++;
-                                        var subchildrens = Model.Where(x => x.PrivId.StartsWith(child.PrivId + "_") && x.PrivNivelOrden.Equals("2"));
+                <li class="list-group-item" id="list-@item.PrivId">
+                    <label>@(position + 1).-</label>
+                    @Html.HiddenFor(model => model[position].PrivId)
+                    @if (ViewBag.RolId == "SECADM" && item.PrivId.Equals("MODI"))
+                    {
+                        @Html.CheckBoxFor(model => model[position].Selected, new { disabled = "disabled" })
+                    }
+                    else
+                    {
+                        @Html.CheckBoxFor(model => model[position].Selected, new { onclick = $"checkAll(this, '#collapse-{item.PrivId}');" })
+                    }
+                    <span>@item.PrivNombre</span> <button class="btn btn-enterprise btn-sm float-right shadow" type="button" data-toggle="collapse" data-target="#collapse-@item.PrivId"><i class="fa fa-chevron-circle-down"></i></button>
+                    <div class="collapse" id="collapse-@item.PrivId">
+                        <ul class="list-group mt-3">
+                            @foreach (var child in childrens)
+                            {
+                                position++;
+                                var subchildrens = Model.Where(x => x.PrivId.StartsWith(child.PrivId + "_") && x.PrivNivelOrden.Equals("2"));
 
-                                        if (subchildrens.Count() > 0)
+                                if (subchildrens.Count() > 0)
+                                {
+                                    <li class="list-group-item" id="list-@child.PrivId">
+                                        <label>@(position + 1).-</label>
+                                        @Html.HiddenFor(model => model[position].PrivId)
+                                        @if (ViewBag.RolId == "SECADM" && child.PrivId.StartsWith("MODI_"))
                                         {
-                                            <li class="list-group-item" id="list-@child.PrivId">
-                                                <label>@(position + 1).-</label>
-                                                @Html.HiddenFor(model => model[position].PrivId)
-                                                @Html.CheckBoxFor(model => model[position].Selected, new { onclick = $"checkParent(this, '#list-{item.PrivId}', '#collapse-{child.PrivId}')" })
-                                                <span>@child.PrivNombre</span> <button class="btn btn-enterprise btn-sm float-right shadow" type="button" data-toggle="collapse" data-target="#collapse-@child.PrivId"><i class="fa fa-chevron-circle-down"></i></button>
-                                                <div class="collapse" id="collapse-@child.PrivId">
-                                                    <ul class="list-group mt-3">
-                                                        @foreach (var subchild in subchildrens)
-                                                        {
-                                                            position++;
-                                                            
-                                                            <li class="list-group-item">
-                                                                <label>@(position + 1).-</label>
-                                                                @Html.HiddenFor(model => model[position].PrivId)
-                                                                @Html.CheckBoxFor(model => model[position].Selected, new { onclick = $"checkSubParent(this, '#list-{child.PrivId}', '#collapse-{child.PrivId}')" })
-                                                                <span>@subchild.PrivNombre</span>
-                                                            </li>
-                                                        }
-                                                    </ul>
-                                                </div>
-                                            </li>
+                                            @Html.CheckBoxFor(model => model[position].Selected, new { disabled = "disabled" })
                                         }
                                         else
                                         {
-                                            <li class="list-group-item">
-                                                <label>@(position + 1).-</label>
-                                                @Html.HiddenFor(model => model[position].PrivId)
-                                                @Html.CheckBoxFor(model => model[position].Selected, new { onclick = $"checkParent(this, '#list-{item.PrivId}', '#collapse-{item.PrivId}')" })
-                                                <span>@child.PrivNombre</span>
-                                            </li>
+                                            @Html.CheckBoxFor(model => model[position].Selected, new { onclick = $"checkParent(this, '#list-{item.PrivId}', '#collapse-{child.PrivId}')" })
                                         }
-                                    }
-                                </ul>
-                            </div>
-                        </li>
+                                        <span>@child.PrivNombre</span> <button class="btn btn-enterprise btn-sm float-right shadow" type="button" data-toggle="collapse" data-target="#collapse-@child.PrivId"><i class="fa fa-chevron-circle-down"></i></button>
+                                        <div class="collapse" id="collapse-@child.PrivId">
+                                            <ul class="list-group mt-3">
+                                                @foreach (var subchild in subchildrens)
+                                                {
+                                                    position++;
+
+                                                <li class="list-group-item">
+                                                    <label>@(position + 1).-</label>
+                                                    @Html.HiddenFor(model => model[position].PrivId)
+                                                    @if (ViewBag.RolId == "SECADM" && child.PrivId.StartsWith("MODI_"))
+                                                    {
+                                                        @Html.CheckBoxFor(model => model[position].Selected, new { disabled = "disabled" })
+                                                    }
+                                                    else
+                                                    {
+                                                        @Html.CheckBoxFor(model => model[position].Selected, new { onclick = $"checkSubParent(this, '#list-{child.PrivId}', '#collapse-{child.PrivId}')" })
+                                                    }
+                                                    <span>@subchild.PrivNombre</span>
+                                                </li>
+                                                }
+                                            </ul>
+                                        </div>
+                                    </li>
+                                }
+                                else
+                                {
+                                    <li class="list-group-item">
+                                        <label>@(position + 1).-</label>
+                                        @Html.HiddenFor(model => model[position].PrivId)
+                                        @Html.CheckBoxFor(model => model[position].Selected, new { onclick = $"checkParent(this, '#list-{item.PrivId}', '#collapse-{item.PrivId}')" })
+                                        <span>@child.PrivNombre</span>
+                                    </li>
+                                }
+                            }
+                        </ul>
+                    </div>
+                </li>
 
                         position++;
                     }
