@@ -6,6 +6,8 @@
         @for (int i = 0; i < Model.Count; i++)
         {
             @Html.HiddenFor(x => Model[i].TipoDocNombre)
+            @Html.HiddenFor(x => Model[i].DocDescripcion)
+            @Html.HiddenFor(x => Model[i].NombreDepartamento)
             @Html.HiddenFor(x => Model[i].PrestNombreSolicitante)
             @Html.HiddenFor(x => Model[i].PrestEmailSolicitante)
             @Html.HiddenFor(x => Model[i].PrestObservacion)
@@ -19,6 +21,8 @@
         <thead>
             <tr>
                 <th id="TipoDocNombre">Documento</th>
+                <th id="DocDescripcion">Descripción</th>
+                <th id="Departamento">Departamento</th>
                 <th id="PrestNombreSolicitante">Solicitante</th>
                 <th id="PrestEmailSolicitante">Correo</th>
                 <th id="PrestObservacion">Observación</th>
@@ -50,6 +54,8 @@
             {
                 <tr>
                     <td>@item.TipoDocNombre</td>
+                    <td>@item.DocDescripcion</td>
+                    <td>@item.NombreDepartamento</td>
                     <td>@item.PrestNombreSolicitante</td>
                     <td>@item.PrestEmailSolicitante</td>
                     <td>@item.PrestObservacion</td>

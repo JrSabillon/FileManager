@@ -227,7 +227,7 @@ namespace SyT_FileManager.Business
             if (busqueda.searchAgency && !string.IsNullOrEmpty(busqueda.AgenciaID))
                 data = data.Where(x => x.DocAgenciaID == busqueda.AgenciaID).ToList();
             if (busqueda.searchDepartment && !string.IsNullOrEmpty(busqueda.Departamento))
-                data = data.Where(x => x.Departamento == busqueda.Departamento).ToList();
+                data = data.Where(x => x.Departamento == Convert.ToInt32(busqueda.Departamento)).ToList();
             if (busqueda.searchTerm && !string.IsNullOrEmpty(busqueda.PlazoRetencion))
                 data = data.Where(x => x.TipoDocPlazo == busqueda.PlazoRetencion).ToList();
 

@@ -15,5 +15,6 @@ namespace SyT_FileManager.Models
         public int TipoDocPlazo { get; set; }
         public string AgenciaNombre { get; set; }
         public string Departamento { get; set; }
+        public string DocDescripcion { get; set; }
     }
 }

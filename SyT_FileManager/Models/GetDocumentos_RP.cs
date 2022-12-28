@@ -26,6 +26,7 @@ namespace SyT_FileManager.Models
         public string TipoDocPlazo { get; set; }
         public string TipoDocNombre { get; set; }
         public string AgenciaNombre { get; set; }
+        public string AlmacenNombre { get; set; }
         public List<AlmacenModel> Almacenes { get; set; }
         public AlmacenModel SelectedAlmacen { 
             get

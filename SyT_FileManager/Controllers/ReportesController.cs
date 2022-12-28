@@ -106,7 +106,11 @@ namespace SyT_FileManager.Controllers
         public ActionResult _DocumentosPrestados(DocumentosPrestadosBusqueda busqueda)
         {
             DocumentoBusiness = new DocumentoBusiness();
+            OrganizacionAccess = new OrganizacionAccess();
             var model = DocumentoBusiness.GetDocumentosPrestados_RP(busqueda, Constants.GetUserData().UserId);
+            var departamentos = OrganizacionAccess.GetEstructuraInicial();
+
+            model.ForEach(item => item.NombreDepartamento = departamentos.Where(x => x.EstOrgaID == item.Departamento).FirstOrDefault().EstOrgaNombre);
 
             return PartialView("./partials/_DocumentosPrestadosTable", model);
         }
@@ -251,8 +255,8 @@ namespace SyT_FileManager.Controllers
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
             ExcelPackage Ep = new ExcelPackage();
 
-            ExcelWorksheet sheet = Ep.Workbook.Worksheets.Add("Usuarios");
-            sheet.Cells["A1:H1"].Style.Font.Bold = true;
+            ExcelWorksheet sheet = Ep.Workbook.Worksheets.Add("Documentos");
+            sheet.Cells["A1:I1"].Style.Font.Bold = true;
             sheet.Cells["A1"].Value = "Documento";
             sheet.Cells["B1"].Value = "Descripción";
             sheet.Cells["C1"].Value = "Fecha";
@@ -261,11 +265,13 @@ namespace SyT_FileManager.Controllers
             sheet.Cells["F1"].Value = "#Caja";
             sheet.Cells["G1"].Value = "Agencia";
             sheet.Cells["H1"].Value = "Departamento";
+            sheet.Cells["I1"].Value = "Almacen";
 
             var almacenes = new AlmacenAccess().GetAlmacenes();
             int row = 2;
             foreach (var item in data)
             {
+                var almacen = almacenes.Where(x => x.AlmacenID == item.AlmacenID).FirstOrDefault();
                 sheet.Cells[$"A{row}"].Value = item.TipoDocNombre;
                 sheet.Cells[$"B{row}"].Value = item.DocDescripcion;
                 sheet.Cells[$"C{row}"].Value = item.DocFechaInfo;
@@ -273,9 +279,10 @@ namespace SyT_FileManager.Controllers
                 sheet.Cells[$"D{row}"].Value = item.TipoDocPlazo;
                 sheet.Cells[$"E{row}"].Value = item.DocFechaVencimiento;
                 sheet.Cells[$"E{row}"].Style.Numberformat.Format = "yyyy-MM-dd";
-                sheet.Cells[$"F{row}"].Value = (almacenes.Where(x => x.AlmacenID == item.AlmacenID).FirstOrDefault()?.AlmacenTipo ?? "ACT") == "ACT" ? item.CajaActivaID : item.CajaInactivaID;
+                sheet.Cells[$"F{row}"].Value = (almacen?.AlmacenTipo ?? "ACT") == "ACT" ? item.CajaActivaID : item.CajaInactivaID;
                 sheet.Cells[$"G{row}"].Value = item.AgenciaNombre;
                 sheet.Cells[$"H{row}"].Value = item.Departamento;
+                sheet.Cells[$"I{row}"].Value = almacen.AlmacenNombre;
 
                 row++;
             }
@@ -300,8 +307,8 @@ namespace SyT_FileManager.Controllers
             Document doc = new Document(PageSize.A4);
             doc.SetMargins(25f, 25f, 10f, 10f);
 
-            string[] columnNames = new string[] { "Documento", "Descripción", "Fecha", "Plazo", "Vencimiento", "#Caja", "Agencia", "Departamento" };
-            float[] columnWidths = new float[] { 15, 15, 10, 10, 10, 10, 15, 15 };
+            string[] columnNames = new string[] { "Documento", "Descripción", "Fecha", "Plazo", "Vencimiento", "#Caja", "Agencia", "Departamento", "Almacen" };
+            float[] columnWidths = new float[] { 15, 15, 10, 10, 10, 10, 15, 15, 15 };
             PdfPTable tableLayout = new PdfPTable(columnWidths.Length);
             var writer = PdfWriter.GetInstance(doc, workStream);
             writer.CloseStream = false;
@@ -320,14 +327,16 @@ namespace SyT_FileManager.Controllers
 
             foreach (var item in documentos)
             {
+                var almacen = almacenes.Where(x => x.AlmacenID == item.AlmacenID).FirstOrDefault();
                 AddCellToBody(tableLayout, item.TipoDocNombre);
                 AddCellToBody(tableLayout, item.DocDescripcion);
                 AddCellToBody(tableLayout, item.DocFechaInfo.ToString("yyyy-MM-dd"));
                 AddCellToBody(tableLayout, $"{item.TipoDocPlazo} año(s)");
                 AddCellToBody(tableLayout, item.DocFechaVencimiento.ToString("yyyy-MM-dd"));
-                AddCellToBody(tableLayout, (almacenes.Where(x => x.AlmacenID == item.AlmacenID).FirstOrDefault()?.AlmacenTipo ?? "ACT") == "ACT" ? item.CajaActivaID : item.CajaInactivaID);
+                AddCellToBody(tableLayout, (almacen?.AlmacenTipo ?? "ACT") == "ACT" ? item.CajaActivaID : item.CajaInactivaID);
                 AddCellToBody(tableLayout, item.AgenciaNombre);
                 AddCellToBody(tableLayout, item.Departamento);
+                AddCellToBody(tableLayout, almacen.AlmacenNombre);
             }
 
             doc.Add(table);
@@ -344,33 +353,40 @@ namespace SyT_FileManager.Controllers
 
         private byte[] PrintDocumentosPrestadosExcel(List<GetDocumentosPrestados_RP> data)
         {
+            OrganizacionAccess = new OrganizacionAccess();
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
             ExcelPackage Ep = new ExcelPackage();
 
-            ExcelWorksheet sheet = Ep.Workbook.Worksheets.Add("Usuarios");
-            sheet.Cells["A1:H1"].Style.Font.Bold = true;
+            ExcelWorksheet sheet = Ep.Workbook.Worksheets.Add("Documentos prestados");
+            sheet.Cells["A1:J1"].Style.Font.Bold = true;
             sheet.Cells["A1"].Value = "Documento";
-            sheet.Cells["B1"].Value = "Solicitante";
-            sheet.Cells["C1"].Value = "Correo";
-            sheet.Cells["D1"].Value = "Observación";
-            sheet.Cells["E1"].Value = "Fecha solicitó";
-            sheet.Cells["F1"].Value = "Fecha retiró";
-            sheet.Cells["G1"].Value = "Dias prestados";
-            sheet.Cells["H1"].Value = "Usuario entrego";
+            sheet.Cells["B1"].Value = "Descripción";
+            sheet.Cells["C1"].Value = "Departamento";
+            sheet.Cells["D1"].Value = "Solicitante";
+            sheet.Cells["E1"].Value = "Correo";
+            sheet.Cells["F1"].Value = "Observación";
+            sheet.Cells["G1"].Value = "Fecha solicitó";
+            sheet.Cells["H1"].Value = "Fecha retiró";
+            sheet.Cells["I1"].Value = "Dias prestados";
+            sheet.Cells["J1"].Value = "Usuario entrego";
 
             int row = 2;
+            //var departamentos = OrganizacionAccess.GetEstructuraInicial();
             foreach (var item in data)
             {
+                //item.NombreDepartamento = departamentos.Where(x => x.EstOrgaID == item.Departamento).FirstOrDefault()?.EstOrgaNombre;
                 sheet.Cells[$"A{row}"].Value = item.TipoDocNombre;
-                sheet.Cells[$"B{row}"].Value = item.PrestNombreSolicitante;
-                sheet.Cells[$"C{row}"].Value = item.PrestEmailSolicitante;
-                sheet.Cells[$"D{row}"].Value = item.PrestObservacion ?? "";
-                sheet.Cells[$"E{row}"].Value = item.PrestFechaSolicitud;
-                sheet.Cells[$"E{row}"].Style.Numberformat.Format = "yyyy-MM-dd";
-                sheet.Cells[$"F{row}"].Value = item.PrestFechaRetira;
-                sheet.Cells[$"F{row}"].Style.Numberformat.Format = "yyyy-MM-dd";
-                sheet.Cells[$"G{row}"].Value = item.PrestPlazoMaximoDevolucion;
-                sheet.Cells[$"H{row}"].Value = item.PrestUsuarioEntrega;
+                sheet.Cells[$"B{row}"].Value = item.DocDescripcion;
+                sheet.Cells[$"C{row}"].Value = item.NombreDepartamento;
+                sheet.Cells[$"D{row}"].Value = item.PrestNombreSolicitante;
+                sheet.Cells[$"E{row}"].Value = item.PrestEmailSolicitante;
+                sheet.Cells[$"F{row}"].Value = item.PrestObservacion ?? "";
+                sheet.Cells[$"G{row}"].Value = item.PrestFechaSolicitud;
+                sheet.Cells[$"G{row}"].Style.Numberformat.Format = "yyyy-MM-dd";
+                sheet.Cells[$"H{row}"].Value = item.PrestFechaRetira;
+                sheet.Cells[$"H{row}"].Style.Numberformat.Format = "yyyy-MM-dd";
+                sheet.Cells[$"I{row}"].Value = item.PrestPlazoMaximoDevolucion;
+                sheet.Cells[$"J{row}"].Value = item.PrestUsuarioEntrega;
 
                 row++;
             }
@@ -381,6 +397,7 @@ namespace SyT_FileManager.Controllers
 
         public FileResult PrintDocumentosPrestados(List<GetDocumentosPrestados_RP> documentos, string extension)
         {
+            OrganizacionAccess = new OrganizacionAccess();
             var today = DateTime.Now;
             string fileName = $"DocumentosPrestados_{today:yyyyMMddHHmmss}{extension}";
 
@@ -395,8 +412,8 @@ namespace SyT_FileManager.Controllers
             Document doc = new Document(PageSize.A4);
             doc.SetMargins(25f, 25f, 10f, 10f);
 
-            string[] columnNames = new string[] { "Documento", "Solicitante", "Correo", "Observación", "Fecha solicitó", "Fecha retiró", "Dias prestado", "Usuario entrego" };
-            float[] columnWidths = new float[] { 15, 15, 15, 15, 10, 10, 10, 10 };
+            string[] columnNames = new string[] { "Documento", "Descripción", "Depto.", "Solicitante", "Correo", "Observación", "Solicitó", "Retiró", "Dias prest.", "Usuario" };
+            float[] columnWidths = new float[] { 15, 15, 15, 15, 15, 15, 10, 10, 10, 10 };
             PdfPTable tableLayout = new PdfPTable(columnWidths.Length);
             var writer = PdfWriter.GetInstance(doc, workStream);
             writer.CloseStream = false;
@@ -411,9 +428,13 @@ namespace SyT_FileManager.Controllers
             doc.Add(new Paragraph($"Fecha de generación: {DateTime.Now:yyyy-MM-dd}", new Font() { Size = 10 }));
             var table = GenerateTable(tableLayout, "\n", columnNames, columnWidths);
 
+            //var departamentos = OrganizacionAccess.GetEstructuraInicial();
             foreach (var item in documentos)
             {
+                //item.NombreDepartamento = departamentos.Where(x => x.EstOrgaID == item.Departamento).FirstOrDefault()?.EstOrgaNombre;
                 AddCellToBody(tableLayout, item.TipoDocNombre);
+                AddCellToBody(tableLayout, item.DocDescripcion);
+                AddCellToBody(tableLayout, item.NombreDepartamento);
                 AddCellToBody(tableLayout, item.PrestNombreSolicitante);
                 AddCellToBody(tableLayout, item.PrestEmailSolicitante);
                 AddCellToBody(tableLayout, item.PrestObservacion ?? "");
@@ -440,29 +461,31 @@ namespace SyT_FileManager.Controllers
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
             ExcelPackage Ep = new ExcelPackage();
 
-            ExcelWorksheet sheet = Ep.Workbook.Worksheets.Add("Usuarios");
-            sheet.Cells["A1:H1"].Style.Font.Bold = true;
+            ExcelWorksheet sheet = Ep.Workbook.Worksheets.Add("Documentos triturados");
+            sheet.Cells["A1:I1"].Style.Font.Bold = true;
             sheet.Cells["A1"].Value = "#Acta";
             sheet.Cells["B1"].Value = "Documentos";
-            sheet.Cells["C1"].Value = "Plazo";
-            sheet.Cells["D1"].Value = "Fecha trit.";
-            sheet.Cells["E1"].Value = "Usuario";
-            sheet.Cells["F1"].Value = "Testigo";
-            sheet.Cells["G1"].Value = "Agencia";
-            sheet.Cells["H1"].Value = "Departamento";
+            sheet.Cells["C1"].Value = "Descripción";
+            sheet.Cells["D1"].Value = "Plazo";
+            sheet.Cells["E1"].Value = "Fecha trit.";
+            sheet.Cells["F1"].Value = "Usuario";
+            sheet.Cells["G1"].Value = "Testigo";
+            sheet.Cells["H1"].Value = "Agencia";
+            sheet.Cells["I1"].Value = "Departamento";
 
             int row = 2;
             foreach (var item in data)
             {
                 sheet.Cells[$"A{row}"].Value = item.TrituraID;
                 sheet.Cells[$"B{row}"].Value = item.TipoDocNombre;
-                sheet.Cells[$"C{row}"].Value = item.TipoDocPlazo;
-                sheet.Cells[$"D{row}"].Value = item.TrituraFecha;
-                sheet.Cells[$"D{row}"].Style.Numberformat.Format = "yyyy-MM-dd";
-                sheet.Cells[$"E{row}"].Value = item.TrituraUsuario;
-                sheet.Cells[$"F{row}"].Value = item.TrituraNombreTestigo;
-                sheet.Cells[$"G{row}"].Value = item.AgenciaNombre;
-                sheet.Cells[$"H{row}"].Value = item.Departamento;
+                sheet.Cells[$"C{row}"].Value = item.DocDescripcion;
+                sheet.Cells[$"D{row}"].Value = item.TipoDocPlazo;
+                sheet.Cells[$"E{row}"].Value = item.TrituraFecha;
+                sheet.Cells[$"E{row}"].Style.Numberformat.Format = "yyyy-MM-dd";
+                sheet.Cells[$"F{row}"].Value = item.TrituraUsuario;
+                sheet.Cells[$"G{row}"].Value = item.TrituraNombreTestigo;
+                sheet.Cells[$"H{row}"].Value = item.AgenciaNombre;
+                sheet.Cells[$"I{row}"].Value = item.Departamento;
 
                 row++;
             }
@@ -487,8 +510,8 @@ namespace SyT_FileManager.Controllers
             Document doc = new Document(PageSize.A4);
             doc.SetMargins(25f, 25f, 10f, 10f);
 
-            string[] columnNames = new string[] { "#Acta", "Documento", "Plazo", "Fecha trit.", "Usuario", "Testigo", "Agencia", "Departamento" };
-            float[] columnWidths = new float[] { 10, 15, 10, 15, 10, 10, 15, 15 };
+            string[] columnNames = new string[] { "#Acta", "Documento", "Descripción", "Plazo", "Fecha trit.", "Usuario", "Testigo", "Agencia", "Depto." };
+            float[] columnWidths = new float[] { 10, 15, 15, 10, 15, 10, 10, 15, 15 };
             PdfPTable tableLayout = new PdfPTable(columnWidths.Length);
             var writer = PdfWriter.GetInstance(doc, workStream);
             writer.CloseStream = false;
@@ -507,6 +530,7 @@ namespace SyT_FileManager.Controllers
             {
                 AddCellToBody(tableLayout, item.TrituraID);
                 AddCellToBody(tableLayout, item.TipoDocNombre);
+                AddCellToBody(tableLayout, item.DocDescripcion);
                 AddCellToBody(tableLayout, $"{item.TipoDocPlazo} año(s)");
                 AddCellToBody(tableLayout, item.TrituraFecha.ToString("yyyy-MM-dd"));
                 AddCellToBody(tableLayout, item.TrituraUsuario);
@@ -532,7 +556,7 @@ namespace SyT_FileManager.Controllers
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
             ExcelPackage Ep = new ExcelPackage();
 
-            ExcelWorksheet sheet = Ep.Workbook.Worksheets.Add("Usuarios");
+            ExcelWorksheet sheet = Ep.Workbook.Worksheets.Add("Roles");
             sheet.Cells["A1:D1"].Style.Font.Bold = true;
             sheet.Cells["A1"].Value = "ID";
             sheet.Cells["B1"].Value = "Rol";
@@ -614,8 +638,9 @@ namespace SyT_FileManager.Controllers
             ExcelPackage Ep = new ExcelPackage();
             TipoDocumentoAccess tipoDocumentoAccess = new TipoDocumentoAccess();
             DocumentoAccess documentoAccess = new DocumentoAccess();
+            OrganizacionAccess = new OrganizacionAccess();
 
-            ExcelWorksheet sheet = Ep.Workbook.Worksheets.Add("Usuarios");
+            ExcelWorksheet sheet = Ep.Workbook.Worksheets.Add(TipoAlmacen.Equals("ACT") ? "Cajas archivo act." : "Cajas archivo ina.");
             sheet.Cells["A1:J1"].Style.Font.Bold = true;
             sheet.Cells["A1"].Value = "#Caja";
             sheet.Cells["B1"].Value = "Fecha";
@@ -626,14 +651,32 @@ namespace SyT_FileManager.Controllers
             sheet.Cells["G1"].Value = "Nivel";
             sheet.Cells["H1"].Value = "Fila";
             sheet.Cells["I1"].Value = "Ubicación";
-            sheet.Cells["J1"].Value = "Documentos";
+            //sheet.Cells["J1"].Value = "Documentos";
+
+            ExcelWorksheet sheetDocuments = Ep.Workbook.Worksheets.Add("Documentos");
+            sheetDocuments.Cells["A1:D1"].Style.Font.Bold = true;
+            sheetDocuments.Cells["A1"].Value = "#Caja";
+            sheetDocuments.Cells["B1"].Value = "Documento";
+            sheetDocuments.Cells["C1"].Value = "Descripción";
+            sheetDocuments.Cells["D1"].Value = "Departamento";
 
             var tiposDocumentos = tipoDocumentoAccess.GetTipoDocumentos();
+            var estructuraOrganizacional = OrganizacionAccess.GetAllEstructuraOrganizacional();
             int row = 2;
+            int rowDocuments = 2;
             foreach (var item in data)
             {
                 var documentos = documentoAccess.GetDocumentosByCajaID(item.CajaID);
-                documentos.ForEach(x => x.TiposDocumentos = tiposDocumentos);
+                documentos.ForEach(x => {
+                    var centroCosto = estructuraOrganizacional.Where(y => y.EstOrgaID == x.DocCCCCID).FirstOrDefault();
+                    x.TiposDocumentos = tiposDocumentos;
+                    sheetDocuments.Cells[$"A{rowDocuments}"].Value = TipoAlmacen.Equals("ACT") ? item.CajaActivaID : item.CajaInactivaID;
+                    sheetDocuments.Cells[$"B{rowDocuments}"].Value = x.SelectedDocumento.TipoDocNombre;
+                    sheetDocuments.Cells[$"C{rowDocuments}"].Value = x.DocDescripcion;
+                    sheetDocuments.Cells[$"D{rowDocuments}"].Value = estructuraOrganizacional.Where(y => y.EstOrgaID == centroCosto.EstOrgaIDPadre).FirstOrDefault().EstOrgaNombre;
+
+                    rowDocuments++;
+                });
 
                 sheet.Cells[$"A{row}"].Value = TipoAlmacen.Equals("ACT") ? item.CajaActivaID : item.CajaInactivaID;
                 sheet.Cells[$"B{row}"].Value = item.CajaFechaRecepcion;
@@ -645,12 +688,13 @@ namespace SyT_FileManager.Controllers
                 sheet.Cells[$"G{row}"].Value = item.Nivel;
                 sheet.Cells[$"H{row}"].Value = item.Fila;
                 sheet.Cells[$"I{row}"].Value = item.Ubicacion;
-                sheet.Cells[$"J{row}"].Value = string.Join(", ", documentos.Select(x => x.SelectedDocumento.TipoDocNombre));
+                //sheet.Cells[$"J{row}"].Value = string.Join(", ", documentos.Select(x => x.SelectedDocumento.TipoDocNombre));
 
                 row++;
             }
             sheet.Cells["A:AZ"].AutoFitColumns();
-
+            sheetDocuments.Cells["A:AZ"].AutoFitColumns();
+            
             return Ep.GetAsByteArray();
         }
 
@@ -667,6 +711,7 @@ namespace SyT_FileManager.Controllers
             }
 
             DocumentoAccess documentoAccess = new DocumentoAccess();
+            OrganizacionAccess = new OrganizacionAccess();
             TipoDocumentoAccess tipoDocumentoAccess = new TipoDocumentoAccess();
             MemoryStream workStream = new MemoryStream();
             Document doc = new Document(PageSize.A4);
@@ -689,10 +734,10 @@ namespace SyT_FileManager.Controllers
             //doc.Add(new Chunk("\n"));
             
             var tiposDocumentos = tipoDocumentoAccess.GetTipoDocumentos();
+            var estructuraOrganizacional = OrganizacionAccess.GetAllEstructuraOrganizacional();
             foreach (var item in cajas)
             {
                 var documentos = documentoAccess.GetDocumentosByCajaID(item.CajaID);
-                documentos.ForEach(x => x.TiposDocumentos = tiposDocumentos);
                 PdfPTable tableLayout = new PdfPTable(2);
                 var table = GenerateTable(tableLayout, "", new string[] { TipoAlmacen.Equals("ACT") ? $"#Caja: {item.CajaActivaID}" : $"#Caja: {item.CajaInactivaID}", $"Fecha: {item.CajaFechaRecepcion:yyyy-MM-dd}"}, new float[] { 50, 50 });
                 doc.Add(new Chunk("\n"));
@@ -705,10 +750,21 @@ namespace SyT_FileManager.Controllers
                 AddCellToBody(tableLayout, item.Fila);
                 AddCellToBody(tableLayout, item.Ubicacion);
                 doc.Add(table);
-                tableLayout = new PdfPTable(1);
-                table = GenerateTable(tableLayout, "", new string[] { "Documentos" }, new float[] { 100 });
-                AddCellToBody(tableLayout, string.Join(", ", documentos.Select(x => x.SelectedDocumento.TipoDocNombre)));
+                //tableLayout = new PdfPTable(1);
+                //table = GenerateTable(tableLayout, "", new string[] { "Documentos" }, new float[] { 100 });
+                //AddCellToBody(tableLayout, string.Join("\n", documentos.Select(x => x.SelectedDocumento.TipoDocNombre + " - " + x.DocDescripcion)));
+                //doc.Add(table);
+                tableLayout = new PdfPTable(3);
+                table = GenerateTable(tableLayout, "", new string[] { "Documento", "Descripción", "Departamento" }, new float[] { 40, 30, 30 });
+                documentos.ForEach(x => {
+                    var centroCosto = estructuraOrganizacional.Where(y => y.EstOrgaID == x.DocCCCCID).FirstOrDefault();
+                    x.TiposDocumentos = tiposDocumentos;
+                    AddCellToBody(tableLayout, x.SelectedDocumento.TipoDocNombre);
+                    AddCellToBody(tableLayout, x.DocDescripcion);
+                    AddCellToBody(tableLayout, estructuraOrganizacional.Where(y => y.EstOrgaID == centroCosto.EstOrgaIDPadre).FirstOrDefault().EstOrgaNombre);
+                });
                 doc.Add(table);
+
             }
 
             //doc.Add(table);
