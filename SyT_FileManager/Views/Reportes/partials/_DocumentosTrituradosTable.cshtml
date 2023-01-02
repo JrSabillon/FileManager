@@ -8,6 +8,7 @@
             @Html.HiddenFor(x => Model[i].AgenciaNombre)
             @Html.HiddenFor(x => Model[i].Departamento)
             @Html.HiddenFor(x => Model[i].TipoDocNombre)
+            @Html.HiddenFor(x => Model[i].DocDescripcion)
             @Html.HiddenFor(x => Model[i].TipoDocPlazo)
             @Html.HiddenFor(x => Model[i].TrituraFecha)
             @Html.HiddenFor(x => Model[i].TrituraID)
@@ -20,6 +21,7 @@
             <tr>
                 <th id="TrituraID">#Acta</th>
                 <th id="TipoDocNombre">Documento</th>
+                <th id="DocDescripcion">Descripción</th>
                 <th id="TipoDocPlazo">Plazo</th>
                 <th id="TrituraFecha">Fecha trit.</th>
                 <th id="TrituraUsuario">Usuario</th>
@@ -51,6 +53,7 @@
                 <tr>
                     <td>@item.TrituraID</td>
                     <td>@item.TipoDocNombre</td>
+                    <td>@item.DocDescripcion</td>
                     <td>@item.TipoDocPlazo Año(s)</td>
                     <td>@item.TrituraFecha.ToString("yyyy-MM-dd")</td>
                     <td>@item.TrituraUsuario</td>

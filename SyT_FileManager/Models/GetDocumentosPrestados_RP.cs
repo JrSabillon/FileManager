@@ -18,6 +18,8 @@ namespace SyT_FileManager.Models
         public string TipoDocNombre { get; set; }
         public string TipoDocPlazo { get; set; }
         public string DocAgenciaID { get; set; }
-        public string Departamento { get; set; }
+        public int Departamento { get; set; }
+        public string DocDescripcion { get; set; }
+        public string NombreDepartamento { get; set; }
     }
 }

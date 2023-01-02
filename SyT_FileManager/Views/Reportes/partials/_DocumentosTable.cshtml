@@ -28,6 +28,7 @@
                 <th id="CajaID">#Caja</th>
                 <th id="AgenciaNombre">Agencia</th>
                 <th id="Departamento">Departamento</th>
+                <th id="AlmacenNombre">Almacen</th>
                 <th>
                     @if (Model.Count > 0)
                     {
@@ -82,6 +83,7 @@
 
                         @Model[i].Departamento
                     </td>
+                    <td>@Model[i].SelectedAlmacen.AlmacenNombre</td>
                     <td>&nbsp;</td>
                 </tr>
             }
