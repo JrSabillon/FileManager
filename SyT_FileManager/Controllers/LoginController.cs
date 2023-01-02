@@ -34,25 +34,42 @@ namespace SyT_FileManager.Controllers
 
             try
             {
-                //using (PrincipalContext pc = new PrincipalContext(ContextType.Domain, ActiveDomain))
+                if (ActiveDomain.Equals(string.Empty))
                 {
-                    //if (pc.ValidateCredentials(User.UserId, UserPassword))
+                    var authUser = UsuarioAccess.GetUsuario(User.UserId);
+
+                    if (authUser != null)
                     {
-                        var authUser = UsuarioAccess.GetUsuario(User.UserId);
+                        CreateUserCookie(authUser);
 
-                        if (authUser != null)
-                        {
-                            CreateUserCookie(authUser);
-
-                            return RedirectToAction("Index", "Home");
-                        }
-
-                        ViewBag.Message = "Usuario no registrado";
-                        return View(User);
+                        return RedirectToAction("Index", "Home");
                     }
 
-                    ViewBag.Message = "Usuario ó Contraseña incorrectos";
+                    ViewBag.Message = "Usuario NO Registrado o Credenciales incorrectas [0]";
                     return View(User);
+                }
+                else
+                {
+                    using (PrincipalContext pc = new PrincipalContext(ContextType.Domain, ActiveDomain))
+                    {
+                        if (pc.ValidateCredentials(User.UserId, UserPassword))
+                        {
+                            var authUser = UsuarioAccess.GetUsuario(User.UserId);
+
+                            if (authUser != null)
+                            {
+                                CreateUserCookie(authUser);
+
+                                return RedirectToAction("Index", "Home");
+                            }
+
+                            ViewBag.Message = "Usuario NO Registrado o Credenciales incorrectas [2]";
+                            return View(User);
+                        }
+
+                        ViewBag.Message = "Usuario NO Registrado o Credenciales incorrectas [1]";
+                        return View(User);
+                    }
                 }
             }
             catch(PrincipalServerDownException LDAPexc)
