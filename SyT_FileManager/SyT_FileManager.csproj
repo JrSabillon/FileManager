@@ -245,6 +245,7 @@
     <Content Include="Content\imgs\background.png" />
     <Content Include="Content\imgs\background2.png" />
     <Content Include="Content\imgs\background3.png" />
+    <Content Include="Content\imgs\logo.png" />
     <Content Include="Content\imgs\SyTCorp_Logo.jfif" />
     <Content Include="Content\Login.css" />
     <Content Include="Content\PagedList.css" />
