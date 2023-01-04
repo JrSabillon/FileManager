@@ -34,5 +34,6 @@ namespace SyT_FileManager.Models
                 return Almacenes.Where(x => x.AlmacenID == AlmacenID).FirstOrDefault();
             }
         }
+        public List<RecursoItem> Recursos { get; set; }
     }
 }

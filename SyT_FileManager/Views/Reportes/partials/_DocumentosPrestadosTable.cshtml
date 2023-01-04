@@ -15,11 +15,13 @@
             @Html.HiddenFor(x => Model[i].PrestFechaRetira)
             @Html.HiddenFor(x => Model[i].PrestPlazoMaximoDevolucion)
             @Html.HiddenFor(x => Model[i].PrestUsuarioEntrega)
+            @Html.HiddenFor(x => Model[i].CajaID)
         }
     </div>
     <table class="table table-hover" id="table-documentos-prestados">
         <thead>
             <tr>
+                <th id="CajaID">#Caja</th>
                 <th id="TipoDocNombre">Documento</th>
                 <th id="DocDescripcion">Descripción</th>
                 <th id="Departamento">Departamento</th>
@@ -53,6 +55,7 @@
             @foreach (var item in Model)
             {
                 <tr>
+                    <td>@item.CajaID</td>
                     <td>@item.TipoDocNombre</td>
                     <td>@item.DocDescripcion</td>
                     <td>@item.NombreDepartamento</td>

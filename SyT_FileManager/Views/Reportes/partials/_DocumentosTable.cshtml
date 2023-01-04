@@ -15,6 +15,11 @@
             @Html.HiddenFor(x => Model[i].AlmacenID)
             @Html.HiddenFor(x => Model[i].AgenciaNombre)
             @Html.HiddenFor(x => Model[i].Departamento)
+            @Html.HiddenFor(x => Model[i].CajaEstante)
+            @Html.HiddenFor(x => Model[i].CajaSeccion)
+            @Html.HiddenFor(x => Model[i].CajaNivel)
+            @Html.HiddenFor(x => Model[i].CajaFila)
+            @Html.HiddenFor(x => Model[i].CajaUbicacion)
         }
     </div>
     <table class="table table-hover" id="table-documentos">
@@ -26,6 +31,11 @@
                 <th id="TipoDocPlazo">Plazo</th>
                 <th id="DocFechaVencimiento">Vencimiento</th>
                 <th id="CajaID">#Caja</th>
+                <th id="CajaEstante">Estante</th>
+                <th id="CajaSeccion">Sección</th>
+                <th id="CajaNivel">Nivel</th>
+                <th id="CajaFila">Fila</th>
+                <th id="CajaUbicacion">Ubicación</th>
                 <th id="AgenciaNombre">Agencia</th>
                 <th id="Departamento">Departamento</th>
                 <th id="AlmacenNombre">Almacen</th>
@@ -52,37 +62,19 @@
             @for (int i = 0; i < Model.Count; i++)
             {
                 <tr>
-                    <td>
-                        @Model[i].TipoDocNombre
-                    </td>
-                    <td>
-
-                        @Model[i].DocDescripcion
-                    </td>
-                    <td>
-
-                        @Model[i].DocFechaInfo.ToString("yyyy-MM-dd")
-                    </td>
-                    <td>
-
-                        @Model[i].TipoDocPlazo Año(s)
-                    </td>
-                    <td>
-
-                        @Model[i].DocFechaVencimiento.ToString("yyyy-MM-dd")
-                    </td>
-                    <td>
-
-                        @(Model[i].SelectedAlmacen.AlmacenTipo.Equals("ACT") ? Model[i].CajaActivaID : Model[i].CajaInactivaID)
-                    </td>
-                    <td>
-
-                        @Model[i].AgenciaNombre
-                    </td>
-                    <td>
-
-                        @Model[i].Departamento
-                    </td>
+                    <td>@Model[i].TipoDocNombre</td>
+                    <td>@Model[i].DocDescripcion</td>
+                    <td>@Model[i].DocFechaInfo.ToString("yyyy-MM-dd")</td>
+                    <td>@Model[i].TipoDocPlazo Año(s)</td>
+                    <td>@Model[i].DocFechaVencimiento.ToString("yyyy-MM-dd")</td>
+                    <td>@(Model[i].SelectedAlmacen.AlmacenTipo.Equals("ACT") ? Model[i].CajaActivaID : Model[i].CajaInactivaID)</td>
+                    <td>@(Model[i].Recursos.Where(x => x.RecursoID == "STNTNUM" && x.RecursoItemID == Model[i].CajaEstante).FirstOrDefault()?.RecursoItemNombre)</td>
+                    <td>@(Model[i].Recursos.Where(x => x.RecursoID == "STNTSEC" && x.RecursoItemID == Model[i].CajaSeccion).FirstOrDefault()?.RecursoItemNombre)</td>
+                    <td>@(Model[i].Recursos.Where(x => x.RecursoID == "STNTNIV" && x.RecursoItemID == Model[i].CajaNivel).FirstOrDefault()?.RecursoItemNombre)</td>
+                    <td>@(Model[i].Recursos.Where(x => x.RecursoID == "STNTFIL" && x.RecursoItemID == Model[i].CajaFila).FirstOrDefault()?.RecursoItemNombre)</td>
+                    <td>@(Model[i].Recursos.Where(x => x.RecursoID == "STNTUBI" && x.RecursoItemID == Model[i].CajaUbicacion).FirstOrDefault()?.RecursoItemNombre)</td>
+                    <td>@Model[i].AgenciaNombre</td>
+                    <td>@Model[i].Departamento</td>
                     <td>@Model[i].SelectedAlmacen.AlmacenNombre</td>
                     <td>&nbsp;</td>
                 </tr>

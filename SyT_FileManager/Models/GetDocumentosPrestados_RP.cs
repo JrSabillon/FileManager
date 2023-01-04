@@ -21,5 +21,6 @@ namespace SyT_FileManager.Models
         public int Departamento { get; set; }
         public string DocDescripcion { get; set; }
         public string NombreDepartamento { get; set; }
+        public int CajaID { get; set; }
     }
 }

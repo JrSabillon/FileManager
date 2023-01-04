@@ -16,5 +16,6 @@ namespace SyT_FileManager.Models
         public string AgenciaNombre { get; set; }
         public string Departamento { get; set; }
         public string DocDescripcion { get; set; }
+        public int CajaInactivaID { get; set; }
     }
 }
