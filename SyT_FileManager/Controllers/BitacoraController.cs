@@ -7,6 +7,7 @@ using SyT_FileManager.AppCode;
 using SyT_FileManager.DataAccess;
 using SyT_FileManager.Models.POCO;
 using PagedList;
+using SyT_FileManager.Models;
 
 namespace SyT_FileManager.Controllers
 {
@@ -16,14 +17,15 @@ namespace SyT_FileManager.Controllers
     {
         BitacoraAccess BitacoraAccess;
         // GET: Bitacora
-        public ActionResult Index(int? page, BitacoraAuditoriaBusqueda busqueda)
+        public ActionResult Index(int? page, BitacoraAuditoriaBusqueda busqueda, int? postback = 0)
         {
             BitacoraAccess = new BitacoraAccess();
-            var model = BitacoraAccess.GetAll();
+            var model = postback == 0 ? new List<BitacoraModel>() : BitacoraAccess.GetAll();
 
             ViewBag.SearchDate = busqueda.SearchDate;
             ViewBag.SearchActionType = busqueda.SearchActionType;
-            ViewBag.Accion = new SelectList(model.Select(x => x.Accion).Distinct());
+            //ViewBag.Accion = new SelectList(model.Select(x => x.Accion).Distinct());
+            ViewBag.Accion = new SelectList(BitacoraAccess.GetBitacoraAcciones());
             ViewBag.SelectedAccion = busqueda.Accion;
             ViewBag.FechaInicio = busqueda.FechaInicio;
             ViewBag.FechaFin = busqueda.FechaFin;

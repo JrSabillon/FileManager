@@ -42,6 +42,16 @@ namespace SyT_FileManager.DataAccess
             }
         }
 
+        internal List<string> GetBitacoraAcciones()
+        {
+            using (IDbConnection context = new SqlConnection(Constants.ConnectionString))
+            {
+                var data = context.Query<string>("SELECT DISTINCT Accion FROM Bitacora").ToList();
+
+                return data;
+            }
+        }
+
         public int NextBitacoraID()
         {
             using (IDbConnection context = new SqlConnection(Constants.ConnectionString))

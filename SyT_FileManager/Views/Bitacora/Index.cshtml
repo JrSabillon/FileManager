@@ -11,6 +11,7 @@
     <hr />
     @using (Html.BeginForm("Index", "Bitacora", FormMethod.Post))
     {
+        @Html.Hidden("postback", 1);
         <div class="row">
             <label class="col-12 col-md">Filtros: </label>
             <div class="col-12 col-md custom-control custom-switch">
